@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { GitBranch, Link as LinkIcon, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/section-heading";
@@ -14,13 +14,13 @@ const links = [
     label: "GitHub",
     href: "https://github.com/Jakey794",
     text: "github.com/Jakey794",
-    icon: Github,
+    icon: GitBranch,
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/jacob-allan-ml/",
     text: "linkedin.com/in/jacob-allan-ml",
-    icon: Linkedin,
+    icon: LinkIcon,
   },
 ];
 
