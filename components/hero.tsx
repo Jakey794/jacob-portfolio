@@ -5,9 +5,9 @@ import {
   ArrowRight,
   Cpu,
   Download,
-  GitBranch,
+  Github,
   GraduationCap,
-  Link as LinkIcon,
+  Linkedin,
   LineChart,
 } from "lucide-react";
 
@@ -103,7 +103,7 @@ export function Hero() {
                 />
               }
             >
-              <GitBranch aria-hidden="true" />
+              <Github aria-hidden="true" />
             </Button>
             <Button
               size="icon-lg"
@@ -119,7 +119,7 @@ export function Hero() {
                 />
               }
             >
-              <LinkIcon aria-hidden="true" />
+              <Linkedin aria-hidden="true" />
             </Button>
           </div>
         </motion.div>
@@ -164,7 +164,7 @@ export function Hero() {
                   </dt>
                   <dd className="font-medium text-slate-100">
                     Incident Triage Copilot, FormatClip, RF Signal
-                    Classification
+                    Classification Research
                   </dd>
                 </div>
               </dl>
