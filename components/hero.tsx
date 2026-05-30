@@ -5,9 +5,9 @@ import {
   ArrowRight,
   Cpu,
   Download,
-  Github,
+  GitBranch,
   GraduationCap,
-  Linkedin,
+  Link as LinkIcon,
   LineChart,
 } from "lucide-react";
 
@@ -103,7 +103,7 @@ export function Hero() {
                 />
               }
             >
-              <Github aria-hidden="true" />
+              <GitBranch aria-hidden="true" />
             </Button>
             <Button
               size="icon-lg"
@@ -119,7 +119,7 @@ export function Hero() {
                 />
               }
             >
-              <Linkedin aria-hidden="true" />
+              <LinkIcon aria-hidden="true" />
             </Button>
           </div>
         </motion.div>
