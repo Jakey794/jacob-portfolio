@@ -77,7 +77,8 @@ export const featuredProjects: Project[] = [
       "Quant Modeling",
     ],
     proof: [
-      "Engineered 10+ time-series indicators for regime-aware return prediction.",
+      "Engineered 10+ time-series indicators and trained 16 XGBoost return-prediction models.",
+      "Achieved 70% directional accuracy and 60% return accuracy on one year of unseen data.",
       "Built Streamlit app for regime classification, model comparison, and trade evaluation.",
     ],
   },
@@ -94,8 +95,9 @@ export const featuredProjects: Project[] = [
       "Data Pipelines",
     ],
     proof: [
-      "Curated large RF spectrogram dataset for real-world signal classification.",
-      "Improved noisy-band generalization through augmentation and spectrogram normalization.",
+      "Curated a 150K-sample, 5-class RF spectrogram dataset for real-world signal classification.",
+      "Achieved 90% average accuracy on unseen real-world signals.",
+      "Improved noisy-band generalization by 10% through augmentation, frequency-offset sampling, and spectrogram normalization.",
     ],
     statusLabel: "Research preview",
   },
