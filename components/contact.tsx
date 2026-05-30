@@ -1,4 +1,4 @@
-import { GitBranch, Link as LinkIcon, Mail } from "lucide-react";
+import { Github, Linkedin, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/section-heading";
@@ -14,13 +14,13 @@ const links = [
     label: "GitHub",
     href: "https://github.com/Jakey794",
     text: "github.com/Jakey794",
-    icon: GitBranch,
+    icon: Github,
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/jacob-allan-ml/",
     text: "linkedin.com/in/jacob-allan-ml",
-    icon: LinkIcon,
+    icon: Linkedin,
   },
 ];
 
@@ -50,19 +50,13 @@ export function Contact() {
                 <a
                   href={href}
                   target={href.startsWith("mailto:") ? undefined : "_blank"}
-                  rel={
-                    href.startsWith("mailto:")
-                      ? undefined
-                      : "noopener noreferrer"
-                  }
+                  rel={href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
                 />
               }
             >
               <Icon aria-hidden="true" className="size-5 text-cyan-300" />
               <span className="grid gap-1 whitespace-normal">
-                <span className="text-xs uppercase text-slate-500">
-                  {label}
-                </span>
+                <span className="text-xs uppercase text-slate-500">{label}</span>
                 <span className="break-all text-sm sm:text-base">{text}</span>
               </span>
             </Button>
