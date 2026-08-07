@@ -1,5 +1,19 @@
+/** Filter buckets used by the projects index. */
+export const projectCategories = [
+  "ML",
+  "Software",
+  "Quant",
+  "Research",
+] as const;
+
+export type ProjectCategory = (typeof projectCategories)[number];
+
 export type Project = {
   slug: string;
+  /** Buckets this project appears under in the index filter row. */
+  categories: ProjectCategory[];
+  /** Short chips shown on cards. Keep to four; must come from `stack`. */
+  displayTags: string[];
   title: string;
   oneLine: string;
   summary: string;
@@ -21,6 +35,8 @@ export type Project = {
 export const allProjects: Project[] = [
   {
     slug: "incident-triage-copilot",
+    categories: ["Software", "ML"],
+    displayTags: ["Next.js", "FastAPI", "Python", "TypeScript"],
     title: "Incident Triage Copilot",
     oneLine:
       "Full-stack AI incident-response tool with typed triage outputs and reliable fallback behavior.",
@@ -64,6 +80,8 @@ export const allProjects: Project[] = [
   },
   {
     slug: "formatclip",
+    categories: ["Software"],
+    displayTags: ["Chrome MV3", "React", "FastAPI", "TypeScript"],
     title: "FormatClip",
     oneLine:
       "Chrome extension and FastAPI backend for formatting saved snippets with provider-swappable LLM support.",
@@ -107,6 +125,8 @@ export const allProjects: Project[] = [
   },
   {
     slug: "rf-signal-classification-research",
+    categories: ["ML", "Research"],
+    displayTags: ["PyTorch", "CNNs", "RTL-SDR", "Spectrograms"],
     title: "RF Signal Classification Research",
     oneLine:
       "PyTorch CNN research pipeline for classifying real-world RF spectrograms from RTL-SDR captures.",
@@ -147,6 +167,8 @@ export const allProjects: Project[] = [
   },
   {
     slug: "regime-specialist-stock-predictor",
+    categories: ["Quant", "ML"],
+    displayTags: ["Python", "XGBoost", "GMM", "Streamlit"],
     title: "Regime Specialist Stock Predictor",
     oneLine:
       "Regime-aware stock prediction system using GMM clustering and XGBoost return models.",
