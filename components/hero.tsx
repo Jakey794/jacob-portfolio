@@ -78,7 +78,7 @@ export function Hero() {
 
           <div className="mt-9 flex flex-wrap items-center gap-4 lg:mt-10 lg:gap-9">
             <CtaLink href="#projects">View Projects</CtaLink>
-            <CtaLink href="#about" variant="secondary">
+            <CtaLink href="/about" variant="secondary">
               About Me
             </CtaLink>
           </div>
