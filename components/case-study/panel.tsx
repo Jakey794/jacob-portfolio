@@ -94,11 +94,18 @@ export function PanelList({ items }: { items: string[] }) {
 /** Big-figure tile grid used by Results. */
 export function StatTiles({
   tiles,
+  columns = 2,
 }: {
   tiles: { value: string; label: string }[];
+  columns?: 2 | 3;
 }) {
   return (
-    <ul className="grid gap-3 sm:grid-cols-2">
+    <ul
+      className={cn(
+        "grid gap-3",
+        columns === 3 ? "sm:grid-cols-2 xl:grid-cols-3" : "sm:grid-cols-2"
+      )}
+    >
       {tiles.map((tile) => (
         <li
           key={tile.label}
