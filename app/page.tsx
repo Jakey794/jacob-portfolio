@@ -1,23 +1,27 @@
 import { About } from "@/components/about";
-import { Contact } from "@/components/contact";
 import { Experience } from "@/components/experience";
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
-import { Projects } from "@/components/projects";
+import {
+  CaseStudyPreviewGrid,
+  FeaturedProjectShowcase,
+} from "@/components/projects";
 import { ResumeCta } from "@/components/resume-cta";
+import { SiteNav } from "@/components/site-nav";
 import { Skills } from "@/components/skills";
 
 export default function Home() {
   return (
-    <div className="min-h-screen overflow-x-clip bg-background text-foreground">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
+      <SiteNav />
       <main>
         <Hero />
-        <Projects />
         <About />
+        <FeaturedProjectShowcase />
+        <CaseStudyPreviewGrid />
         <Experience />
         <Skills />
         <ResumeCta />
-        <Contact />
       </main>
       <Footer />
     </div>
