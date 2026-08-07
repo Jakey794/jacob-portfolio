@@ -2,10 +2,7 @@ import { About } from "@/components/about";
 import { Experience } from "@/components/experience";
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
-import {
-  CaseStudyPreviewGrid,
-  FeaturedProjectShowcase,
-} from "@/components/projects";
+import { Projects } from "@/components/projects";
 import { ResumeCta } from "@/components/resume-cta";
 import { SiteNav } from "@/components/site-nav";
 import { Skills } from "@/components/skills";
@@ -17,8 +14,7 @@ export default function Home() {
       <main>
         <Hero />
         <About />
-        <FeaturedProjectShowcase />
-        <CaseStudyPreviewGrid />
+        <Projects />
         <Experience />
         <Skills />
         <ResumeCta />

@@ -108,7 +108,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           ))}
         </ul>
         <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
+          {project.displayTags.map((tag) => (
             <Badge
               key={tag}
               variant="outline"
