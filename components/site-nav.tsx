@@ -13,7 +13,7 @@ const navItems = [
   { key: "about", label: "About", href: "/about" },
   { key: "projects", label: "Projects", href: "/projects" },
   { key: "experience", label: "Experience", href: "/experience" },
-  { key: "contact", label: "Contact", href: "/#contact" },
+  { key: "contact", label: "Contact", href: "/contact" },
 ];
 
 export type NavKey = (typeof navItems)[number]["key"];

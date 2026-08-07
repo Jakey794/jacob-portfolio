@@ -2,27 +2,25 @@ import { GitBranch, Link as LinkIcon, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/section-heading";
+import { availabilityStatement, contactChannels } from "@/lib/contact";
 
-const links = [
-  {
-    label: "Email",
-    href: "mailto:jacob.allan@mail.utoronto.ca",
-    text: "jacob.allan@mail.utoronto.ca",
-    icon: Mail,
-  },
-  {
-    label: "GitHub",
-    href: "https://github.com/Jakey794",
-    text: "github.com/Jakey794",
-    icon: GitBranch,
-  },
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/jacob-allan-ml/",
-    text: "linkedin.com/in/jacob-allan-ml",
-    icon: LinkIcon,
-  },
-];
+/** Destinations come from lib/contact.ts so there is one source of truth. */
+const icons = {
+  email: Mail,
+  github: GitBranch,
+  linkedin: LinkIcon,
+} as const;
+
+const links = (["email", "github", "linkedin"] as const).map((key) => {
+  const channel = contactChannels.find((c) => c.key === key)!;
+
+  return {
+    label: channel.key === "email" ? "Email" : channel.label,
+    href: channel.href,
+    text: channel.text,
+    icon: icons[key],
+  };
+});
 
 export function Contact() {
   return (
@@ -33,11 +31,7 @@ export function Contact() {
           eyebrow="Contact"
           title="Open to focused technical work"
         >
-          <p>
-            Open to machine learning, software engineering, quantitative
-            development, quantitative research, and ML research assistant
-            opportunities.
-          </p>
+          <p>{availabilityStatement}</p>
         </SectionHeading>
         <div className="grid gap-3">
           {links.map(({ label, href, text, icon: Icon }) => (

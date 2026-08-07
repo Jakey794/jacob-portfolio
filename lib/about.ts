@@ -8,6 +8,12 @@
  * see the notes on individual fields.
  */
 
+import {
+  availabilityStatement,
+  contactChannels,
+  contactEmail,
+  universityBase,
+} from "@/lib/contact";
 import { allProjects } from "@/lib/projects";
 import { experience } from "@/lib/experience";
 
@@ -136,19 +142,15 @@ export const journey = experience.map((item) => ({
   role: item.role,
 }));
 
-/**
- * Availability line, carried over from the existing contact section, and the
- * real contact destinations.
- */
-export const availability =
-  "Open to machine learning, software engineering, quantitative development, quantitative research, and ML research assistant opportunities.";
+/** Availability line and contact destinations both live in `lib/contact.ts`. */
+export const availability = availabilityStatement;
 
 export const aboutContact = {
-  email: "jacob.allan@mail.utoronto.ca",
-  github: "https://github.com/Jakey794",
-  linkedin: "https://www.linkedin.com/in/jacob-allan-ml/",
-  resume: "/resume.pdf",
-  institution: "University of Toronto",
+  email: contactEmail,
+  github: contactChannels.find((c) => c.key === "github")!.href,
+  linkedin: contactChannels.find((c) => c.key === "linkedin")!.href,
+  resume: contactChannels.find((c) => c.key === "resume")!.href,
+  institution: universityBase.institution,
 };
 
 /** Rail entries for the standalone page. */
