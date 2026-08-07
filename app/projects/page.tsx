@@ -43,14 +43,14 @@ export default function ProjectsIndexPage() {
       <main className="relative z-10 px-6 pb-24 pt-[7rem] sm:px-10 sm:pt-[7.5rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%] lg:pt-[7.6rem]">
         <PageEyebrow index="02" label="Projects" />
 
-        <PageTitle className="mt-5">Projects</PageTitle>
+        <PageTitle className="mt-1">Projects</PageTitle>
 
-        <p className="mt-5 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
+        <p className="mt-2 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
           A selection of systems, tools, and research exploring intelligent
           solutions to complex problems.
         </p>
 
-        <div className="mt-11 lg:mt-14">
+        <div className="mt-9 lg:mt-8">
           <ProjectsExplorer projects={items} />
         </div>
 

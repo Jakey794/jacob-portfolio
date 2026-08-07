@@ -27,26 +27,57 @@ export function PageEyebrow({
 }
 
 /**
+ * Display-heading scale.
+ *
+ * Font size and line height are declared together with Tailwind's
+ * `text-[size]/[leading]` syntax, and never as separate `text-*` + `leading-*`
+ * classes. A `text-*` utility conflicts with `leading-*` in tailwind-merge, so
+ * a separate `leading-*` in the base string is silently dropped the moment any
+ * font size is applied — which previously left every title at the default 1.5
+ * line height. Keeping the pair atomic makes that impossible.
+ *
+ * Sizes are per-page because each was measured against its own concept.
+ */
+const titleSizes = {
+  /** Projects index. */
+  hero: "text-[clamp(2.6rem,5.7vw,5.95rem)]/[1.06]",
+  /** Experience index. */
+  index: "text-[clamp(2.4rem,5.2vw,5.45rem)]/[1.06]",
+  /** About. */
+  page: "text-[clamp(2.3rem,4.5vw,4.7rem)]/[1.06]",
+  /** Project case study. */
+  detail: "text-[clamp(2.3rem,3.75vw,3.9rem)]/[1.06]",
+  /** Experience detail. */
+  compact: "text-[clamp(2.1rem,3.35vw,3.5rem)]/[1.06]",
+} as const;
+
+export type PageTitleSize = keyof typeof titleSizes;
+
+/**
  * Display heading with the accent dot used across the site. `dot` renders the
  * periwinkle full stop that closes the homepage headline.
+ *
+ * Pass `size` rather than a `text-*` class in `className` — see above.
  */
 export function PageTitle({
   children,
   id,
   dot = true,
+  size = "hero",
   className,
 }: {
   children: React.ReactNode;
   id?: string;
   dot?: boolean;
+  size?: PageTitleSize;
   className?: string;
 }) {
   return (
     <h1
       id={id}
       className={cn(
-        "bg-gradient-to-b from-[#b6bbc6] to-[#dfe2e9] bg-clip-text font-medium leading-[1.06] tracking-[-0.028em] text-transparent",
-        "text-[clamp(2.6rem,5.7vw,5.95rem)]",
+        "bg-gradient-to-b from-[#b6bbc6] to-[#dfe2e9] bg-clip-text font-medium tracking-[-0.028em] text-transparent",
+        titleSizes[size],
         className
       )}
     >

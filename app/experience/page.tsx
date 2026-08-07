@@ -57,13 +57,11 @@ export default function ExperienceIndexPage() {
       <main className="relative z-10 px-6 pb-24 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%] lg:pt-[6.4rem]">
         <PageEyebrow index="04" label="Experience" />
 
-        {/* Paired size/leading: a bare `text-[…]` would reset the line-height
-            inherited from PageTitle. */}
-        <PageTitle className="mt-2 text-[clamp(2.4rem,5.2vw,5.45rem)]/[1.06]">
+        <PageTitle size="index" className="mt-0.5">
           Experience
         </PageTitle>
 
-        <p className="mt-4 max-w-[26rem] text-[0.95rem] leading-[1.5] text-[#a2a8b5]">
+        <p className="mt-0.5 max-w-[26rem] text-[0.95rem] leading-[1.5] text-[#a2a8b5]">
           Roles, research positions, and technical work across engineering,
           machine learning, and quantitative systems.
         </p>

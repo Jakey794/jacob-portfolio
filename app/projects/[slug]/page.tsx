@@ -103,7 +103,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           <div>
             <PageEyebrow index={eyebrowIndex} label="Project Case Study" />
 
-            <PageTitle className="mt-6 text-[clamp(2.3rem,3.75vw,3.9rem)]">
+            <PageTitle size="detail" className="mt-6">
               {project.title}
             </PageTitle>
 

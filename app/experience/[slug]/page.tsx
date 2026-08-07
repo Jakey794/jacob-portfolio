@@ -102,9 +102,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
           <div>
             <PageEyebrow index={eyebrowIndex} label="Experience Detail" />
 
-            {/* Paired size/leading: a bare `text-[…]` would reset the
-                line-height inherited from PageTitle. */}
-            <PageTitle className="mt-2 text-[clamp(2.1rem,3.35vw,3.5rem)]/[1.06]">
+            <PageTitle size="compact" className="mt-2">
               {item.organization}
             </PageTitle>
 
