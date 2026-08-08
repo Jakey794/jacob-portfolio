@@ -4,8 +4,15 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 
+import {
+  ResultField,
+  RoleSchematic,
+  StageChain,
+} from "@/components/experience/role-visuals";
 import { PendingPlate } from "@/components/pending";
 import { ProjectThumb } from "@/components/projects/project-thumb";
+import { SectionRail } from "@/components/section-rail";
+import type { ResultTile, WorkflowStage } from "@/lib/experience";
 import { cn } from "@/lib/utils";
 
 /** Serialisable slice of an experience entry, prepared on the server. */
@@ -22,6 +29,10 @@ export type ExperienceIndexItem = {
   location?: string;
   image?: string;
   imageAlt?: string;
+  /** Figures quoted in the role's bullets, used where no photography exists. */
+  results?: ResultTile[];
+  /** Pipeline described by the role's bullets, used as a fallback visual. */
+  workflow?: WorkflowStage[];
 };
 
 const FILTERS = ["All", "Industry", "Research", "Leadership", "Quant"] as const;
@@ -64,47 +75,15 @@ export function ExperienceExplorer({
       </div>
 
       {/* Numbered rail, derived from the visible set. */}
-      <nav
-        aria-label="Experience entries"
+      <SectionRail
         className="absolute -right-[6.5%] top-[3.25rem] z-10 hidden xl:block"
-      >
-        <span
-          aria-hidden="true"
-          className="absolute left-[4px] top-1.5 bottom-1.5 w-px bg-white/15"
-        />
-        <ol className="relative flex flex-col gap-[2.6rem]">
-          {visible.map((item, index) => (
-            <li key={item.slug}>
-              <a
-                href={`#experience-${item.slug}`}
-                className="group flex items-center gap-[1.35rem] rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-              >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "size-[9px] shrink-0 rounded-full border bg-background transition-colors",
-                    index === 0
-                      ? "border-accent-indigo bg-accent-indigo"
-                      : "border-white/35 group-hover:border-white/70"
-                  )}
-                />
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "font-mono text-[0.78rem] tracking-[0.12em] transition-colors",
-                    index === 0
-                      ? "text-white/90"
-                      : "text-white/45 group-hover:text-white/80"
-                  )}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="sr-only">{`${item.organization} — ${item.role}`}</span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
+        gap="2.6rem"
+        sections={visible.map((item, index) => ({
+          index: String(index + 1).padStart(2, "0"),
+          label: `${item.organization} — ${item.role}`,
+          href: `#experience-${item.slug}`,
+        }))}
+      />
     </div>
   );
 }
@@ -149,9 +128,11 @@ function FilterRow({
         })}
       </div>
 
+      {/* Hidden on the narrowest viewports: at 390px it lands hard against
+          the last filter, and the list beside it already shows the count. */}
       <p
         aria-live="polite"
-        className="font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/35"
+        className="hidden font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/35 sm:block"
       >
         {count} {count === 1 ? "role" : "roles"}
       </p>
@@ -192,9 +173,19 @@ function FeaturedExperience({ item }: { item: ExperienceIndexItem }) {
         <TagRow tags={item.tools.slice(0, 5)} className="mt-3" />
       </div>
 
-      <div className="relative min-h-[13rem] border-t border-white/10 lg:min-h-0 lg:border-l lg:border-t-0">
+      {/*
+        No photography exists for any role. Rather than reserve half the card
+        for a dashed "imagery pending" plate, the slot carries the role's own
+        measured figures — the strongest proof it has — falling back to its
+        pipeline, and only then to a placeholder.
+      */}
+      {/* Not `absolute inset-0`: below lg the row has no height of its own, so
+          absolutely positioning the figures inside a `min-h` box clipped the
+          bottom two labels clean off at 768px. The pane is in flow and the
+          grid row sizes to it. */}
+      <div className="relative border-t border-white/10 lg:border-l lg:border-t-0">
         {item.image ? (
-          <>
+          <div className="relative h-full min-h-[13rem]">
             <ProjectThumb
               src={item.image}
               alt={item.imageAlt ?? `${item.organization} imagery`}
@@ -206,23 +197,38 @@ function FeaturedExperience({ item }: { item: ExperienceIndexItem }) {
               aria-hidden="true"
               className="absolute inset-0 bg-[linear-gradient(270deg,rgba(9,12,19,0.7)_0%,transparent_40%)]"
             />
-          </>
+          </div>
+        ) : item.results?.length ? (
+          <ResultField results={item.results} className="h-full" />
+        ) : item.workflow?.length ? (
+          <RoleSchematic stages={item.workflow} className="h-full" />
         ) : (
-          <PendingPlate hint="Imagery" className="absolute inset-0 border-0" />
+          <PendingPlate hint="Imagery" className="h-full min-h-[13rem] border-0" />
         )}
       </div>
     </article>
   );
 }
 
-/** Dated rows with a connecting spine, as in the concept. */
+/**
+ * The supporting roles, drawn as a timeline rather than as an index.
+ *
+ * The projects index is a list of rows with a thumbnail; if this were the same
+ * shape it would read as the same page twice. So the entries hang off a
+ * continuous spine, lead with the period rather than the name, and close with
+ * the role's pipeline as a chain of stage names — progression and systems,
+ * which is what this page is for.
+ */
 function Timeline({ items }: { items: ExperienceIndexItem[] }) {
   return (
-    <ol className="relative mt-6 lg:mt-7">
+    <ol className="relative mt-8 lg:mt-10">
+      {/* The spine. Runs the full height of the list and fades at both ends so
+          it reads as a segment of a longer track. */}
       <span
         aria-hidden="true"
-        className="absolute left-[1.6rem] top-8 bottom-8 hidden w-px bg-white/12 sm:block"
+        className="pointer-events-none absolute left-[4px] top-2 bottom-2 hidden w-px bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.16)_6%,rgba(255,255,255,0.16)_92%,transparent)] sm:block"
       />
+
       {items.map((item) => (
         <li
           key={item.slug}
@@ -231,34 +237,41 @@ function Timeline({ items }: { items: ExperienceIndexItem[] }) {
         >
           <Link
             href={`/experience/${item.slug}`}
-            className="flex items-center gap-4 py-4 pl-4 pr-4 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:gap-5 sm:pl-0 sm:pr-5"
+            className="flex gap-5 py-6 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:gap-7 sm:pr-5"
           >
             <span
               aria-hidden="true"
-              className="relative z-10 hidden size-[9px] shrink-0 rounded-full border border-white/35 bg-background transition-colors group-hover:border-accent-indigo-soft sm:ml-[1.25rem] sm:block"
+              className="relative z-10 mt-[0.4rem] hidden size-[9px] shrink-0 rounded-full border border-white/35 bg-background transition-colors group-hover:border-accent-indigo-soft group-hover:bg-accent-indigo/60 sm:block"
             />
 
-            <span className="hidden w-[9.5rem] shrink-0 whitespace-nowrap font-mono text-[0.76rem] tracking-[0.04em] text-white/45 lg:block">
-              {item.dates}
-            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-white/40">
+                {item.dates}
+              </p>
 
-            {/* Real organisation names run longer than the concept's, so these
-                columns are wider and clamped rather than truncated mid-word. */}
-            <span className="line-clamp-2 w-[13rem] shrink-0 text-[0.92rem] font-medium leading-snug text-[#dfe2e9] xl:w-[17rem]">
-              {item.shortName}
-            </span>
+              <div className="mt-2.5 grid gap-x-10 gap-y-2 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+                <div>
+                  <p className="text-[1.06rem] font-medium leading-snug tracking-[-0.01em] text-[#e2e5ec]">
+                    {item.shortName}
+                  </p>
+                  <p className="mt-1.5 text-[0.9rem] leading-snug text-accent-indigo-soft">
+                    {item.role}
+                  </p>
+                </div>
 
-            <span className="line-clamp-2 hidden w-[12rem] shrink-0 text-[0.88rem] leading-snug text-accent-indigo-soft lg:block xl:w-[13rem]">
-              {item.role}
-            </span>
+                <p className="text-[0.86rem] leading-[1.65] text-[#8d93a1]">
+                  {item.summary}
+                </p>
+              </div>
 
-            <span className="line-clamp-2 hidden min-w-0 flex-1 text-[0.84rem] leading-[1.55] text-[#8d93a1] xl:block">
-              {item.summary}
-            </span>
+              {item.workflow?.length ? (
+                <StageChain stages={item.workflow} className="mt-4" />
+              ) : null}
+            </div>
 
             <ArrowRight
               aria-hidden="true"
-              className="ml-auto size-[1.05rem] shrink-0 text-white/35 transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent-indigo-soft"
+              className="mt-[0.2rem] size-[1.05rem] shrink-0 self-start text-white/30 transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent-indigo-soft"
             />
           </Link>
         </li>
@@ -287,14 +300,16 @@ export function MetaRow({
         <CalendarDays aria-hidden="true" className="size-[0.9rem] text-white/35" />
         {dates}
       </span>
+      {/* A missing location stays visible so it is easy to find and fill, but
+          it is drawn at a fraction of the weight of a real value — it should
+          read as a gap in the data, not as a field of the design. */}
       {location ? (
         <span className="inline-flex items-center gap-2">
           <MapPin aria-hidden="true" className="size-[0.9rem] text-white/35" />
           {location}
         </span>
       ) : (
-        <span className="inline-flex items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-white/25">
-          <MapPin aria-hidden="true" className="size-[0.9rem]" />
+        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-white/18">
           Location pending
         </span>
       )}

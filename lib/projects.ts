@@ -27,8 +27,21 @@ export type Project = {
   github?: string;
   liveDemo?: string;
   statusLabel?: "Live demo" | "GitHub" | "Research preview" | "Case study";
+  /**
+   * Primary capture, filling the large slots.
+   *
+   * Point this at a derivative under `public/images/projects/`, never at a raw
+   * screenshot: the raw files are whole browser windows and carry chrome, a
+   * personal bookmarks bar and an account avatar. `scripts/crop-captures.mjs`
+   * produces the shipped crops from them and documents each rectangle.
+   */
   image?: string;
   imageAlt?: string;
+  /**
+   * Secondary capture for small slots, zoomed to the one region of the product
+   * that still reads at thumbnail size. Falls back to `image` when absent.
+   */
+  imageDetail?: string;
   featured: boolean;
 };
 
@@ -73,9 +86,10 @@ export const allProjects: Project[] = [
     ],
     github: "https://github.com/Jakey794/incident-triage-copilot",
     statusLabel: "GitHub",
-    image: "/images/incident-triage.png",
+    image: "/images/projects/incident-triage-wide.jpg",
     imageAlt:
       "Incident Triage Copilot interface preview with severity and root-cause panels",
+    imageDetail: "/images/projects/incident-triage-detail.jpg",
     featured: true,
   },
   {
@@ -119,8 +133,9 @@ export const allProjects: Project[] = [
     ],
     github: "https://github.com/Jakey794/formatclip",
     statusLabel: "GitHub",
-    image: "/images/formatclip.png",
+    image: "/images/projects/formatclip-wide.jpg",
     imageAlt: "FormatClip extension and backend workflow preview",
+    imageDetail: "/images/projects/formatclip-detail.jpg",
     featured: false,
   },
   {
@@ -211,8 +226,6 @@ export const allProjects: Project[] = [
 const projectBySlug = new Map(
   allProjects.map((project) => [project.slug, project])
 );
-
-export const featuredProjects = allProjects;
 
 export const featuredProject =
   allProjects.find((project) => project.featured) ?? allProjects[0];

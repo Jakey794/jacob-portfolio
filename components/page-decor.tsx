@@ -3,7 +3,6 @@ import {
   CrossMark,
   DotGrid,
   GuideLine,
-  ScrollCue,
 } from "@/components/technical-decor";
 
 /** Toronto / UofT St. George, matching the homepage readouts. */
@@ -11,12 +10,26 @@ const LOCATION = ["43.6629° N", "79.3957° W", "Toronto, ON"];
 const LOCATION_DMS = ["43° 39′ 46″ N", "79° 23′ 45″ W"];
 
 /**
- * The standing set of technical marks used on inner pages: guide marks and a
- * coordinate readout at the top, location and a scroll cue at the foot.
+ * The standing set of technical marks on inner pages.
+ *
+ * The set is not identical everywhere: a page picks the marks that suit its
+ * character, so the decor contributes to each route's identity instead of
+ * stamping the same four glyphs on all of them.
+ *
+ *   `quiet`      — left guide marks only. Editorial pages.
+ *   `instrument` — guide marks plus the coordinate readout. Research pages.
+ *   `spec`       — guide marks, readout and the dot grid. Product pages.
+ *
  * Positioned against the nearest positioned ancestor, so wrap the page in
  * `relative`.
  */
-export function PageDecorTop() {
+export type PageDecorVariant = "quiet" | "instrument" | "spec";
+
+export function PageDecorTop({
+  variant = "spec",
+}: {
+  variant?: PageDecorVariant;
+}) {
   return (
     <>
       <GuideLine className="absolute left-[2%] top-[7rem] z-10 hidden h-[22rem] lg:block" />
@@ -31,19 +44,34 @@ export function PageDecorTop() {
 
       {/* Held back until xl: below that the page content reaches into this
           corner and the marks would sit on top of it. */}
-      <CrossMark
-        size={16}
-        className="absolute left-[68.5%] top-[7.4rem] z-10 hidden text-white/40 xl:block"
-      />
-      <CoordinateBlock
-        lines={LOCATION_DMS}
-        className="absolute left-[72%] top-[7rem] z-10 hidden xl:block"
-      />
-      <DotGrid className="absolute right-[2%] top-[6.5rem] z-10 hidden xl:block" />
+      {variant !== "quiet" ? (
+        <>
+          <CrossMark
+            size={16}
+            className="absolute left-[68.5%] top-[7.4rem] z-10 hidden text-white/40 xl:block"
+          />
+          <CoordinateBlock
+            lines={LOCATION_DMS}
+            className="absolute left-[72%] top-[7rem] z-10 hidden xl:block"
+          />
+        </>
+      ) : null}
+
+      {variant === "spec" ? (
+        <DotGrid className="absolute right-[2%] top-[6.5rem] z-10 hidden xl:block" />
+      ) : null}
     </>
   );
 }
 
+/**
+ * End-of-page marks.
+ *
+ * This used to close every page with the hero's "Scroll" cue, which pointed
+ * at nothing — by the time it is on screen the page has ended. The foot now
+ * carries the location readout and a terminating rule instead, so the page
+ * resolves rather than inviting a scroll that does not exist.
+ */
 export function PageDecorFoot() {
   return (
     <>
@@ -51,7 +79,15 @@ export function PageDecorFoot() {
         lines={LOCATION}
         className="absolute bottom-8 left-[4.5%] z-10 hidden lg:block"
       />
-      <ScrollCue className="absolute bottom-10 right-[3.4%] z-10 hidden lg:flex" />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-10 right-[3.4%] z-10 hidden flex-col items-end gap-3 lg:flex"
+      >
+        <span className="h-16 w-px bg-gradient-to-b from-transparent to-white/30" />
+        <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-white/30">
+          End
+        </span>
+      </div>
     </>
   );
 }

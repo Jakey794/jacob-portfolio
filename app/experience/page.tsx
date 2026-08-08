@@ -42,6 +42,8 @@ function toIndexItem(item: ExperienceItem): ExperienceIndexItem {
     location: item.location,
     image: item.image,
     imageAlt: item.imageAlt,
+    results: item.results,
+    workflow: item.workflow,
   };
 }
 
@@ -50,23 +52,23 @@ export default function ExperienceIndexPage() {
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.experience} />
       <SiteNav active="experience" />
-      {pageAtmospheres.experience.decor ? <PageDecorTop /> : null}
+      {pageAtmospheres.experience.decor ? (
+        <PageDecorTop variant="instrument" />
+      ) : null}
 
-      {/* Tighter vertical rhythm than /projects: the experience concept packs
-          the header into roughly 220px before the first card. */}
-      <main className="relative z-10 px-6 pb-24 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%] lg:pt-[6.4rem]">
+      <main className="relative z-10 px-6 pb-24 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%]">
         <PageEyebrow index="04" label="Experience" />
 
-        <PageTitle size="index" className="mt-0.5">
+        <PageTitle size="index" className="mt-2">
           Experience
         </PageTitle>
 
-        <p className="mt-0.5 max-w-[26rem] text-[0.95rem] leading-[1.5] text-[#a2a8b5]">
+        <p className="mt-3 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
           Roles, research positions, and technical work across engineering,
           machine learning, and quantitative systems.
         </p>
 
-        <div className="mt-8 lg:mt-5">
+        <div className="mt-9 lg:mt-10">
           <ExperienceExplorer
             featured={toIndexItem(featuredExperience)}
             items={supportingExperience.map(toIndexItem)}

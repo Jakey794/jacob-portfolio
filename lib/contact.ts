@@ -1,9 +1,9 @@
 /**
  * Single source of truth for contact destinations and the availability copy.
  *
- * Every value here already existed in the portfolio (the original
- * `components/contact.tsx` / `components/resume-cta.tsx` link lists and the
- * education facts). Nothing about location, response time, timezone or
+ * Every value here already existed in the portfolio (the pre-redesign contact
+ * section and `components/resume-cta.tsx` link lists, and the education
+ * facts). Nothing about location, response time, timezone or
  * preferred channel is asserted, because none of it is recorded anywhere in
  * the repo — see `unverified` at the bottom.
  */
@@ -117,12 +117,17 @@ export const unverified = [
   "preferred channel",
 ] as const;
 
-/** Rail entries for the standalone page. */
+/**
+ * Rail entries for the standalone page.
+ *
+ * `channels` used to be a sixth entry pointing at a panel that relisted the
+ * same four destinations shown directly above it. The duplicate panel is gone,
+ * so the rail no longer advertises it.
+ */
 export const contactSections = [
   { id: "overview", index: "01", label: "Overview" },
   { id: "reach-out", index: "02", label: "Reach Out" },
   { id: "links", index: "03", label: "Links" },
   { id: "availability", index: "04", label: "Availability" },
-  { id: "channels", index: "05", label: "Channels" },
-  { id: "next", index: "06", label: "Next" },
+  { id: "next", index: "05", label: "Next" },
 ];

@@ -26,7 +26,9 @@ import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
+import { CaptureFrame } from "@/components/projects/capture-frame";
 import { ProjectThumb } from "@/components/projects/project-thumb";
+import { SectionRail, anchorSections } from "@/components/section-rail";
 import { SiteNav } from "@/components/site-nav";
 import { caseStudies, caseStudySlugs, getCaseStudy } from "@/lib/case-studies";
 import { allProjects, getProjectBySlug } from "@/lib/projects";
@@ -93,11 +95,13 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.projectDetail} />
       <SiteNav active="projects" />
-      {pageAtmospheres.projectDetail.decor ? <PageDecorTop /> : null}
+      {pageAtmospheres.projectDetail.decor ? (
+        <PageDecorTop variant="spec" />
+      ) : null}
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}
-      <main className="relative z-10 px-6 pb-28 pt-[7rem] sm:px-10 sm:pt-[7.5rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] lg:pt-[7.4rem] xl:pr-[15.5%]">
+      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
         {/* ---------------------------------------------------------- masthead */}
         <div className="grid gap-12 lg:grid-cols-[0.42fr_0.58fr] lg:items-start lg:gap-10">
           <div>
@@ -138,10 +142,20 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
             </dl>
           </div>
 
-          {/* Angled product capture, as in the concept. */}
+          {/*
+            Product capture. The concept angles this plate hard; at
+            rotateY(-13deg) over an already dark grade the interface stopped
+            being readable, which defeats the point of showing it. The tilt is
+            kept but shallow, and the capture sits in the same drawn window
+            chrome the index uses so the two pages agree.
+          */}
           <div className="relative lg:-mt-2">
-            <div className="[perspective:1700px]">
-              <div className="relative overflow-hidden border border-white/12 bg-[#0b0e16] shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] lg:[transform:rotateY(-13deg)_rotateX(4deg)_rotate(-1.2deg)]">
+            <div className="[perspective:2200px]">
+              <CaptureFrame
+                label={project.title}
+                className="shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] lg:[transform:rotateY(-5deg)_rotateX(1.5deg)]"
+                bodyClassName="aspect-[16/9]"
+              >
                 <ProjectThumb
                   src={project.image}
                   alt={
@@ -149,25 +163,28 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
                   }
                   sizes="(min-width: 1024px) 52vw, 100vw"
                   priority
-                  className="aspect-[16/9]"
+                  className="absolute inset-0"
                 />
-                {/* Presentational grading so the light-mode capture settles
-                    into the dark composition. */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-[radial-gradient(130%_120%_at_35%_30%,transparent_25%,rgba(8,11,18,0.6)_100%)]"
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-[rgba(8,11,18,0.24)]"
-                />
-              </div>
+              </CaptureFrame>
             </div>
           </div>
         </div>
 
         {/* -------------------------------------------------- summary band */}
-        <div className="mt-16 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-20 xl:grid-cols-[repeat(3,minmax(0,1fr))_1.15fr]">
+        {/*
+          The fourth cell used to be a second copy of the same screenshot under
+          heavy scrims, which rendered as an empty black rectangle. It now
+          carries the detail crop — a different region of the product — and is
+          dropped entirely for projects with no capture, so the band closes at
+          three panels instead of leaving a hole.
+        */}
+        <div
+          className={`mt-16 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-20 ${
+            project.image
+              ? "xl:grid-cols-[repeat(3,minmax(0,1fr))_1.15fr]"
+              : "xl:grid-cols-3"
+          }`}
+        >
           <Panel id="overview" title="Overview" icon={Sparkles} className="border-0">
             <PanelText>{project.summary}</PanelText>
           </Panel>
@@ -180,23 +197,18 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
             <PanelText>{project.role}</PanelText>
           </Panel>
 
-          {/* Second capture slot — drop a detail screenshot here. */}
-          <div className="relative min-h-[11rem] bg-[#090c13]">
-            <ProjectThumb
-              src={project.image}
-              alt=""
-              sizes="(min-width: 1024px) 28vw, 100vw"
-              className="absolute inset-0"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,12,19,0.8)_0%,rgba(9,12,19,0.2)_38%,transparent_70%)]"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[rgba(8,11,18,0.32)]"
-            />
-          </div>
+          {project.image ? (
+            <div className="flex min-h-[13rem] items-stretch bg-[#090c13] p-5 sm:col-span-2 xl:col-span-1">
+              <CaptureFrame chrome={false} className="w-full">
+                <ProjectThumb
+                  src={project.imageDetail ?? project.image}
+                  alt=""
+                  sizes="(min-width: 1280px) 26vw, 100vw"
+                  className="absolute inset-0"
+                />
+              </CaptureFrame>
+            </div>
+          ) : null}
         </div>
 
         {/* ------------------------------------------ architecture / features */}
@@ -300,43 +312,12 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
       </main>
 
       {/* Section rail — anchors into the panels above. */}
-      <nav
-        aria-label="Case study sections"
-        className="absolute right-[3.2%] top-[15rem] z-20 hidden xl:block"
-      >
-        <span
-          aria-hidden="true"
-          className="absolute left-[4px] top-1.5 bottom-1.5 w-px bg-white/15"
-        />
-        <ol className="relative flex flex-col gap-[1.35rem]">
-          {railSections.map((section, index) => (
-            <li key={section.id}>
-              <a
-                href={`#${section.id}`}
-                className="group flex items-center gap-[1.1rem] rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-              >
-                <span
-                  aria-hidden="true"
-                  className={
-                    index === 0
-                      ? "size-[9px] shrink-0 rounded-full border border-accent-indigo bg-accent-indigo"
-                      : "size-[9px] shrink-0 rounded-full border border-white/35 bg-background transition-colors group-hover:border-white/70"
-                  }
-                />
-                <span
-                  className={
-                    index === 0
-                      ? "text-[0.85rem] text-white/85"
-                      : "text-[0.85rem] text-white/45 transition-colors group-hover:text-white/80"
-                  }
-                >
-                  {section.label}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
+      <SectionRail
+        variant="labelled"
+        gap="1.35rem"
+        sections={anchorSections(railSections)}
+        className="absolute right-[3.2%] top-[15.5rem] z-20 hidden xl:block"
+      />
 
       <Footer />
     </div>

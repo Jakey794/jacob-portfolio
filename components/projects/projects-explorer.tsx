@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { CaptureFrame } from "@/components/projects/capture-frame";
 import { ProjectThumb } from "@/components/projects/project-thumb";
+import { SectionRail } from "@/components/section-rail";
 import { cn } from "@/lib/utils";
 
 /** Serialisable slice of a project, prepared on the server. */
@@ -16,6 +18,7 @@ export type ProjectIndexItem = {
   displayTags: string[];
   image?: string;
   imageAlt?: string;
+  imageDetail?: string;
 };
 
 const FILTERS = ["All", "ML", "Software", "Quant", "Research"] as const;
@@ -50,10 +53,12 @@ export function ProjectsExplorer({
           </p>
         )}
 
-        {/* Two columns only once there is room for the thumbnail and the copy
-            to sit side by side without starving the text. */}
+        {/* Single column. A two-column grid left a visible empty cell whenever
+            the filtered count was odd — which it is for four of the five
+            filters — so the remainder is drawn as an index of full-width rows
+            that fills at any count. */}
         {rest.length > 0 ? (
-          <ul className="mt-6 grid border-t border-l border-white/10 lg:mt-8 xl:grid-cols-2">
+          <ul className="mt-6 border-t border-white/10 lg:mt-8">
             {rest.map((project, index) => (
               <CompactRow
                 key={project.slug}
@@ -67,47 +72,15 @@ export function ProjectsExplorer({
 
       {/* Numbered rail, derived from the visible set so it never points at a
           filtered-out card. */}
-      <nav
-        aria-label="Projects"
+      <SectionRail
         className="absolute -right-[6.5%] top-[3.5rem] z-10 hidden xl:block"
-      >
-        <span
-          aria-hidden="true"
-          className="absolute left-[4px] top-1.5 bottom-1.5 w-px bg-white/15"
-        />
-        <ol className="relative flex flex-col gap-[2.35rem]">
-          {visible.map((project, index) => (
-            <li key={project.slug}>
-              <a
-                href={`#project-${project.slug}`}
-                className="group flex items-center gap-[1.35rem] rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-              >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "size-[9px] shrink-0 rounded-full border bg-background transition-colors",
-                    index === 0
-                      ? "border-accent-indigo bg-accent-indigo"
-                      : "border-white/35 group-hover:border-white/70"
-                  )}
-                />
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "font-mono text-[0.78rem] tracking-[0.12em] transition-colors",
-                    index === 0
-                      ? "text-white/90"
-                      : "text-white/45 group-hover:text-white/80"
-                  )}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="sr-only">{project.title}</span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
+        gap="2.35rem"
+        sections={visible.map((project, index) => ({
+          index: String(index + 1).padStart(2, "0"),
+          label: project.title,
+          href: `#project-${project.slug}`,
+        }))}
+      />
     </div>
   );
 }
@@ -150,9 +123,11 @@ function FilterRow({
         })}
       </div>
 
+      {/* Hidden on the narrowest viewports: at 390px it lands hard against
+          the last filter, and the list beside it already shows the count. */}
       <p
         aria-live="polite"
-        className="font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/35"
+        className="hidden font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/35 sm:block"
       >
         {count} {count === 1 ? "project" : "projects"}
       </p>
@@ -170,9 +145,9 @@ function FeaturedCard({
   return (
     <article
       id={`project-${project.slug}`}
-      className="group relative grid scroll-mt-28 overflow-hidden border border-white/10 bg-[#090c13]/60 transition-colors hover:border-white/20 lg:min-h-[19.5rem] lg:grid-cols-[0.365fr_0.635fr]"
+      className="group relative grid scroll-mt-28 overflow-hidden border border-white/10 bg-[#090c13]/60 transition-colors hover:border-white/20 lg:grid-cols-[0.365fr_0.635fr]"
     >
-      <div className="flex flex-col justify-between gap-6 p-7 sm:p-8 lg:px-9 lg:py-8">
+      <div className="flex flex-col justify-between gap-6 p-7 sm:p-8 lg:px-9 lg:py-9">
         <div>
           <span className="font-mono text-[0.78rem] tracking-[0.12em] text-white/40">
             {String(index).padStart(2, "0")}
@@ -198,30 +173,26 @@ function FeaturedCard({
         </Link>
       </div>
 
-      <div className="relative min-h-[15rem] border-t border-white/10 lg:min-h-0 lg:border-l lg:border-t-0">
-        <ProjectThumb
-          src={project.image}
-          alt={project.imageAlt ?? `${project.title} interface preview`}
-          sizes="(min-width: 1024px) 58vw, 100vw"
-          priority
-          className="absolute inset-0"
-        />
-        {/* The real capture is a light-mode browser window, so it is settled
-            into the dark card with a presentational scrim and vignette rather
-            than left as a bright block. A dark-mode capture would need none of
-            this — see the note in the projects README. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(270deg,rgba(9,12,19,0.8)_0%,rgba(9,12,19,0.2)_16%,transparent_42%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(120%_110%_at_70%_40%,transparent_20%,rgba(8,11,18,0.7)_100%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[rgba(8,11,18,0.36)]"
-        />
+      {/* The capture is presented inside drawn app chrome rather than bled to
+          the card edge: it is a light-mode interface on a near-black page, and
+          framing it reads as a product shot instead of as a bright block that
+          has to be dimmed until it disappears. */}
+      <div className="relative border-t border-white/10 p-5 sm:p-6 lg:border-l lg:border-t-0 lg:p-7">
+        {/* Held near the capture's own 1.68:1 so `object-cover` has little
+            left to trim. A short band cropped the interface to a strip. */}
+        <CaptureFrame
+          label={project.title}
+          className="shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)]"
+          bodyClassName="aspect-[2/1] lg:aspect-[2.55/1]"
+        >
+          <ProjectThumb
+            src={project.image}
+            alt={project.imageAlt ?? `${project.title} interface preview`}
+            sizes="(min-width: 1024px) 52vw, 100vw"
+            priority
+            className="absolute inset-0"
+          />
+        </CaptureFrame>
       </div>
     </article>
   );
@@ -237,32 +208,43 @@ function CompactRow({
   return (
     <li
       id={`project-${project.slug}`}
-      className="group scroll-mt-28 border-b border-r border-white/10"
+      className="group scroll-mt-28 border-b border-white/10"
     >
       <Link
         href={`/projects/${project.slug}`}
-        className="flex h-full items-center gap-5 px-5 py-4 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:gap-6 sm:px-6 sm:py-4"
+        className="flex h-full items-center gap-5 px-1 py-5 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:gap-7 sm:px-3 sm:py-6"
       >
-        <span className="hidden shrink-0 self-start pt-1.5 font-mono text-[0.78rem] tracking-[0.12em] text-white/35 sm:block">
+        <span className="hidden shrink-0 self-center font-mono text-[0.78rem] tracking-[0.12em] text-white/35 sm:block">
           {String(index).padStart(2, "0")}
         </span>
 
-        <ProjectThumb
-          src={project.image}
-          alt={project.imageAlt ?? `${project.title} preview`}
-          sizes="(min-width: 1024px) 15vw, 32vw"
-          className="aspect-[2.4/1] w-[8rem] shrink-0 border border-white/10 sm:w-[11rem] lg:w-[14.25rem] xl:w-[11rem] 2xl:w-[14.25rem]"
-        />
+        {/* Detail crop: at this size the whole surface is noise, so the row
+            shows the one region of the product that still reads. */}
+        <CaptureFrame
+          chrome={false}
+          className="aspect-[16/10] w-[7rem] shrink-0 sm:w-[9.5rem] lg:w-[11rem]"
+        >
+          <ProjectThumb
+            src={project.imageDetail ?? project.image}
+            alt={project.imageAlt ?? `${project.title} preview`}
+            sizes="(min-width: 1024px) 15vw, 32vw"
+            className="absolute inset-0"
+          />
+        </CaptureFrame>
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-[1.08rem] font-medium leading-snug tracking-[-0.01em] text-[#e2e5ec]">
+          <h3 className="text-[1.12rem] font-medium leading-snug tracking-[-0.01em] text-[#e2e5ec]">
             {project.title}
           </h3>
-          <p className="mt-1.5 line-clamp-2 text-[0.86rem] leading-[1.6] text-[#8d93a1]">
+          <p className="mt-2 max-w-[38rem] text-[0.88rem] leading-[1.6] text-[#8d93a1]">
             {project.oneLine}
           </p>
-          <TagRow tags={project.displayTags.slice(0, 3)} className="mt-2.5" />
         </div>
+
+        <TagRow
+          tags={project.displayTags.slice(0, 3)}
+          className="hidden w-[15rem] shrink-0 lg:flex"
+        />
 
         <ArrowRight
           aria-hidden="true"

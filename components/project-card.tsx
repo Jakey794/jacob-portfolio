@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import type { Project } from "@/lib/projects";
 import { PendingPlate } from "@/components/pending";
+import { ProjectThumb } from "@/components/projects/project-thumb";
 
 type ProjectCardProps = {
   project: Project;
@@ -41,21 +41,20 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
   return (
     <article className="group flex h-full flex-col bg-[#090c13] transition-colors duration-300 hover:bg-[#0c101a]">
       {/* A shallow media band rather than 16/9: two of the four projects have
-          no screenshot yet, and a full-height empty plate dominates the row. */}
+          no screenshot yet, and a full-height empty plate dominates the row.
+          Shows the wide crop — at a third of the row the whole surface is
+          still legible, and the detail crop was zoomed so far in that the card
+          read as a wall of body text. `ProjectThumb` brings the same grading
+          every other capture on the site gets; the old `scale-[1.28]` hack
+          existed only because the source was a whole browser window. */}
       {project.image ? (
         <div className="relative aspect-[2.2/1] overflow-hidden border-b border-white/10 bg-[#070a10]">
-          <Image
+          <ProjectThumb
             src={project.image}
             alt={project.imageAlt ?? `${project.title} screenshot`}
-            width={900}
-            height={520}
-            /* Scaled in: at a third of the row width a whole browser window
-               reads as noise, so the band shows a legible detail instead. */
-            className="h-full w-full scale-[1.28] object-cover object-center brightness-[0.96] saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.33]"
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,18,0.18)_0%,transparent_35%,rgba(8,11,18,0.55)_100%)]"
+            sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"
+            focus="left top"
+            className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           />
         </div>
       ) : (

@@ -31,6 +31,7 @@ const items: ProjectIndexItem[] = allProjects.map((project) => ({
   displayTags: project.displayTags,
   image: project.image,
   imageAlt: project.imageAlt,
+  imageDetail: project.imageDetail,
 }));
 
 export default function ProjectsIndexPage() {
@@ -38,19 +39,21 @@ export default function ProjectsIndexPage() {
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.projects} />
       <SiteNav active="projects" />
-      {pageAtmospheres.projects.decor ? <PageDecorTop /> : null}
+      {pageAtmospheres.projects.decor ? <PageDecorTop variant="spec" /> : null}
 
-      <main className="relative z-10 px-6 pb-24 pt-[7rem] sm:px-10 sm:pt-[7.5rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%] lg:pt-[7.6rem]">
+      {/* Shallowest masthead of the standalone pages: the work is the point
+          here, so the header hands over to the first capture quickly. */}
+      <main className="relative z-10 px-6 pb-24 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%]">
         <PageEyebrow index="03" label="Projects" />
 
-        <PageTitle className="mt-1">Projects</PageTitle>
+        <PageTitle className="mt-2">Projects</PageTitle>
 
-        <p className="mt-2 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
+        <p className="mt-3 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
           A selection of systems, tools, and research exploring intelligent
           solutions to complex problems.
         </p>
 
-        <div className="mt-9 lg:mt-8">
+        <div className="mt-9 lg:mt-10">
           <ProjectsExplorer projects={items} />
         </div>
 

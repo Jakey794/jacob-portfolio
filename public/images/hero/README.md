@@ -61,8 +61,7 @@ viewport.
   delivery, so this only costs repository size. To trim it:
   `sips -s format jpeg -s formatOptions 90 mountains.png --out mountains.jpg`
   then update the `src` in `HeroBackdrop`.
-- **No unique photography exists for the inner pages.** `/about`,
-  `/projects`, `/experience`, `/contact` and both detail routes all point at
-  `mountains.png` and are differentiated only by crop, luminance, saturation
-  and opacity. See `pageAtmospheres` in `components/page-atmosphere.tsx` —
-  each preset only needs its `src` changed when its own image arrives.
+- The inner pages no longer share this plate — see
+  `public/images/atmosphere/README.md`. This file is now the homepage only,
+  because the hero composition is built around the portrait cutout and its
+  geometry does not transfer.

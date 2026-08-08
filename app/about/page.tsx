@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Compass,
-  GraduationCap,
-  Mail,
-  MapPin,
-  Route,
-  Sparkles,
-  Target,
-  User,
-} from "lucide-react";
+import { ArrowRight, Mail, MapPin } from "lucide-react";
 
-import { Panel, PanelText } from "@/components/case-study/panel";
 import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
+import { SectionRail, anchorSections } from "@/components/section-rail";
 import { SiteNav } from "@/components/site-nav";
 import {
   aboutBody,
@@ -45,32 +35,79 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Section head for the editorial bands below the masthead.
+ *
+ * About used to be six equally weighted bordered panels in two rows, which
+ * gave the most personal page on the site the density of a dashboard. The
+ * page is now set as an article instead: a numbered head, a hairline rule,
+ * and content in a reading measure. Nothing is boxed.
+ */
+function Band({
+  id,
+  index,
+  title,
+  children,
+}: {
+  id: string;
+  index: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className="scroll-mt-28 border-t border-white/10 pt-8"
+    >
+      <div className="grid gap-8 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-16">
+        <h2
+          id={`${id}-title`}
+          className="flex items-baseline gap-3 text-[0.95rem] font-medium text-[#dfe2e9] lg:sticky lg:top-28 lg:h-fit"
+        >
+          <span
+            aria-hidden="true"
+            className="font-mono text-[0.72rem] tracking-[0.12em] text-accent-indigo-soft/70"
+          >
+            {index}
+          </span>
+          {title}
+        </h2>
+
+        <div className="min-w-0">{children}</div>
+      </div>
+    </section>
+  );
+}
+
 export default function AboutPage() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.about} />
       <SiteNav active="about" />
-      {pageAtmospheres.about.decor ? <PageDecorTop /> : null}
+      {pageAtmospheres.about.decor ? <PageDecorTop variant="quiet" /> : null}
 
-      <main className="relative z-10 px-6 pb-28 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] lg:pt-[6.2rem] xl:pr-[15.5%]">
+      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
         {/* ---------------------------------------------------------- masthead */}
         <PageEyebrow index="02" label="About" />
 
-        <PageTitle size="page" className="mt-0.5">
+        <PageTitle size="page" className="mt-2">
           About
         </PageTitle>
 
-        <p className="mt-0 max-w-[33rem] text-[1.22rem] leading-[1.18] text-[#ccd1da] lg:text-[1.32rem]">
+        {/* The lede is the largest body type on the site. This is the one page
+            where the writing, rather than the work, is the subject. */}
+        <p className="mt-6 max-w-[36rem] text-[1.32rem] leading-[1.5] text-[#ccd1da] lg:text-[1.5rem] lg:leading-[1.48]">
           {aboutLede}
         </p>
 
-        {/* The masthead carries the first paragraph; the Bio panel picks up
-            the second, so neither repeats the other. */}
-        <p className="mt-3 max-w-[33rem] text-[0.93rem] leading-[1.38] text-[#9299a7]">
-          {aboutBody[0]}
-        </p>
+        <div className="mt-8 max-w-[36rem] space-y-5 text-[1.02rem] leading-[1.78] text-[#a2a8b5]">
+          {aboutBody.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
 
-        <ul className="mt-4 flex flex-wrap gap-2">
+        <ul className="mt-8 flex flex-wrap gap-2">
           {aboutTags.map((tag) => (
             <li
               key={tag}
@@ -81,144 +118,124 @@ export default function AboutPage() {
           ))}
         </ul>
 
-        {/* ------------------------------------------------------ first band */}
-        <div className="mt-8 grid gap-px bg-white/10 lg:mt-5 lg:grid-cols-[0.95fr_1fr_1.15fr]">
-          <Panel
-            id="overview"
-            title="Bio"
-            icon={User}
-            className="border-0 p-5 sm:p-6"
-          >
-            <PanelText>{aboutBody[1]}</PanelText>
+        {/* Figures sit under the prose as a quiet index into the site rather
+            than inside a panel of their own. */}
+        <ul
+          id="overview"
+          className="mt-12 flex scroll-mt-28 flex-wrap gap-x-14 gap-y-8 border-t border-white/10 pt-8"
+        >
+          {aboutStats.map((stat) => (
+            <li key={stat.label}>
+              <Link
+                href={stat.href}
+                className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+              >
+                <span className="block text-[2rem] font-medium leading-none tracking-[-0.03em] text-accent-indigo-soft transition-colors group-hover:text-white">
+                  {stat.value}
+                </span>
+                <span className="mt-3 block text-[0.78rem] leading-[1.4] text-[#8d93a1]">
+                  {stat.label}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-            <ul className="mt-5 grid grid-cols-3 gap-4 border-t border-white/10 pt-4">
-              {aboutStats.map((stat) => (
-                <li key={stat.label}>
-                  <Link
-                    href={stat.href}
-                    className="group block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-                  >
-                    <span className="block text-[1.5rem] font-medium leading-none tracking-[-0.02em] text-accent-indigo-soft transition-colors group-hover:text-white">
-                      {stat.value}
-                    </span>
-                    <span className="mt-2 block text-[0.72rem] leading-[1.4] text-[#8d93a1]">
-                      {stat.label}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-
-          <Panel
-            id="education"
-            title="Education"
-            icon={GraduationCap}
-            className="border-0 p-5 sm:p-6"
-          >
-            <p className="text-[1.05rem] font-medium leading-snug text-accent-indigo-soft">
+        {/* ------------------------------------------------------------ bands */}
+        <div className="mt-16 grid gap-14 lg:mt-20 lg:gap-16">
+          <Band id="education" index="02" title="Education">
+            <p className="text-[1.35rem] font-medium leading-snug tracking-[-0.015em] text-[#e2e5ec]">
               {education.programme}
             </p>
-            <p className="mt-1.5 text-[0.9rem] text-[#a0a6b4]">
+            <p className="mt-2 text-[1rem] text-[#a0a6b4]">
               {education.institution}
             </p>
 
-            <div className="mt-5 border-t border-white/10 pt-4">
-              <p className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
-                Honour
-              </p>
-              <p className="mt-2.5 text-[0.95rem] text-[#dfe2e9]">
-                {education.honour}
-              </p>
-            </div>
+            <dl className="mt-7 flex flex-wrap gap-x-16 gap-y-6">
+              <div>
+                <dt className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
+                  Honour
+                </dt>
+                <dd className="mt-2.5 text-[0.95rem] text-[#dfe2e9]">
+                  {education.honour}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
+                  Résumé
+                </dt>
+                <dd className="mt-2.5">
+                  <a
+                    href={aboutContact.resume}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2.5 rounded-sm text-[0.95rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                  >
+                    View PDF
+                    <ArrowRight aria-hidden="true" className="size-4" />
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </Band>
 
-            <a
-              href={aboutContact.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-flex items-center gap-2.5 rounded-sm text-[0.88rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-            >
-              View résumé
-              <ArrowRight aria-hidden="true" className="size-4" />
-            </a>
-          </Panel>
-
-          <Panel
-            id="focus"
-            title="Technical Focus"
-            icon={Target}
-            className="border-0 p-5 sm:p-6"
-          >
-            <ul className="divide-y divide-white/8">
-              {technicalFocus.map((area, index) => (
-                <li
-                  key={area.title}
-                  className={index === 0 ? "pb-3" : "py-3 last:pb-0"}
-                >
-                  <p className="text-[0.92rem] font-medium text-accent-indigo-soft">
+          <Band id="focus" index="03" title="Technical Focus">
+            <dl className="grid gap-7 sm:grid-cols-3 sm:gap-10">
+              {technicalFocus.map((area) => (
+                <div key={area.title}>
+                  <dt className="text-[0.95rem] font-medium leading-snug text-accent-indigo-soft">
                     {area.title}
-                  </p>
-                  <p className="mt-1.5 text-[0.82rem] leading-[1.55] text-[#8d93a1]">
-                    {area.skills.slice(0, 4).join(", ")}
-                  </p>
-                </li>
+                  </dt>
+                  <dd className="mt-2.5 text-[0.86rem] leading-[1.65] text-[#8d93a1]">
+                    {area.skills.join(", ")}
+                  </dd>
+                </div>
               ))}
-            </ul>
-          </Panel>
-        </div>
+            </dl>
+          </Band>
 
-        {/* ----------------------------------------------------- second band */}
-        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 lg:grid-cols-[0.95fr_1.15fr_1fr]">
-          <Panel
-            id="skills"
-            title="Skills"
-            icon={Compass}
-            className="border-0 p-5 sm:p-6"
-          >
-            {/* Label/value rows rather than chips: chips wrap to several
-                lines and blow past the density the concept sets. The full
-                list stays on the homepage stack section. */}
-            <ul className="divide-y divide-white/8">
+          <Band id="skills" index="04" title="Skills">
+            {/* Label/value rows rather than chips: chips wrap to several lines
+                and blow past the density this page is set at. */}
+            <dl className="grid">
               {skillGroups.map((group, index) => (
-                <li
+                <div
                   key={group.category}
-                  className={index === 0 ? "pb-3" : "py-3 last:pb-0"}
+                  className={`grid gap-2 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8 ${
+                    index === 0
+                      ? "pb-4"
+                      : "border-t border-white/[0.07] py-4 last:pb-0"
+                  }`}
                 >
-                  <p className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-accent-indigo-soft/70">
+                  <dt className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-accent-indigo-soft/70">
                     {group.category}
-                  </p>
-                  <p className="mt-1 text-[0.8rem] leading-[1.5] text-[#8d93a1]">
-                    {group.skills.slice(0, 5).join(", ")}
-                    {group.skills.length > 5 ? (
-                      <span className="text-white/30">
-                        {` +${group.skills.length - 5}`}
-                      </span>
-                    ) : null}
-                  </p>
-                </li>
+                  </dt>
+                  <dd className="text-[0.9rem] leading-[1.7] text-[#a0a6b4]">
+                    {group.skills.join(", ")}
+                  </dd>
+                </div>
               ))}
-            </ul>
-          </Panel>
+            </dl>
+          </Band>
 
-          <Panel
-            id="how-i-work"
-            title="How I Work"
-            icon={Sparkles}
-            className="border-0 p-5 sm:p-6"
-          >
-            <ul className="grid gap-3.5">
-              {workingPrinciples.map((principle) => (
+          <Band id="how-i-work" index="05" title="How I Work">
+            <ol className="grid gap-8 sm:grid-cols-2 sm:gap-x-14 sm:gap-y-9">
+              {workingPrinciples.map((principle, index) => (
                 <li key={principle.title}>
-                  <p className="text-[0.88rem] font-medium leading-snug text-[#dfe2e9]">
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-[0.66rem] tracking-[0.14em] text-white/25"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="mt-2.5 text-[1rem] font-medium leading-snug text-[#dfe2e9]">
                     {principle.title}
                   </p>
-                  {/* Source runs inline with the evidence so each principle
-                      stays a two-line block. */}
-                  <p className="mt-1 text-[0.79rem] leading-[1.5] text-[#8d93a1]">
+                  <p className="mt-2 text-[0.88rem] leading-[1.65] text-[#8d93a1]">
                     {principle.evidence}{" "}
                     <Link
                       href={principle.href}
-                      className="whitespace-nowrap rounded-sm text-accent-indigo-soft/80 transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="whitespace-nowrap rounded-sm text-accent-indigo-soft/85 transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       {principle.source}
                       <ArrowRight
@@ -229,39 +246,36 @@ export default function AboutPage() {
                   </p>
                 </li>
               ))}
-            </ul>
-          </Panel>
+            </ol>
+          </Band>
 
-          <Panel
-            id="journey"
-            title="Selected Journey"
-            icon={Route}
-            className="border-0 p-5 sm:p-6"
-          >
-            <ol className="relative grid gap-5">
+          <Band id="journey" index="06" title="Selected Journey">
+            <ol className="relative grid gap-7">
               <span
                 aria-hidden="true"
-                className="absolute left-[4px] top-2 bottom-3 w-px bg-white/12"
+                className="absolute left-[4px] top-2 bottom-3 w-px bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.16)_8%,rgba(255,255,255,0.16)_90%,transparent)]"
               />
               {journey.map((entry) => (
-                <li key={entry.slug} className="relative flex gap-4">
+                <li key={entry.slug} className="relative flex gap-5">
                   <span
                     aria-hidden="true"
-                    className="relative z-10 mt-[0.35rem] size-[9px] shrink-0 rounded-full border border-accent-indigo/70 bg-accent-indigo"
+                    className="relative z-10 mt-[0.45rem] size-[9px] shrink-0 rounded-full border border-accent-indigo/70 bg-accent-indigo"
                   />
-                  <div className="min-w-0">
-                    <p className="font-mono text-[0.7rem] tracking-[0.06em] text-white/40">
+                  <div className="min-w-0 grid gap-x-10 gap-y-1 sm:grid-cols-[11rem_minmax(0,1fr)]">
+                    <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-white/40 sm:pt-[0.15rem]">
                       {entry.dates}
                     </p>
-                    <Link
-                      href={`/experience/${entry.slug}`}
-                      className="mt-1 block rounded-sm text-[0.9rem] font-medium leading-snug text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-                    >
-                      {entry.role}
-                    </Link>
-                    <p className="mt-1 text-[0.8rem] leading-[1.5] text-[#8d93a1]">
-                      {entry.organization}
-                    </p>
+                    <div>
+                      <Link
+                        href={`/experience/${entry.slug}`}
+                        className="block rounded-sm text-[0.98rem] font-medium leading-snug text-[#e2e5ec] transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                      >
+                        {entry.organization}
+                      </Link>
+                      <p className="mt-1 text-[0.88rem] leading-[1.5] text-accent-indigo-soft/80">
+                        {entry.role}
+                      </p>
+                    </div>
                   </div>
                 </li>
               ))}
@@ -269,37 +283,29 @@ export default function AboutPage() {
 
             <Link
               href="/experience"
-              className="mt-6 inline-flex items-center gap-2.5 rounded-sm text-[0.85rem] text-white/55 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+              className="mt-8 inline-flex items-center gap-2.5 rounded-sm text-[0.9rem] text-white/55 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
             >
               Full experience
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
-          </Panel>
+          </Band>
         </div>
 
         {/* --------------------------------------------------------- cta bar */}
         <section
           aria-labelledby="about-cta-title"
-          className="mt-6 flex flex-col gap-6 border border-white/10 bg-[#090c13]/60 p-6 lg:mt-8 lg:flex-row lg:items-center lg:justify-between lg:p-7"
+          className="mt-16 flex flex-col gap-7 border-t border-white/10 pt-8 lg:mt-20 lg:flex-row lg:items-end lg:justify-between lg:gap-16"
         >
-          <div className="flex items-start gap-4">
-            <span
-              aria-hidden="true"
-              className="grid size-11 shrink-0 place-items-center border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] text-accent-indigo-soft"
+          <div>
+            <h2
+              id="about-cta-title"
+              className="text-[1.35rem] font-medium leading-snug tracking-[-0.015em] text-[#e2e5ec]"
             >
-              <Mail className="size-[1.1rem]" />
-            </span>
-            <div>
-              <h2
-                id="about-cta-title"
-                className="text-[1.02rem] font-medium text-[#e2e5ec]"
-              >
-                Open to interesting problems and collaborations.
-              </h2>
-              <p className="mt-1.5 max-w-[42rem] text-[0.86rem] leading-[1.55] text-[#8d93a1]">
-                {availability}
-              </p>
-            </div>
+              Open to interesting problems and collaborations.
+            </h2>
+            <p className="mt-3 max-w-[38rem] text-[0.95rem] leading-[1.7] text-[#8d93a1]">
+              {availability}
+            </p>
           </div>
 
           <div className="flex shrink-0 flex-wrap gap-3">
@@ -324,46 +330,12 @@ export default function AboutPage() {
       </main>
 
       {/* Section rail + contact meta, mirroring the concept's right column. */}
-      <div className="absolute right-[3.2%] top-[15.5rem] z-20 hidden xl:block">
-        <nav aria-label="About sections">
-          <span
-            aria-hidden="true"
-            className="absolute left-[4px] top-1.5 h-[19rem] w-px bg-white/15"
-          />
-          <ol className="relative flex flex-col gap-[2.05rem]">
-            {aboutSections.map((section, index) => (
-              <li key={section.id}>
-                <a
-                  href={`#${section.id}`}
-                  className="group flex items-start gap-[1.1rem] rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={
-                      index === 0
-                        ? "mt-[0.3rem] size-[9px] shrink-0 rounded-full border border-accent-indigo bg-accent-indigo"
-                        : "mt-[0.3rem] size-[9px] shrink-0 rounded-full border border-white/35 bg-background transition-colors group-hover:border-white/70"
-                    }
-                  />
-                  <span>
-                    <span className="block font-mono text-[0.74rem] tracking-[0.1em] text-white/40">
-                      {section.index}
-                    </span>
-                    <span
-                      className={
-                        index === 0
-                          ? "mt-0.5 block text-[0.85rem] text-accent-indigo-soft"
-                          : "mt-0.5 block text-[0.85rem] text-white/55 transition-colors group-hover:text-white/85"
-                      }
-                    >
-                      {section.label}
-                    </span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
+      <div className="absolute right-[3.2%] top-[16rem] z-20 hidden xl:block">
+        <SectionRail
+          variant="indexed"
+          gap="2.05rem"
+          sections={anchorSections(aboutSections)}
+        />
 
         <ul className="mt-10 grid gap-3.5 border-t border-white/10 pt-6 text-[0.84rem] text-[#9299a7]">
           <li className="flex items-center gap-2.5">

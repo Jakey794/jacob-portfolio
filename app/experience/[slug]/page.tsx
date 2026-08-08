@@ -20,18 +20,21 @@ import {
   StatTiles,
 } from "@/components/case-study/panel";
 import { MetaRow, TagRow } from "@/components/experience/experience-explorer";
+import { ResultMark, RoleSchematic } from "@/components/experience/role-visuals";
 import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { PendingPlate, PendingText, PendingTile } from "@/components/pending";
 import { ProjectThumb } from "@/components/projects/project-thumb";
+import { SectionRail, anchorSections } from "@/components/section-rail";
 import { SiteNav } from "@/components/site-nav";
 import {
   experience,
   experienceSlugs,
   getAdjacentExperience,
   getExperienceBySlug,
+  type ResultTile,
 } from "@/lib/experience";
 
 type PageProps = {
@@ -65,10 +68,11 @@ export async function generateMetadata({
   };
 }
 
+/** Ordered as the panels are laid out, so the rail counts down the page. */
 const railSections = [
+  { id: "contributions", label: "Contributions" },
   { id: "overview", label: "Overview" },
   { id: "context", label: "Context" },
-  { id: "contributions", label: "Contributions" },
   { id: "workflow", label: "Workflow" },
   { id: "results", label: "Results" },
   { id: "tools", label: "Tools" },
@@ -88,15 +92,24 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
   const eyebrowIndex = String(position + 1).padStart(2, "0");
   const next = getAdjacentExperience(slug);
 
+  /**
+   * With no photograph to show, the masthead carries the workflow schematic —
+   * and then the horizontal flow panel further down would repeat it verbatim.
+   * Only one of the two renders.
+   */
+  const schematicInMasthead = !item.image && Boolean(item.workflow?.length);
+
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.experienceDetail} />
       <SiteNav active="experience" />
-      {pageAtmospheres.experienceDetail.decor ? <PageDecorTop /> : null}
+      {pageAtmospheres.experienceDetail.decor ? (
+        <PageDecorTop variant="instrument" />
+      ) : null}
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}
-      <main className="relative z-10 px-6 pb-28 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] lg:pt-[6.3rem] xl:pr-[15.5%]">
+      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
         {/* ---------------------------------------------------------- masthead */}
         <div className="grid gap-12 lg:grid-cols-[0.46fr_0.54fr] lg:items-start lg:gap-10">
           <div>
@@ -127,7 +140,21 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
             <TagRow tags={item.tools} className="mt-4" />
           </div>
 
-          <div className="relative lg:-mt-2">
+          {/*
+            No photography exists for any role, so where there is none the
+            masthead draws the role itself: the pipeline its bullets describe,
+            as a signal chain. This slot previously held a dashed "role imagery
+            pending" plate over the atmosphere band, which was the single most
+            unfinished-looking element on the site.
+
+            When the schematic lands here it takes the `workflow` anchor with
+            it and the panel version below is dropped, so the same five stages
+            are never drawn twice on one page.
+          */}
+          <div
+            id={schematicInMasthead ? "workflow" : undefined}
+            className="relative scroll-mt-28 lg:-mt-2"
+          >
             {item.image ? (
               <div className="overflow-hidden border border-white/12 bg-[#0b0e16]">
                 <ProjectThumb
@@ -138,6 +165,12 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
                   className="aspect-[16/10]"
                 />
               </div>
+            ) : schematicInMasthead ? (
+              <RoleSchematic
+                stages={item.workflow!}
+                caption="System workflow"
+                className="border border-white/10"
+              />
             ) : (
               <PendingPlate hint="Role imagery" className="aspect-[16/10]" />
             )}
@@ -145,7 +178,22 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
         </div>
 
         {/* -------------------------------------------------- summary band */}
-        <div className="mt-14 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-16 xl:grid-cols-3">
+        {/*
+          Contributions leads. It is the only panel of the three that is
+          populated for every role — `summary` and `context` are unwritten
+          across the board — so putting the written work first keeps the band
+          from opening on two placeholders.
+        */}
+        <div className="mt-14 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-16 xl:grid-cols-[1.4fr_1fr_1fr]">
+          <Panel
+            id="contributions"
+            title="Technical Contributions"
+            icon={ListChecks}
+            className="border-0 sm:col-span-2 xl:col-span-1"
+          >
+            <PanelList items={item.bullets} />
+          </Panel>
+
           <Panel id="overview" title="Overview" icon={Sparkles} className="border-0">
             {item.summary ? (
               <PanelText>{item.summary}</PanelText>
@@ -166,36 +214,33 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
               <PendingText hint="Problem / context" lines={4} />
             )}
           </Panel>
-
-          <Panel
-            id="contributions"
-            title="Technical Contributions"
-            icon={ListChecks}
-            className="border-0 sm:col-span-2 xl:col-span-1"
-          >
-            <PanelList items={item.bullets} />
-          </Panel>
         </div>
 
         {/* ------------------------------------------- workflow / results */}
-        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1.15fr_1fr]">
-          <Panel
-            id="workflow"
-            title="System Workflow"
-            icon={CircuitBoard}
-            className="border-0"
-            bodyClassName="flex flex-col justify-center"
-          >
-            {item.workflow?.length ? (
-              <ArchitectureFlow
-                stages={item.workflow}
-                size="detailed"
-                feedbackLabel={item.feedbackLabel}
-              />
-            ) : (
-              <PendingPlate hint="Workflow diagram" className="min-h-[10rem]" />
-            )}
-          </Panel>
+        <div
+          className={`mt-6 grid gap-px bg-white/10 lg:mt-8 ${
+            schematicInMasthead ? "" : "xl:grid-cols-[1.15fr_1fr]"
+          }`}
+        >
+          {schematicInMasthead ? null : (
+            <Panel
+              id="workflow"
+              title="System Workflow"
+              icon={CircuitBoard}
+              className="border-0"
+              bodyClassName="flex flex-col justify-center"
+            >
+              {item.workflow?.length ? (
+                <ArchitectureFlow
+                  stages={item.workflow}
+                  size="detailed"
+                  feedbackLabel={item.feedbackLabel}
+                />
+              ) : (
+                <PendingPlate hint="Workflow diagram" className="min-h-[10rem]" />
+              )}
+            </Panel>
+          )}
 
           <Panel id="results" title="Key Results" icon={FileText} className="border-0">
             {item.results?.length ? (
@@ -270,6 +315,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
               href={`/experience/${next.slug}`}
               image={next.image}
               imageAlt={next.imageAlt}
+              results={next.results}
             />
           ) : null}
         </div>
@@ -288,43 +334,12 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
       </main>
 
       {/* Section rail — anchors into the panels above. */}
-      <nav
-        aria-label="Experience sections"
-        className="absolute right-[3.2%] top-[15rem] z-20 hidden xl:block"
-      >
-        <span
-          aria-hidden="true"
-          className="absolute left-[4px] top-1.5 bottom-1.5 w-px bg-white/15"
-        />
-        <ol className="relative flex flex-col gap-[1.35rem]">
-          {railSections.map((section, index) => (
-            <li key={section.id}>
-              <a
-                href={`#${section.id}`}
-                className="group flex items-center gap-[1.1rem] rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-              >
-                <span
-                  aria-hidden="true"
-                  className={
-                    index === 0
-                      ? "size-[9px] shrink-0 rounded-full border border-accent-indigo bg-accent-indigo"
-                      : "size-[9px] shrink-0 rounded-full border border-white/35 bg-background transition-colors group-hover:border-white/70"
-                  }
-                />
-                <span
-                  className={
-                    index === 0
-                      ? "text-[0.85rem] text-white/85"
-                      : "text-[0.85rem] text-white/45 transition-colors group-hover:text-white/80"
-                  }
-                >
-                  {section.label}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
+      <SectionRail
+        variant="labelled"
+        gap="1.35rem"
+        sections={anchorSections(railSections)}
+        className="absolute right-[3.2%] top-[15.5rem] z-20 hidden xl:block"
+      />
 
       <Footer />
     </div>
@@ -339,6 +354,7 @@ function NextExperiencePanel({
   href,
   image,
   imageAlt,
+  results,
 }: {
   index: string;
   organization: string;
@@ -347,6 +363,7 @@ function NextExperiencePanel({
   href: string;
   image?: string;
   imageAlt?: string;
+  results?: ResultTile[];
 }) {
   return (
     <section
@@ -389,6 +406,11 @@ function NextExperiencePanel({
               alt={imageAlt ?? `${organization} preview`}
               sizes="(min-width: 1024px) 14vw, 34vw"
               className="hidden aspect-[16/10] w-[8.5rem] shrink-0 border border-white/12 sm:block"
+            />
+          ) : results?.length ? (
+            <ResultMark
+              results={results}
+              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 sm:grid"
             />
           ) : (
             <PendingPlate

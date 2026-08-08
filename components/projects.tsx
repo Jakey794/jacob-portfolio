@@ -1,9 +1,10 @@
-import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
 import { caseStudyProjects, featuredProject } from "@/lib/projects";
 import { ArrowLink, CtaLink, ctaClass } from "@/components/cta-link";
 import { ProjectCard } from "@/components/project-card";
+import { CaptureFrame } from "@/components/projects/capture-frame";
+import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionHeading } from "@/components/section-heading";
 import { HomeSection } from "@/components/section-shell";
 
@@ -34,24 +35,27 @@ export function FeaturedProjectShowcase() {
       {/* The featured slot is a single drawn object: one hairline box split by
           a 1px rule, rather than a floating card with a shadow. */}
       <article className="group mt-12 grid gap-px border border-white/10 bg-white/10 lg:mt-14 lg:grid-cols-[1.12fr_0.88fr]">
+        {/* Same drawn window chrome the projects index and case studies use.
+            Bleeding the capture to the cell edge made it the loudest object on
+            the homepage and the only screenshot on the site without a frame. */}
         {featuredProject.image ? (
-          <div className="relative overflow-hidden bg-[#070a10]">
-            <Image
-              src={featuredProject.image}
-              alt={
-                featuredProject.imageAlt ??
-                `${featuredProject.title} screenshot`
-              }
-              width={1200}
-              height={760}
-              priority
-              className="h-full min-h-72 w-full object-cover object-top brightness-[0.96] saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.012] sm:min-h-[26rem]"
-            />
-            {/* Settles the bright product screenshot into the dark page. */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,18,0.14)_0%,transparent_30%,rgba(8,11,18,0.5)_100%)]"
-            />
+          <div className="flex items-center bg-[#070a10] p-6 sm:p-8 lg:p-9">
+            <CaptureFrame
+              label={featuredProject.title}
+              className="w-full shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)]"
+              bodyClassName="aspect-[1.68/1]"
+            >
+              <ProjectThumb
+                src={featuredProject.image}
+                alt={
+                  featuredProject.imageAlt ??
+                  `${featuredProject.title} screenshot`
+                }
+                sizes="(min-width: 1024px) 55vw, 100vw"
+                priority
+                className="absolute inset-0"
+              />
+            </CaptureFrame>
           </div>
         ) : null}
 
