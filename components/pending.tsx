@@ -59,11 +59,17 @@ export function PendingPlate({
   return (
     <div
       className={cn(
-        "relative grid place-items-center border border-dashed border-white/12 bg-[linear-gradient(135deg,rgba(133,144,246,0.05),transparent_60%)]",
+        "relative grid place-items-center overflow-hidden border border-dashed border-white/12 bg-[linear-gradient(135deg,rgba(133,144,246,0.05),transparent_60%)]",
         className
       )}
     >
-      <p className="font-mono text-[0.64rem] uppercase tracking-[0.18em] text-white/25">
+      {/* Faint measuring grid. Keeps an empty slot looking like a reserved
+          plate rather than a broken image, without implying content. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:28px_28px]"
+      />
+      <p className="relative font-mono text-[0.64rem] uppercase tracking-[0.18em] text-white/25">
         {hint} pending
       </p>
     </div>

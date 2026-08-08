@@ -21,7 +21,7 @@ import {
 } from "@/components/case-study/panel";
 import { MetaRow, TagRow } from "@/components/experience/experience-explorer";
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { PendingPlate, PendingText, PendingTile } from "@/components/pending";
@@ -90,9 +90,9 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere height="h-[26rem] lg:h-[34rem]" />
+      <PageAtmosphere config={pageAtmospheres.experienceDetail} />
       <SiteNav active="experience" />
-      <PageDecorTop />
+      {pageAtmospheres.experienceDetail.decor ? <PageDecorTop /> : null}
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}

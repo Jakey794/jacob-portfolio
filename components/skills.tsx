@@ -1,49 +1,48 @@
 import { skillGroups } from "@/lib/skills";
 import { SectionHeading } from "@/components/section-heading";
-import { Badge } from "@/components/ui/badge";
+import { HomeSection } from "@/components/section-shell";
 
+/**
+ * Supporting band rather than a numbered section — it backs up the work above
+ * instead of introducing a new one, so it carries a plain eyebrow and is drawn
+ * as a dense label/value table rather than a grid of chip cards.
+ */
 export function Skills() {
   return (
-    <section id="skills" aria-labelledby="skills-title" className="px-6 py-20 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeading
-          id="skills-title"
-          eyebrow="Skills"
-          title="A compact technical stack"
-        >
-          <p>
-            Languages, ML tooling, quant concepts, and software platforms used
-            across research and product projects.
-          </p>
-        </SectionHeading>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {skillGroups.map((group) => (
-            <section
-              key={group.category}
-              aria-labelledby={`skills-${group.category.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")}`}
-              className="rounded-lg border border-slate-800 bg-slate-950/60 p-5"
-            >
-              <h3
-                id={`skills-${group.category.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")}`}
-                className="text-lg font-semibold text-slate-50"
-              >
-                {group.category}
-              </h3>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {group.skills.map((skill) => (
-                  <Badge
-                    key={skill}
-                    variant="outline"
-                    className="border-slate-700 bg-slate-900/70 text-slate-200"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </div>
-    </section>
+    <HomeSection id="skills" labelledBy="skills-title">
+      <SectionHeading
+        eyebrow="Stack"
+        title="A compact technical stack"
+        id="skills-title"
+      >
+        <p>
+          Languages, ML tooling, quant concepts, and software platforms used
+          across research and product projects.
+        </p>
+      </SectionHeading>
+
+      <dl className="mt-12 border-t border-white/10 lg:mt-14">
+        {skillGroups.map((group) => (
+          <div
+            key={group.category}
+            className="grid gap-2 border-b border-white/10 py-6 lg:grid-cols-[19rem_1fr] lg:gap-14"
+          >
+            <dt className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent-indigo-soft/80">
+              {group.category}
+            </dt>
+            <dd className="flex flex-wrap gap-x-2 gap-y-2">
+              {group.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="border border-white/12 px-2.5 py-1 text-[0.78rem] text-[#a0a6b4] transition-colors hover:border-white/25 hover:text-white"
+                >
+                  {skill}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </HomeSection>
   );
 }

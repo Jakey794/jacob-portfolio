@@ -1,150 +1,148 @@
 import Image from "next/image";
-import { ExternalLink, GitBranch, Radio } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import type { Project } from "@/lib/projects";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { PendingPlate } from "@/components/pending";
 
 type ProjectCardProps = {
   project: Project;
+  /** Two-digit label shown against the project, matching the featured slot. */
+  index?: string;
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+const caseStudyProjectSlugs = new Set([
+  "incident-triage-copilot",
+  "formatclip",
+  "rf-signal-classification-research",
+  "regime-specialist-stock-predictor",
+]);
+
+/**
+ * A cell in the case-study grid. Deliberately not a rounded, shadowed card:
+ * the grid draws its own hairlines, so each cell is a flat panel that shares
+ * the page background and lifts only slightly on hover.
+ */
+export function ProjectCard({ project, index }: ProjectCardProps) {
+  const hasCaseStudyPage = caseStudyProjectSlugs.has(project.slug);
+  const primaryAction = hasCaseStudyPage
+    ? {
+        label: "Read case study",
+        href: `/projects/${project.slug}`,
+        internal: true,
+      }
+    : project.liveDemo
+      ? { label: "Live demo", href: project.liveDemo, internal: false }
+      : project.github
+        ? { label: "GitHub", href: project.github, internal: false }
+        : null;
+  const statusLabel = project.statusLabel ?? "Case-study preview";
+
   return (
-    <Card className="h-full border border-slate-800 bg-slate-950/70 shadow-xl shadow-slate-950/40 transition-colors hover:border-cyan-300/35">
+    <article className="group flex h-full flex-col bg-[#090c13] transition-colors duration-300 hover:bg-[#0c101a]">
+      {/* A shallow media band rather than 16/9: two of the four projects have
+          no screenshot yet, and a full-height empty plate dominates the row. */}
       {project.image ? (
-        <div className="mx-4 mt-4 aspect-[16/9] overflow-hidden rounded-lg border border-slate-800 bg-slate-900">
+        <div className="relative aspect-[2.2/1] overflow-hidden border-b border-white/10 bg-[#070a10]">
           <Image
             src={project.image}
-            alt={`${project.title} screenshot`}
+            alt={project.imageAlt ?? `${project.title} screenshot`}
             width={900}
             height={520}
-            className="h-full w-full rounded-xl object-cover"
-            priority={project.featured === true}
+            /* Scaled in: at a third of the row width a whole browser window
+               reads as noise, so the band shows a legible detail instead. */
+            className="h-full w-full scale-[1.28] object-cover object-center brightness-[0.96] saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.33]"
+          />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,11,18,0.18)_0%,transparent_35%,rgba(8,11,18,0.55)_100%)]"
           />
         </div>
       ) : (
-        <div className="mx-4 mt-4 grid aspect-[16/9] place-items-center rounded-lg border border-slate-800 bg-[linear-gradient(135deg,rgba(14,165,233,0.16),rgba(15,23,42,0.95)),linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[size:auto,22px_22px,22px_22px]">
-          <div className="flex items-center gap-3 text-cyan-100">
-            <Radio aria-hidden="true" className="size-5" />
-            <span className="font-mono text-xs uppercase">
-              Research preview
-            </span>
-          </div>
-        </div>
+        <PendingPlate
+          hint="Imagery"
+          className="aspect-[2.2/1] border-0 border-b border-solid border-white/10"
+        />
       )}
-      <CardHeader className="gap-3 px-5 pt-5">
-        <div className="space-y-3">
-          <CardTitle className="text-xl text-slate-50">
-            {project.title}
-          </CardTitle>
-          {project.statusLabel ? (
-            <Badge
-              variant="outline"
-              className="border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
-            >
-              {project.statusLabel}
-            </Badge>
-          ) : null}
+
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex items-center gap-3 font-mono text-[0.66rem] uppercase tracking-[0.16em]">
+          {index ? <span className="text-accent-indigo-soft">{index}</span> : null}
+          <span className="text-white/35">{statusLabel}</span>
         </div>
-        {project.github || project.liveDemo ? (
-          <CardAction>
-            <div className="flex gap-2">
-              {project.liveDemo ? (
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  nativeButton={false}
-                  className="border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800"
-                  aria-label={`${project.title} live demo`}
-                  render={
-                    <a
-                      href={project.liveDemo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    />
-                  }
-                >
-                  <ExternalLink aria-hidden="true" />
-                </Button>
-              ) : null}
-              {project.github ? (
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  nativeButton={false}
-                  className="border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800"
-                  aria-label={`${project.title} GitHub repository`}
-                  render={
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    />
-                  }
-                >
-                  <GitBranch aria-hidden="true" />
-                </Button>
-              ) : null}
-            </div>
-          </CardAction>
-        ) : null}
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col px-5 pb-5">
-        <p className="text-sm leading-6 text-slate-300">{project.summary}</p>
-        <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-300">
+
+        <h3 className="mt-4 text-[1.18rem]/[1.3] font-medium tracking-[-0.015em] text-[#e4e7ed]">
+          {project.title}
+        </h3>
+
+        <p className="mt-3 text-[0.9rem] leading-[1.68] text-[#8d93a1]">
+          {project.summary}
+        </p>
+
+        <ul className="mt-5 grid gap-2.5">
           {project.proof.map((item) => (
-            <li key={item} className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" />
-              <span>{item}</span>
+            <li key={item} className="flex gap-2.5">
+              <span
+                aria-hidden="true"
+                className="mt-[0.5rem] size-[4px] shrink-0 rounded-full bg-accent-indigo-soft/70"
+              />
+              <span className="text-[0.83rem] leading-[1.6] text-[#a0a6b4]">
+                {item}
+              </span>
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <Badge
+
+        <ul className="mt-5 flex flex-wrap gap-1.5">
+          {project.displayTags.map((tag) => (
+            <li
               key={tag}
-              variant="outline"
-              className="border-slate-700 bg-slate-900/70 text-slate-200"
+              className="border border-white/12 px-2 py-[0.2rem] text-[0.7rem] text-[#9299a7]"
             >
               {tag}
-            </Badge>
+            </li>
           ))}
+        </ul>
+
+        <div className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-3 pt-7">
+          {primaryAction ? (
+            primaryAction.internal ? (
+              <Link
+                href={primaryAction.href}
+                className="inline-flex items-center gap-2.5 rounded-sm text-[0.88rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+              >
+                {primaryAction.label}
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-[0.95rem] transition-transform duration-200 group-hover:translate-x-1"
+                />
+              </Link>
+            ) : (
+              <a
+                href={primaryAction.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 rounded-sm text-[0.88rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+              >
+                {primaryAction.label}
+                <ArrowUpRight aria-hidden="true" className="size-[0.95rem]" />
+              </a>
+            )
+          ) : null}
+
+          {project.github && primaryAction?.href !== project.github ? (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm text-[0.85rem] text-white/45 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            >
+              GitHub
+              <ArrowUpRight aria-hidden="true" className="size-[0.85rem]" />
+            </a>
+          ) : null}
         </div>
-        {project.liveDemo || project.github ? (
-          <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2">
-            {project.liveDemo ? (
-              <a
-                href={project.liveDemo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium text-cyan-200 hover:text-cyan-100"
-              >
-                Live demo
-                <ExternalLink aria-hidden="true" className="size-4" />
-              </a>
-            ) : null}
-            {project.github ? (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium text-cyan-200 hover:text-cyan-100"
-              >
-                GitHub
-                <ExternalLink aria-hidden="true" className="size-4" />
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
 }

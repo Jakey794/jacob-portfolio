@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import {
@@ -36,12 +36,12 @@ const items: ProjectIndexItem[] = allProjects.map((project) => ({
 export default function ProjectsIndexPage() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere />
+      <PageAtmosphere config={pageAtmospheres.projects} />
       <SiteNav active="projects" />
-      <PageDecorTop />
+      {pageAtmospheres.projects.decor ? <PageDecorTop /> : null}
 
       <main className="relative z-10 px-6 pb-24 pt-[7rem] sm:px-10 sm:pt-[7.5rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%] lg:pt-[7.6rem]">
-        <PageEyebrow index="02" label="Projects" />
+        <PageEyebrow index="03" label="Projects" />
 
         <PageTitle className="mt-1">Projects</PageTitle>
 

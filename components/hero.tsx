@@ -96,29 +96,36 @@ export function Hero() {
 function HeroBackdrop() {
   return (
     <div aria-hidden="true" className="absolute inset-0 z-0">
-      {/* The plate is lifted so the ridgeline reads behind the headline at the
-          density the concept shows; the layers below then take brightness back
-          out only where it would fight the type or the rail. */}
+      {/* The plate is already graded dark and stormy, so it is lifted only
+          enough to keep the ridgeline legible behind the figure. Lifting it
+          harder washes the cloud break out to a flat tan and costs the scene
+          its depth. */}
       <Image
         src="/images/hero/mountains.png"
         alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center brightness-[1.38]"
+        className="object-cover object-[62%_center] brightness-[1.22] contrast-[1.06] saturate-[0.92]"
       />
       {/* Left column: just enough to hold the headline, no more. */}
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,8,14,0.62)_0%,rgba(6,8,14,0.34)_16%,rgba(6,8,14,0.14)_36%,transparent_62%)]" />
-      {/* Knocks down the upper-right cloud break so the coordinates, dot grid
-          and numbered rail stay legible, while leaving the lower-right rock. */}
-      <div className="absolute inset-0 bg-[radial-gradient(52%_66%_at_103%_20%,rgba(6,8,14,0.99)_0%,rgba(6,8,14,0.78)_42%,transparent_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,8,14,0.80)_0%,rgba(6,8,14,0.54)_15%,rgba(6,8,14,0.26)_34%,rgba(6,8,14,0.07)_56%,transparent_70%)]" />
+      {/* Knocks the upper-right cloud break back so the coordinates, dot grid
+          and numbered rail stay legible — but only partly, because that break
+          is what separates the figure's head and shoulder from the ridge. */}
+      <div className="absolute inset-0 bg-[radial-gradient(42%_54%_at_104%_14%,rgba(6,8,14,0.88)_0%,rgba(6,8,14,0.44)_48%,transparent_100%)]" />
+      {/* Cool indigo cast: ties the photography to the page accent instead of
+          letting the lifted cloud drift warm. */}
+      <div className="absolute inset-0 bg-[radial-gradient(80%_70%_at_52%_38%,rgba(32,38,74,0.22)_0%,rgba(11,14,26,0.34)_62%,rgba(6,8,14,0.54)_100%)] mix-blend-multiply" />
+      {/* Vignette. Keeps the eye on the headline/figure axis. */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_95%_at_52%_46%,transparent_48%,rgba(4,6,11,0.5)_100%)]" />
       {/* Anchors the composition to the bottom of the viewport. */}
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.5)_7%,transparent_22%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.5)_7%,transparent_24%)]" />
       {/* Settles the navigation into the scene. */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,rgba(6,8,14,0.5),transparent)]" />
+      <div className="absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(6,8,14,0.62),transparent)]" />
       {/* Below lg the copy sits over the full width of the plate rather than
           its dark left third, so it needs its own scrim. */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,14,0.72)_0%,rgba(6,8,14,0.52)_45%,rgba(6,8,14,0.16)_74%,transparent_100%)] lg:hidden" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,14,0.78)_0%,rgba(6,8,14,0.58)_45%,rgba(6,8,14,0.2)_74%,transparent_100%)] lg:hidden" />
     </div>
   );
 }
@@ -128,10 +135,21 @@ function HeroBackdrop() {
  * box (142x215 centred at 1086,308 in a 1672x941 frame) puts the plate at
  * 65.7% width, inset 2% from the right, with its base lifted 8.4% so the
  * figure settles into the fog rather than butting the viewport edge.
+ *
+ * `top` matters as much as the width. The plate is `object-contain`, so on a
+ * short viewport it scales to the box height instead of its width and the
+ * crown climbs into the navigation — at a 713px-tall viewport the head landed
+ * directly behind "About". Starting the box below the nav bounds the drawn
+ * height, so the crown can never reach it, and at the reference 941px height
+ * the plate is still width-limited and the composition is unchanged.
+ *
+ * The bottom mask is what settles the figure into the scene: the torso runs
+ * off the source frame, so without it the jacket ends on a hard horizontal
+ * cut. The fade hands over to `HeroFog` at roughly the same height.
  */
 function HeroPortrait() {
   return (
-    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_13%)] [mask-image:linear-gradient(to_top,transparent_0,#000_13%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:top-0 lg:bottom-[8.4%] lg:right-[2%] lg:h-auto lg:w-[65.7%]">
+    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_13%)] [mask-image:linear-gradient(to_top,transparent_0,#000_13%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_11%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_11%)]">
       <Image
         src="/images/hero/portrait.png"
         alt="Jacob Allan"
@@ -150,10 +168,18 @@ function HeroPortrait() {
  */
 function HeroFog() {
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[18%] bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.5)_38%,transparent_100%)]"
-    />
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[22%] bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.62)_34%,transparent_100%)]"
+      />
+      {/* A shallow bank of haze drifting across the base of the figure, so the
+          cutout meets the rock through atmosphere rather than at a line. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-[6%] z-[16] h-[16%] bg-[radial-gradient(70%_100%_at_62%_100%,rgba(126,140,178,0.14)_0%,transparent_70%)]"
+      />
+    </>
   );
 }
 
@@ -171,19 +197,23 @@ function HeroDecor() {
         className="absolute left-[2.35%] top-[16%] z-10 hidden text-white/40 lg:block"
       />
 
-      {/* Upper-right technical readout */}
+      {/* Upper-right technical readout. The coordinates and the dot grid share
+          this corner, so they are stacked rather than overlaid: grid above,
+          readout below, both clear of the rail at right-4.4%. */}
+      <DotGrid className="absolute right-[9.5%] top-[12.5%] z-10 hidden lg:block" />
       <CrossMark
         size={16}
-        className="absolute left-[80.5%] top-[19%] z-10 hidden text-white/40 lg:block"
+        className="absolute left-[80.5%] top-[22.4%] z-10 hidden text-white/40 lg:block"
       />
       <CoordinateBlock
         lines={["43° 39′ 46″ N", "79° 23′ 45″ W"]}
-        className="absolute left-[84%] top-[17.8%] z-10 hidden lg:block"
+        className="absolute left-[83.5%] top-[21.2%] z-10 hidden lg:block"
       />
-      <DotGrid className="absolute right-0 top-[15.5%] z-10 hidden lg:block" />
 
-      {/* Topographic wireframe behind the portrait */}
-      <WireframePeaks className="absolute left-[74%] top-[21%] z-0 hidden w-[11.5%] lg:block" />
+      {/* Topographic wireframe. Sits in the gap between the figure's shoulder
+          and the numbered rail — anywhere further left is covered by the
+          portrait, which renders above it. */}
+      <WireframePeaks className="absolute left-[83%] top-[30%] z-0 hidden w-[10.5%] lg:block" />
 
       {/* Location readout */}
       <CoordinateBlock

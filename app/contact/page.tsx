@@ -16,7 +16,7 @@ import {
 
 import { Panel } from "@/components/case-study/panel";
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { SiteNav } from "@/components/site-nav";
@@ -50,9 +50,9 @@ const channelIcons = {
 export default function ContactPage() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere height="h-[26rem] lg:h-[32rem]" />
+      <PageAtmosphere config={pageAtmospheres.contact} />
       <SiteNav active="contact" />
-      <PageDecorTop />
+      {pageAtmospheres.contact.decor ? <PageDecorTop /> : null}
 
       <main className="relative z-10 px-6 pb-28 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-32 lg:pl-[4.5%] lg:pr-[5%] lg:pt-[6.2rem] xl:pr-[12.6%]">
         {/* ---------------------------------------------------------- masthead */}

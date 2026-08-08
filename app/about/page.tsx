@@ -14,7 +14,7 @@ import {
 
 import { Panel, PanelText } from "@/components/case-study/panel";
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { SiteNav } from "@/components/site-nav";
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere height="h-[24rem] lg:h-[30rem]" />
+      <PageAtmosphere config={pageAtmospheres.about} />
       <SiteNav active="about" />
-      <PageDecorTop />
+      {pageAtmospheres.about.decor ? <PageDecorTop /> : null}
 
       <main className="relative z-10 px-6 pb-28 pt-[6.5rem] sm:px-10 sm:pt-[6.75rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] lg:pt-[6.2rem] xl:pr-[15.5%]">
         {/* ---------------------------------------------------------- masthead */}
-        <PageEyebrow index="01" label="About" />
+        <PageEyebrow index="02" label="About" />
 
         <PageTitle size="page" className="mt-0.5">
           About

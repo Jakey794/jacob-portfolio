@@ -5,7 +5,7 @@ import {
   type ExperienceIndexItem,
 } from "@/components/experience/experience-explorer";
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { SiteNav } from "@/components/site-nav";
@@ -48,9 +48,9 @@ function toIndexItem(item: ExperienceItem): ExperienceIndexItem {
 export default function ExperienceIndexPage() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere />
+      <PageAtmosphere config={pageAtmospheres.experience} />
       <SiteNav active="experience" />
-      <PageDecorTop />
+      {pageAtmospheres.experience.decor ? <PageDecorTop /> : null}
 
       {/* Tighter vertical rhythm than /projects: the experience concept packs
           the header into roughly 220px before the first card. */}

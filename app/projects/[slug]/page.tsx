@@ -23,7 +23,7 @@ import {
   StatTiles,
 } from "@/components/case-study/panel";
 import { Footer } from "@/components/footer";
-import { PageAtmosphere } from "@/components/page-atmosphere";
+import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { ProjectThumb } from "@/components/projects/project-thumb";
@@ -91,9 +91,9 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere height="h-[26rem] lg:h-[34rem]" />
+      <PageAtmosphere config={pageAtmospheres.projectDetail} />
       <SiteNav active="projects" />
-      <PageDecorTop />
+      {pageAtmospheres.projectDetail.decor ? <PageDecorTop /> : null}
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}
