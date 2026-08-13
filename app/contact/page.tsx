@@ -10,12 +10,15 @@ import {
   Link2,
 } from "lucide-react";
 
+import { ctaClass } from "@/components/cta-link";
 import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { SectionRail, anchorSections } from "@/components/section-rail";
+import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import {
   availabilityStatement,
   contactSections,
@@ -59,7 +62,7 @@ export default function ContactPage() {
       <PageAtmosphere config={pageAtmospheres.contact} />
       <SiteNav active="contact" />
 
-      <main className="relative z-10 px-6 pb-32 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-40 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
+      <main className={cn("relative z-10 pb-28 pt-[8.5rem] md:pt-[7.1rem] lg:pb-24", pageGutters.railed)}>
         {/* ---------------------------------------------------------- masthead */}
         <div id="overview" className="scroll-mt-28">
           <PageEyebrow index="05" label="Contact" />
@@ -92,16 +95,12 @@ export default function ContactPage() {
             </li>
           </ul>
 
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {contactTags.map((tag) => (
-              <li
-                key={tag}
-                className="border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] px-2.5 py-1 text-[0.74rem] text-accent-indigo-soft/85"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
+          {/* Set as a line, not as chips: this is the calmest page on the
+              site and four bordered rectangles were the only boxes on it. */}
+          <TechLine
+            items={contactTags}
+            className="mt-6 text-[0.95rem] text-accent-indigo-soft/85"
+          />
         </div>
 
         {/* ------------------------------------------------------------ email */}
@@ -121,7 +120,10 @@ export default function ContactPage() {
 
           <a
             href={emailChannel.href}
-            className="group mt-5 inline-flex max-w-full flex-wrap items-center gap-x-5 gap-y-2 rounded-sm text-[clamp(1.5rem,3.6vw,2.7rem)] leading-[1.15] tracking-[-0.025em] text-[#e2e5ec] transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            /* The gap tightens below sm so the address and its arrow still
+               share a line at 390px instead of the arrow dropping under the
+               address on a line of its own. */
+            className="group mt-5 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-sm text-[clamp(1.5rem,3.6vw,2.7rem)] leading-[1.15] tracking-[-0.025em] text-[#e2e5ec] transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:gap-x-5"
           >
             <span className="break-all">{emailChannel.text}</span>
             <ArrowRight
@@ -156,9 +158,13 @@ export default function ContactPage() {
                     {...(channel.external
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    className="group flex flex-wrap items-center gap-x-8 gap-y-2 rounded-sm py-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                    /* Stacked below sm. Wrapping, the résumé row kept its
+                       short destination on the first line and squeezed the
+                       description into a sixty-pixel column that set one word
+                       per line, eleven lines deep. */
+                    className="group flex flex-col gap-2.5 rounded-sm py-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-2"
                   >
-                    <span className="flex w-[9rem] shrink-0 items-center gap-3">
+                    <span className="flex items-center gap-3 sm:w-[9rem] sm:shrink-0">
                       <Icon
                         aria-hidden="true"
                         className="size-[1rem] shrink-0 text-white/35 transition-colors group-hover:text-accent-indigo-soft"
@@ -168,7 +174,7 @@ export default function ContactPage() {
                       </span>
                     </span>
 
-                    <span className="min-w-0 flex-1 text-[0.9rem] leading-[1.6] text-[#8d93a1]">
+                    <span className="min-w-0 text-[0.9rem] leading-[1.6] text-[#8d93a1] sm:flex-1">
                       {channel.description}
                     </span>
 
@@ -237,14 +243,14 @@ export default function ContactPage() {
           <div className="flex shrink-0 flex-wrap gap-3">
             <Link
               href="/projects"
-              className="inline-flex h-[2.9rem] items-center justify-center gap-3 rounded-md bg-accent-indigo px-6 text-[0.95rem] text-white transition-colors outline-none hover:bg-accent-indigo/85 focus-visible:ring-2 focus-visible:ring-accent-indigo-soft focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={ctaClass("primary", "sm")}
             >
               View Projects
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
             <Link
               href="/"
-              className="inline-flex h-[2.9rem] items-center justify-center gap-3 rounded-md border border-white/18 px-6 text-[0.95rem] text-white transition-colors outline-none hover:border-white/40 hover:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-accent-indigo-soft focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={ctaClass("secondary", "sm")}
             >
               Back to Home
               <ArrowRight aria-hidden="true" className="size-4" />
@@ -262,7 +268,7 @@ export default function ContactPage() {
         className="absolute right-[3.2%] top-[18rem] z-20 hidden xl:block"
       />
 
-      <Footer />
+      <Footer className={pageGutters.railed} />
     </div>
   );
 }

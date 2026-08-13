@@ -1,16 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowRight,
-  Boxes,
-  CircuitBoard,
-  FileText,
-  HelpCircle,
-  ListChecks,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { ArchitectureFlow } from "@/components/case-study/architecture-flow";
 import {
@@ -19,16 +10,18 @@ import {
   PanelText,
   StatTiles,
 } from "@/components/case-study/panel";
-import { MetaRow, TagRow } from "@/components/experience/experience-explorer";
+import { MetaRow } from "@/components/experience/experience-explorer";
 import { ResultMark, RoleSchematic } from "@/components/experience/role-visuals";
 import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
-import { PendingPlate, PendingText, PendingTile } from "@/components/pending";
+import { PendingPlate } from "@/components/pending";
 import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionRail, anchorSections } from "@/components/section-rail";
+import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import {
   experience,
   experienceSlugs,
@@ -68,18 +61,6 @@ export async function generateMetadata({
   };
 }
 
-/** Ordered as the panels are laid out, so the rail counts down the page. */
-const railSections = [
-  { id: "contributions", label: "Contributions" },
-  { id: "overview", label: "Overview" },
-  { id: "context", label: "Context" },
-  { id: "workflow", label: "Workflow" },
-  { id: "results", label: "Results" },
-  { id: "tools", label: "Tools" },
-  { id: "team", label: "Team" },
-  { id: "next-role", label: "Next Role" },
-];
-
 export default async function ExperienceDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const item = getExperienceBySlug(slug);
@@ -99,6 +80,47 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
    */
   const schematicInMasthead = !item.image && Boolean(item.workflow?.length);
 
+  /*
+    Which panels this role actually has content for.
+
+    `summary`, `context`, `team` and `location` are unset for every role in
+    `lib/experience.ts`, so the page used to render five skeleton placeholders
+    per role — "role summary pending" directly under the job title, then
+    "overview pending", "problem / context pending", "team / collaboration
+    pending" and "location pending". A reader met four grey stubs before any
+    real work. Empty slots are dropped instead: the bands close up around what
+    exists, and the outstanding fields stay documented in the data file rather
+    than on the page.
+  */
+  const hasOverview = Boolean(item.summary);
+  const hasContext = Boolean(item.context);
+  const hasTeam = Boolean(item.team?.length);
+  const hasResults = Boolean(item.results?.length);
+  const hasWorkflow = Boolean(item.workflow?.length);
+
+  /* Ordered as the panels are laid out, so the rail counts down the page — and
+     built from what renders, so no entry scrolls to a section that is absent. */
+  const railSections = [
+    { id: "contributions", label: "Contributions" },
+    ...(hasOverview ? [{ id: "overview", label: "Overview" }] : []),
+    ...(hasContext ? [{ id: "context", label: "Context" }] : []),
+    ...(hasWorkflow ? [{ id: "workflow", label: "Workflow" }] : []),
+    ...(hasResults ? [{ id: "results", label: "Results" }] : []),
+    { id: "tools", label: "Tools" },
+    ...(hasTeam ? [{ id: "team", label: "Team" }] : []),
+    ...(next ? [{ id: "next-role", label: "Next Role" }] : []),
+  ];
+
+  /** Panel heads carry the same index the rail entry that targets them does. */
+  const panelIndex = (id: string) => {
+    const position = railSections.findIndex((section) => section.id === id);
+    return position === -1
+      ? undefined
+      : String(position + 1).padStart(2, "0");
+  };
+
+  const summaryPanels = 1 + Number(hasOverview) + Number(hasContext);
+
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <PageAtmosphere config={pageAtmospheres.experienceDetail} />
@@ -109,7 +131,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}
-      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
+      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.railed)}>
         {/* ---------------------------------------------------------- masthead */}
         <div className="grid gap-12 lg:grid-cols-[0.46fr_0.54fr] lg:items-start lg:gap-10">
           <div>
@@ -127,17 +149,17 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
               <p className="mt-3.5 max-w-[28rem] text-[0.95rem] leading-[1.6] text-[#a2a8b5]">
                 {item.summary}
               </p>
-            ) : (
-              <PendingText
-                hint="Role summary"
-                lines={3}
-                className="mt-3.5 max-w-[28rem]"
-              />
-            )}
+            ) : null}
 
             <MetaRow dates={item.dates} location={item.location} className="mt-5" />
 
-            <TagRow tags={item.tools} className="mt-4" />
+            {/* A line, not chips — the masthead is unboxed, and the same tools
+                already appear as chips in the index card this page opens
+                from. */}
+            <TechLine
+              items={item.tools}
+              className="mt-4 text-[0.95rem] text-accent-indigo-soft/85"
+            />
           </div>
 
           {/*
@@ -156,7 +178,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
             className="relative scroll-mt-28 lg:-mt-2"
           >
             {item.image ? (
-              <div className="overflow-hidden border border-white/12 bg-[#0b0e16]">
+              <div className="overflow-hidden border border-white/10 bg-[#0b0e16]">
                 <ProjectThumb
                   src={item.image}
                   alt={item.imageAlt ?? `${item.organization} imagery`}
@@ -166,10 +188,14 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
                 />
               </div>
             ) : schematicInMasthead ? (
+              // The fill stays opaque — the corner readout sits behind this
+              // slot and ghosts through anything translucent — but it is lifted
+              // off the plate with a soft cast shadow, so the panel reads as
+              // resting over the scene rather than as cut out of it.
               <RoleSchematic
                 stages={item.workflow!}
                 caption="System workflow"
-                className="border border-white/10"
+                className="border border-white/10 shadow-[0_44px_110px_-45px_rgba(0,0,0,0.95)]"
               />
             ) : (
               <PendingPlate hint="Role imagery" className="aspect-[16/10]" />
@@ -179,109 +205,132 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
 
         {/* -------------------------------------------------- summary band */}
         {/*
-          Contributions leads. It is the only panel of the three that is
-          populated for every role — `summary` and `context` are unwritten
-          across the board — so putting the written work first keeps the band
-          from opening on two placeholders.
+          Contributions leads: it is the one panel populated for every role.
+          The band sizes itself to however many of the three have content, so a
+          role with no written summary or context opens on one full-width panel
+          of real work rather than on one panel and two stubs.
         */}
-        <div className="mt-14 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-16 xl:grid-cols-[1.4fr_1fr_1fr]">
+        <div
+          className={cn(
+            "mt-14 grid gap-px bg-white/10 lg:mt-16",
+            summaryPanels === 3 &&
+              "sm:grid-cols-2 xl:grid-cols-[1.4fr_1fr_1fr]",
+            summaryPanels === 2 && "xl:grid-cols-[1.4fr_1fr]"
+          )}
+        >
           <Panel
             id="contributions"
             title="Technical Contributions"
-            icon={ListChecks}
-            className="border-0 sm:col-span-2 xl:col-span-1"
+            index={panelIndex("contributions")}
+            className={cn(
+              "border-0",
+              summaryPanels === 3 && "sm:col-span-2 xl:col-span-1"
+            )}
           >
-            <PanelList items={item.bullets} />
+            {/* Alone, the panel runs the full measure of the page, so the
+                bullets are set in two tracks rather than as fourteen-hundred
+                pixel lines. */}
+            <PanelList
+              items={item.bullets}
+              className={cn(
+                summaryPanels === 1 && "gap-x-14 lg:grid-cols-2 xl:gap-x-20"
+              )}
+            />
           </Panel>
 
-          <Panel id="overview" title="Overview" icon={Sparkles} className="border-0">
-            {item.summary ? (
+          {hasOverview ? (
+            <Panel
+              id="overview"
+              title="Overview"
+              index={panelIndex("overview")}
+              className="border-0"
+            >
               <PanelText>{item.summary}</PanelText>
-            ) : (
-              <PendingText hint="Overview" lines={4} />
-            )}
-          </Panel>
+            </Panel>
+          ) : null}
 
-          <Panel
-            id="context"
-            title="Problem / Context"
-            icon={HelpCircle}
-            className="border-0"
-          >
-            {item.context ? (
+          {hasContext ? (
+            <Panel
+              id="context"
+              title="Problem / Context"
+              index={panelIndex("context")}
+              className="border-0"
+            >
               <PanelText>{item.context}</PanelText>
-            ) : (
-              <PendingText hint="Problem / context" lines={4} />
-            )}
-          </Panel>
+            </Panel>
+          ) : null}
         </div>
 
         {/* ------------------------------------------- workflow / results */}
         <div
-          className={`mt-6 grid gap-px bg-white/10 lg:mt-8 ${
-            schematicInMasthead ? "" : "xl:grid-cols-[1.15fr_1fr]"
-          }`}
+          className={cn(
+            "mt-6 grid gap-px bg-white/10 lg:mt-8",
+            !schematicInMasthead && hasWorkflow && hasResults &&
+              "xl:grid-cols-[1.15fr_1fr]"
+          )}
         >
-          {schematicInMasthead ? null : (
+          {!schematicInMasthead && hasWorkflow ? (
             <Panel
               id="workflow"
               title="System Workflow"
-              icon={CircuitBoard}
+              index={panelIndex("workflow")}
               className="border-0"
               bodyClassName="flex flex-col justify-center"
             >
-              {item.workflow?.length ? (
-                <ArchitectureFlow
-                  stages={item.workflow}
-                  size="detailed"
-                  feedbackLabel={item.feedbackLabel}
-                />
-              ) : (
-                <PendingPlate hint="Workflow diagram" className="min-h-[10rem]" />
-              )}
+              <ArchitectureFlow
+                stages={item.workflow!}
+                size="detailed"
+                feedbackLabel={item.feedbackLabel}
+              />
             </Panel>
-          )}
+          ) : null}
 
-          <Panel id="results" title="Key Results" icon={FileText} className="border-0">
-            {item.results?.length ? (
-              <StatTiles tiles={item.results} columns={3} />
-            ) : (
-              <ul className="grid gap-3 sm:grid-cols-2">
-                <PendingTile hint="Result pending" />
-                <PendingTile hint="Result pending" />
-              </ul>
-            )}
-          </Panel>
+          {hasResults ? (
+            <Panel
+              id="results"
+              title="Key Results"
+              index={panelIndex("results")}
+              className="border-0"
+            >
+              <StatTiles tiles={item.results!} columns={3} />
+            </Panel>
+          ) : null}
         </div>
 
         {/* ------------------------------------------------ tools / team / next */}
-        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1fr_0.85fr_1fr]">
-          <Panel id="tools" title="Tools & Stack" icon={Boxes} className="border-0">
-            <ul className="flex flex-wrap gap-2">
-              {item.tools.map((tool) => (
-                <li
-                  key={tool}
-                  className="flex items-center gap-2 border border-white/12 bg-white/[0.02] px-3 py-2 text-[0.8rem] text-[#c3c8d2]"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="size-[5px] rounded-full bg-accent-indigo-soft/70"
-                  />
-                  {tool}
-                </li>
-              ))}
-            </ul>
-          </Panel>
-
+        <div
+          className={cn(
+            "mt-6 grid gap-px bg-white/10 lg:mt-8",
+            /* Without a team panel the band is two cells, and the tools line
+               is a single line of text: giving it the wider track left a
+               quarter of a screen of empty panel beside it. The narrower track
+               holds the line and the next-role card gets the width, which also
+               shortens the band. */
+            hasTeam ? "xl:grid-cols-[1fr_0.85fr_1fr]" : "xl:grid-cols-[0.76fr_1fr]"
+          )}
+        >
           <Panel
-            id="team"
-            title="Team / Collaboration"
-            icon={Users}
+            id="tools"
+            title="Tools & Stack"
+            index={panelIndex("tools")}
             className="border-0"
           >
-            {item.team?.length ? (
+            {/* Set as a line rather than as bordered chips. Six rectangles
+                inside an already-bordered panel is the same tag cloud the
+                homepage dropped, and it read as the loudest thing in the
+                band. */}
+            <TechLine items={item.tools} className="text-[0.88rem]" />
+          </Panel>
+
+          {hasTeam ? (
+            <Panel
+              id="team"
+              title="Team / Collaboration"
+              index={panelIndex("team")}
+              className="border-0"
+            >
               <div className="grid gap-6 sm:grid-cols-2">
-                {item.team.map((group) => (
+                {item.team!.map((group) => (
                   <div key={group.label}>
                     <p className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
                       {group.label}
@@ -299,16 +348,12 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
-            ) : (
-              <PendingText hint="Team / collaboration" lines={4} />
-            )}
-          </Panel>
+            </Panel>
+          ) : null}
 
           {next ? (
             <NextExperiencePanel
-              index={String(
-                ((position + 1) % experience.length) + 1
-              ).padStart(2, "0")}
+              index={panelIndex("next-role")}
               organization={next.organization}
               role={next.role}
               summary={next.summary ?? next.bullets[0]}
@@ -341,7 +386,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
         className="absolute right-[3.2%] top-[15.5rem] z-20 hidden xl:block"
       />
 
-      <Footer />
+      <Footer className={pageGutters.railed} />
     </div>
   );
 }
@@ -356,7 +401,7 @@ function NextExperiencePanel({
   imageAlt,
   results,
 }: {
-  index: string;
+  index?: string;
   organization: string;
   role: string;
   summary: string;
@@ -405,7 +450,7 @@ function NextExperiencePanel({
               src={image}
               alt={imageAlt ?? `${organization} preview`}
               sizes="(min-width: 1024px) 14vw, 34vw"
-              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 border border-white/12 sm:block"
+              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 border border-white/10 sm:block"
             />
           ) : results?.length ? (
             <ResultMark

@@ -42,41 +42,69 @@ export function ProjectThumb({
             sizes={sizes}
             priority={priority}
             className="object-cover"
-            style={{ objectPosition: focus }}
+            style={{
+              objectPosition: focus,
+              // Light-mode product UI is the brightest thing on a near-black
+              // page. A luminance and saturation pull-back seats the capture in
+              // the grade the rest of the site is shot in, and is gentler than
+              // another scrim: scrims flatten the interface, this keeps its
+              // internal contrast.
+              //
+              // At 0.9 the captures were still the brightest object on every
+              // page they appeared on — a white rectangle in a near-black
+              // composition, which is what made the projects index and the case
+              // study mastheads read as a different site. Taken further down and
+              // slightly harder on contrast, the interface stays legible while
+              // sitting inside the page's own exposure rather than on top of it.
+              ...(grade === "settle"
+                ? { filter: "brightness(0.58) saturate(0.68) contrast(1.06)" }
+                : {}),
+            }}
           />
 
           {/*
             The captures are light-mode product UI on a near-black page. They
             were previously buried under three stacked scrims, which took them
-            to solid black. A single cool, low-strength grade is enough to seat
-            one in the composition while leaving the interface readable.
+            to solid black; the opposite extreme left a near-white rectangle as
+            the brightest object on every page it appeared on.
+
+            The grade is doing the work now: luminance and saturation come down
+            in the filter above, and the cool multiply cast pulls what is left
+            of the whites toward the page's own navy instead of leaving them
+            neutral grey. The two gradients only settle the edges, so the
+            interface keeps its internal contrast and stays readable.
           */}
           {grade === "settle" ? (
             <>
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,13,22,0.20)_0%,transparent_26%,transparent_68%,rgba(8,11,18,0.42)_100%)]"
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(10,13,22,0.24)_0%,transparent_26%,transparent_66%,rgba(8,11,18,0.46)_100%)]"
               />
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_38%,transparent_46%,rgba(8,11,18,0.34)_100%)]"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_38%,transparent_44%,rgba(8,11,18,0.38)_100%)]"
               />
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[rgba(28,34,64,0.16)] mix-blend-multiply"
+                className="pointer-events-none absolute inset-0 bg-[rgba(34,42,78,0.30)] mix-blend-multiply"
               />
             </>
           ) : null}
         </>
       ) : (
+        /*
+          No capture for this project. The slot draws the site's own
+          topographic mark on a measuring grid rather than announcing the
+          gap: a row that reads as a quiet technical plate sits beside a
+          real screenshot without looking like a missing image, whereas the
+          "capture pending" label this used to carry told every reader that
+          the page was unfinished.
+        */
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(135deg,rgba(133,144,246,0.07),transparent_58%),linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] bg-[size:auto,22px_22px,22px_22px]"
+          className="absolute inset-0 bg-[linear-gradient(135deg,rgba(133,144,246,0.06),transparent_58%),linear-gradient(rgba(148,163,184,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.045)_1px,transparent_1px)] bg-[size:auto,22px_22px,22px_22px]"
         >
           <WireframePeaks className="absolute bottom-0 left-1/2 w-[62%] -translate-x-1/2 opacity-70" />
-          <span className="absolute left-3 top-3 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-white/25">
-            capture pending
-          </span>
         </div>
       )}
     </div>

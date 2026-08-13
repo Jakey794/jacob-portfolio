@@ -2,15 +2,29 @@ import { ArrowUpRight } from "lucide-react";
 
 import { caseStudyProjects, featuredProject } from "@/lib/projects";
 import { ArrowLink, CtaLink, ctaClass } from "@/components/cta-link";
-import { ProjectCard } from "@/components/project-card";
+import { ProjectRow } from "@/components/project-row";
 import { CaptureFrame } from "@/components/projects/capture-frame";
 import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionHeading } from "@/components/section-heading";
-import { HomeSection } from "@/components/section-shell";
+import {
+  HomeSection,
+  SpecList,
+  SpecRow,
+  TechLine,
+} from "@/components/section-shell";
 
 /** Labels for the featured project's two proof lines, in order. */
 const featuredProofLabels = ["System", "Reliability"];
 
+/**
+ * The one product moment on the homepage.
+ *
+ * The capture is the object; there is no card around it. Wrapping the whole
+ * band in a bordered panel put a frame inside a frame — the screenshot already
+ * carries drawn window chrome — and turned the section into the largest box on
+ * the page. The copy is separated from the capture by a single hairline
+ * instead.
+ */
 export function FeaturedProjectShowcase() {
   return (
     <HomeSection id="projects" labelledBy="featured-project-title" glow="right">
@@ -32,18 +46,17 @@ export function FeaturedProjectShowcase() {
         </p>
       </SectionHeading>
 
-      {/* The featured slot is a single drawn object: one hairline box split by
-          a 1px rule, rather than a floating card with a shadow. */}
-      <article className="group mt-12 grid gap-px border border-white/10 bg-white/10 lg:mt-14 lg:grid-cols-[1.12fr_0.88fr]">
-        {/* Same drawn window chrome the projects index and case studies use.
-            Bleeding the capture to the cell edge made it the loudest object on
-            the homepage and the only screenshot on the site without a frame. */}
+      {/* Held in one column until xl: below that the two halves each land
+          under thirty characters wide and every proof line wraps four deep. */}
+      <article className="mt-14 grid gap-10 lg:mt-[4.5rem] xl:grid-cols-[1.06fr_0.94fr] xl:gap-0">
         {featuredProject.image ? (
-          <div className="flex items-center bg-[#070a10] p-6 sm:p-8 lg:p-9">
+          <div className="xl:pr-16 2xl:pr-20">
+            {/* Same drawn window chrome the projects index and case studies
+                use, so every capture on the site is framed the same way. */}
             <CaptureFrame
               label={featuredProject.title}
-              className="w-full shadow-[0_30px_90px_-45px_rgba(0,0,0,0.95)]"
-              bodyClassName="aspect-[1.68/1]"
+              className="w-full shadow-[0_40px_110px_-50px_rgba(0,0,0,0.95)]"
+              bodyClassName="aspect-[1.62/1]"
             >
               <ProjectThumb
                 src={featuredProject.image}
@@ -59,7 +72,13 @@ export function FeaturedProjectShowcase() {
           </div>
         ) : null}
 
-        <div className="flex flex-col bg-[#090c13] p-6 sm:p-8 lg:p-10">
+        {/* The divider is a drawn rule rather than a border: a hard edge that
+            stops where the copy stops reads as the side of a missing box. */}
+        <div className="relative flex flex-col xl:pl-16 2xl:pl-20">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 hidden h-full w-px bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.13)_9%,rgba(255,255,255,0.13)_74%,transparent_100%)] xl:block"
+          />
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[0.7rem] uppercase tracking-[0.18em]">
             <span className="text-accent-indigo-soft">01 / Primary case study</span>
             {featuredProject.statusLabel ? (
@@ -67,7 +86,7 @@ export function FeaturedProjectShowcase() {
             ) : null}
           </div>
 
-          <h3 className="mt-5 text-[1.75rem]/[1.16] font-medium tracking-[-0.022em] text-[#e4e7ed] sm:text-[2.05rem]/[1.14]">
+          <h3 className="mt-5 text-[1.8rem]/[1.16] font-medium tracking-[-0.022em] text-[#e4e7ed] sm:text-[2.15rem]/[1.13]">
             {featuredProject.title}
           </h3>
 
@@ -75,34 +94,27 @@ export function FeaturedProjectShowcase() {
             {featuredProject.summary}
           </p>
 
-          <ul className="mt-8 border-t border-white/10">
+          <SpecList className="mt-9 max-w-[46rem] xl:max-w-none">
             {featuredProject.proof.map((item, index) => (
-              <li
+              <SpecRow
                 key={item}
-                className="grid gap-2 border-b border-white/10 py-4 sm:grid-cols-[7.5rem_1fr] sm:gap-6"
+                label={featuredProofLabels[index] ?? `Proof ${index + 1}`}
+                className="sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-7"
               >
-                <span className="font-mono text-[0.66rem] uppercase leading-[1.6] tracking-[0.16em] text-white/35">
-                  {featuredProofLabels[index] ?? `Proof ${index + 1}`}
-                </span>
-                <span className="text-[0.9rem] leading-[1.65] text-[#a0a6b4]">
+                <span className="block text-[0.92rem] leading-[1.68] text-[#a0a6b4]">
                   {item}
                 </span>
-              </li>
+              </SpecRow>
             ))}
-          </ul>
+            <SpecRow
+              label="Stack"
+              className="sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-7"
+            >
+              <TechLine items={featuredProject.stack} />
+            </SpecRow>
+          </SpecList>
 
-          <ul className="mt-6 flex flex-wrap gap-1.5">
-            {featuredProject.stack.map((tag) => (
-              <li
-                key={tag}
-                className="border border-white/12 px-2.5 py-1 text-[0.73rem] text-[#9299a7]"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-auto flex flex-wrap items-center gap-3 pt-9">
+          <div className="mt-auto flex flex-wrap items-center gap-3 pt-10">
             <CtaLink href={`/projects/${featuredProject.slug}`} size="sm">
               Read case study
             </CtaLink>
@@ -141,9 +153,18 @@ export function FeaturedProjectShowcase() {
   );
 }
 
+/**
+ * The remaining case studies, drawn as a numbered editorial list.
+ *
+ * This was a three-up grid of bordered cards, two of which were mostly a
+ * dashed "imagery pending" plate — a wall of boxes announcing missing content
+ * at the exact point a recruiter is deciding whether to keep reading. A list
+ * lets the one project with a real capture carry an image and the two without
+ * carry their metrics instead, without either looking like a hole.
+ */
 export function CaseStudyPreviewGrid() {
   return (
-    <HomeSection id="case-studies" labelledBy="case-studies-title">
+    <HomeSection id="case-studies" labelledBy="case-studies-title" glow="left">
       {/* No index: this band continues section 03 rather than opening a new
           one, so it carries a plain eyebrow and the rail stays at five. */}
       <SectionHeading
@@ -151,7 +172,7 @@ export function CaseStudyPreviewGrid() {
         title="Research, product tooling, and quant systems"
         id="case-studies-title"
         aside={
-          <ArrowLink href="/projects" className="lg:hidden">
+          <ArrowLink href="/projects" className="hidden lg:inline-flex">
             All projects
           </ArrowLink>
         }
@@ -162,15 +183,19 @@ export function CaseStudyPreviewGrid() {
         </p>
       </SectionHeading>
 
-      <div className="mt-12 grid gap-px border border-white/10 bg-white/10 md:grid-cols-2 xl:grid-cols-3">
+      <ol className="mt-14 border-t border-white/10 lg:mt-[4.5rem]">
         {caseStudyProjects.map((project, index) => (
-          <ProjectCard
-            key={project.title}
+          <ProjectRow
+            key={project.slug}
             project={project}
             index={String(index + 2).padStart(2, "0")}
           />
         ))}
-      </div>
+      </ol>
+
+      <ArrowLink href="/projects" className="mt-10 lg:hidden">
+        All projects
+      </ArrowLink>
     </HomeSection>
   );
 }

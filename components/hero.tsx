@@ -53,9 +53,13 @@ export function Hero() {
 
           {/* Wraps until the viewport is wide enough for the single line to
               clear the figure; only then does it run full width. */}
-          <p className="mt-7 flex max-w-[26rem] flex-wrap items-center gap-x-[0.85rem] text-[1.05rem] text-accent-indigo-soft sm:max-w-none sm:text-[1.2rem] lg:mt-8 lg:max-[1399px]:max-w-[26rem] lg:text-[1.18rem] xl:max-[1399px]:max-w-[35rem] xl:text-[1.28rem]">
+          <p className="mt-7 flex max-w-[26rem] flex-col items-start gap-y-1 text-[1.05rem] text-accent-indigo-soft sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-[0.85rem] sm:text-[1.2rem] lg:mt-8 lg:max-[1399px]:max-w-[26rem] lg:text-[1.18rem] xl:max-[1399px]:max-w-[35rem] xl:text-[1.28rem]">
             {/* Each label keeps its trailing separator in the same flex item,
-                so a wrap can end a line with the dot but never start one. */}
+                so a wrap can end a line with the dot but never start one.
+                Below sm there is not room for two disciplines on a line at
+                all, so the list is stacked and the separators are dropped —
+                one per line, each ending in a dot, read as three unfinished
+                fragments. */}
             {disciplines.map((discipline, index) => (
               <span
                 key={discipline}
@@ -63,7 +67,10 @@ export function Hero() {
               >
                 {discipline}
                 {index < disciplines.length - 1 ? (
-                  <span aria-hidden="true" className="text-accent-indigo-soft/45">
+                  <span
+                    aria-hidden="true"
+                    className="hidden text-accent-indigo-soft/45 sm:inline"
+                  >
                     ·
                   </span>
                 ) : null}
@@ -76,9 +83,19 @@ export function Hero() {
             and quantitative software.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4 lg:mt-10 lg:gap-9">
-            <CtaLink href="#projects">View Projects</CtaLink>
-            <CtaLink href="/about" variant="secondary">
+          {/* Stacked full-width below sm. Left to wrap, the two buttons broke
+              onto separate lines at their own natural widths — a 200px primary
+              above a 165px secondary, which reads as a mistake rather than as
+              a pair. */}
+          <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:mt-10 lg:gap-9">
+            <CtaLink href="#projects" className="w-full sm:w-auto">
+              View Projects
+            </CtaLink>
+            <CtaLink
+              href="/about"
+              variant="secondary"
+              className="w-full sm:w-auto"
+            >
               About Me
             </CtaLink>
           </div>
@@ -119,8 +136,18 @@ function HeroBackdrop() {
       <div className="absolute inset-0 bg-[radial-gradient(80%_70%_at_52%_38%,rgba(32,38,74,0.22)_0%,rgba(11,14,26,0.34)_62%,rgba(6,8,14,0.54)_100%)] mix-blend-multiply" />
       {/* Vignette. Keeps the eye on the headline/figure axis. */}
       <div className="absolute inset-0 bg-[radial-gradient(120%_95%_at_52%_46%,transparent_48%,rgba(4,6,11,0.5)_100%)]" />
-      {/* Anchors the composition to the bottom of the viewport. */}
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.5)_7%,transparent_24%)]" />
+      {/*
+        Anchors the composition to the bottom of the viewport, and hands the
+        plate over to the page.
+
+        This used to run from transparent to solid background across a quarter
+        of the hero, with most of that travel packed into the last fifty
+        pixels. The plate did not dissolve so much as stop, and the resulting
+        horizontal seam was the first thing visible on scrolling. The same
+        distance is now spent on four stops, so the ridge sinks through haze
+        into the page instead of meeting an edge.
+      */}
+      <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.90)_8%,rgba(8,11,18,0.62)_17%,rgba(8,11,18,0.30)_29%,rgba(8,11,18,0.10)_40%,transparent_52%)]" />
       {/* Settles the navigation into the scene. */}
       <div className="absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(6,8,14,0.62),transparent)]" />
       {/* Below lg the copy sits over the full width of the plate rather than
@@ -149,7 +176,7 @@ function HeroBackdrop() {
  */
 function HeroPortrait() {
   return (
-    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_13%)] [mask-image:linear-gradient(to_top,transparent_0,#000_13%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_11%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_11%)]">
+    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_30%)] [mask-image:linear-gradient(to_top,transparent_0,#000_30%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_15%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_15%)]">
       <Image
         src="/images/hero/portrait.png"
         alt="Jacob Allan"
@@ -171,13 +198,20 @@ function HeroFog() {
     <>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[22%] bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.62)_34%,transparent_100%)]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[34%] bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.78)_16%,rgba(8,11,18,0.42)_38%,rgba(8,11,18,0.16)_62%,transparent_100%)]"
       />
-      {/* A shallow bank of haze drifting across the base of the figure, so the
-          cutout meets the rock through atmosphere rather than at a line. */}
+      {/*
+        A shallow bank of haze drifting across the base of the figure, so the
+        cutout meets the rock through atmosphere rather than at a line.
+
+        The bloom is centred inside its own box and decays before reaching any
+        edge of it. Anchored to the bottom edge — where it was — the element
+        was clipped at the brightest point of the gradient, which drew exactly
+        the hard horizontal line the haze exists to prevent.
+      */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-[6%] z-[16] h-[16%] bg-[radial-gradient(70%_100%_at_62%_100%,rgba(126,140,178,0.14)_0%,transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 bottom-[4%] z-[16] h-[22%] bg-[radial-gradient(58%_66%_at_62%_56%,rgba(126,140,178,0.13)_0%,transparent_74%)]"
       />
     </>
   );

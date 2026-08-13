@@ -79,15 +79,22 @@ export const pageAtmospheres = {
    */
   about: {
     src: PLATES.about,
-    height: "h-[23rem] lg:h-[30rem]",
+    // Pulled back from 30rem at 0.82. This is the page the brief asks to be
+    // the quietest on the site, and it was carrying the tallest, brightest and
+    // most saturated band of the four — a lit summit filling the upper right
+    // of the fold at close to the weight of the homepage hero, which is the
+    // one place the photography is supposed to lead. Shorter, dimmer, cooler
+    // and slightly softened, the plate now sits behind the writing.
+    height: "h-[21rem] lg:h-[26rem]",
     position: "62% 38%",
-    brightness: 0.98,
-    contrast: 1.04,
-    saturate: 0.86,
-    opacity: 0.82,
-    scrim: 0.78,
-    reach: 72,
+    brightness: 0.9,
+    contrast: 1.03,
+    saturate: 0.7,
+    opacity: 0.66,
+    scrim: 0.8,
+    reach: 74,
     dissolve: 96,
+    blur: 0.6,
     decor: true,
   },
   /**
@@ -138,12 +145,19 @@ export const pageAtmospheres = {
     height: "h-[26rem] lg:h-[34rem]",
     // Held on the ridge and the water line beneath it. Cropping lower put the
     // band entirely inside the dark half of the lake, which read as a missing
-    // image rather than as a quiet one.
-    position: "62% 34%",
-    brightness: 1.04,
+    // image rather than as a quiet one — but at 34% the still water this plate
+    // was chosen for barely entered frame, and the band was another ridge. A
+    // few points lower brings the reflection up into the dissolve without
+    // losing the summit.
+    position: "62% 41%",
+    brightness: 1.0,
     contrast: 0.98,
-    saturate: 0.72,
-    opacity: 0.8,
+    // The only plate with dusk light in it. At 0.72 the ridge kept a warm tan
+    // cast that was the one non-cool colour on the site; pulled down, the
+    // band stays legible but sits in the same navy as everything else.
+    saturate: 0.5,
+    opacity: 0.78,
+    wash: "linear-gradient(180deg, rgba(20,26,50,0.30) 0%, rgba(12,16,28,0.14) 58%, transparent 100%)",
     scrim: 0.72,
     reach: 62,
     dissolve: 100,

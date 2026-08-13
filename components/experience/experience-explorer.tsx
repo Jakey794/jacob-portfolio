@@ -13,6 +13,7 @@ import { PendingPlate } from "@/components/pending";
 import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionRail } from "@/components/section-rail";
 import type { ResultTile, WorkflowStage } from "@/lib/experience";
+import { Tag } from "@/components/section-shell";
 import { cn } from "@/lib/utils";
 
 /** Serialisable slice of an experience entry, prepared on the server. */
@@ -300,19 +301,18 @@ export function MetaRow({
         <CalendarDays aria-hidden="true" className="size-[0.9rem] text-white/35" />
         {dates}
       </span>
-      {/* A missing location stays visible so it is easy to find and fill, but
-          it is drawn at a fraction of the weight of a real value — it should
-          read as a gap in the data, not as a field of the design. */}
+      {/* A missing location renders nothing. It used to print "Location
+          pending" beside the dates on every role — the field is unset for all
+          of them, so the marker was not a rare gap but a permanent label on the
+          page telling readers the site was unfinished. The row simply closes
+          after the dates instead; `lib/experience.ts` still documents the
+          field as outstanding. */}
       {location ? (
         <span className="inline-flex items-center gap-2">
           <MapPin aria-hidden="true" className="size-[0.9rem] text-white/35" />
           {location}
         </span>
-      ) : (
-        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-white/18">
-          Location pending
-        </span>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -327,12 +327,7 @@ export function TagRow({
   return (
     <ul className={cn("flex flex-wrap gap-2", className)}>
       {tags.map((tag) => (
-        <li
-          key={tag}
-          className="border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] px-2.5 py-1 text-[0.72rem] tracking-[0.02em] text-accent-indigo-soft/85"
-        >
-          {tag}
-        </li>
+        <Tag key={tag}>{tag}</Tag>
       ))}
     </ul>
   );

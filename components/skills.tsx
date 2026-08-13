@@ -1,15 +1,24 @@
 import { skillGroups } from "@/lib/skills";
 import { SectionHeading } from "@/components/section-heading";
-import { HomeSection } from "@/components/section-shell";
+import {
+  HomeSection,
+  SpecList,
+  SpecRow,
+  TechLine,
+} from "@/components/section-shell";
 
 /**
  * Supporting band rather than a numbered section — it backs up the work above
- * instead of introducing a new one, so it carries a plain eyebrow and is drawn
- * as a dense label/value table rather than a grid of chip cards.
+ * instead of introducing a new one, so it carries a plain eyebrow.
+ *
+ * Drawn as the same label/value rules the rest of the page uses. It was
+ * thirty-five bordered chips over four rows, which read as a tag cloud and was
+ * the most generic object on the homepage; the words are unchanged, the boxes
+ * are gone.
  */
 export function Skills() {
   return (
-    <HomeSection id="skills" labelledBy="skills-title">
+    <HomeSection id="skills" labelledBy="skills-title" glow="right">
       <SectionHeading
         eyebrow="Stack"
         title="A compact technical stack"
@@ -21,28 +30,27 @@ export function Skills() {
         </p>
       </SectionHeading>
 
-      <dl className="mt-12 border-t border-white/10 lg:mt-14">
+      <SpecList className="mt-14 lg:mt-[4.5rem]">
         {skillGroups.map((group) => (
-          <div
+          <SpecRow
             key={group.category}
-            className="grid gap-2 border-b border-white/10 py-6 lg:grid-cols-[19rem_1fr] lg:gap-14"
+            label={group.category}
+            accent
+            /* The label track was 17rem against labels that are never more
+               than eight characters, which opened a 250px hole between every
+               category and its values while the row's rule ran on to the page
+               gutter. Tightened, and the value measure widened to the point
+               where each group sets on one line — which also stops a wrap
+               leaving a separator dangling at the end of a line. */
+            className="py-6 sm:gap-12 lg:grid-cols-[14rem_minmax(0,1fr)] lg:py-7"
           >
-            <dt className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent-indigo-soft/80">
-              {group.category}
-            </dt>
-            <dd className="flex flex-wrap gap-x-2 gap-y-2">
-              {group.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="border border-white/12 px-2.5 py-1 text-[0.78rem] text-[#a0a6b4] transition-colors hover:border-white/25 hover:text-white"
-                >
-                  {skill}
-                </span>
-              ))}
-            </dd>
-          </div>
+            <TechLine
+              items={group.skills}
+              className="max-w-[62rem] gap-x-[0.7rem] gap-y-1.5 text-[0.9rem]"
+            />
+          </SpecRow>
         ))}
-      </dl>
+      </SpecList>
     </HomeSection>
   );
 }

@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail, MapPin } from "lucide-react";
 
+import { ctaClass } from "@/components/cta-link";
 import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { SectionRail, anchorSections } from "@/components/section-rail";
+import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import {
   aboutBody,
   aboutContact,
@@ -87,7 +90,7 @@ export default function AboutPage() {
       <SiteNav active="about" />
       {pageAtmospheres.about.decor ? <PageDecorTop variant="quiet" /> : null}
 
-      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
+      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.railed)}>
         {/* ---------------------------------------------------------- masthead */}
         <PageEyebrow index="02" label="About" />
 
@@ -107,16 +110,14 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <ul className="mt-8 flex flex-wrap gap-2">
-          {aboutTags.map((tag) => (
-            <li
-              key={tag}
-              className="border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] px-2.5 py-1 text-[0.74rem] text-accent-indigo-soft/85"
-            >
-              {tag}
-            </li>
-          ))}
-        </ul>
+        {/* The same disciplines the homepage hero sets, drawn the same way —
+            an accented line of interpuncts. As four bordered chips they were
+            the only boxed object on a page that is otherwise entirely
+            hairlines and prose. */}
+        <TechLine
+          items={aboutTags}
+          className="mt-8 text-[0.95rem] text-accent-indigo-soft/85"
+        />
 
         {/* Figures sit under the prose as a quiet index into the site rather
             than inside a panel of their own. */}
@@ -180,7 +181,10 @@ export default function AboutPage() {
           </Band>
 
           <Band id="focus" index="03" title="Technical Focus">
-            <dl className="grid gap-7 sm:grid-cols-3 sm:gap-10">
+            {/* Two up until xl. Inside the band's value column three tracks
+                left each one about 155px wide at lg, which broke every skill
+                list onto five lines. */}
+            <dl className="grid gap-7 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-8 xl:grid-cols-3 xl:gap-10">
               {technicalFocus.map((area) => (
                 <div key={area.title}>
                   <dt className="text-[0.95rem] font-medium leading-snug text-accent-indigo-soft">
@@ -204,7 +208,7 @@ export default function AboutPage() {
                   className={`grid gap-2 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8 ${
                     index === 0
                       ? "pb-4"
-                      : "border-t border-white/[0.07] py-4 last:pb-0"
+                      : "border-t border-white/10 py-4 last:pb-0"
                   }`}
                 >
                   <dt className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-accent-indigo-soft/70">
@@ -311,14 +315,14 @@ export default function AboutPage() {
           <div className="flex shrink-0 flex-wrap gap-3">
             <Link
               href="/projects"
-              className="inline-flex h-[2.9rem] items-center justify-center gap-3 rounded-md bg-accent-indigo px-6 text-[0.95rem] text-white transition-colors outline-none hover:bg-accent-indigo/85 focus-visible:ring-2 focus-visible:ring-accent-indigo-soft focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={ctaClass("primary", "sm")}
             >
               View Projects
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
             <a
               href={`mailto:${aboutContact.email}`}
-              className="inline-flex h-[2.9rem] items-center justify-center gap-3 rounded-md border border-white/18 px-6 text-[0.95rem] text-white transition-colors outline-none hover:border-white/40 hover:bg-white/[0.05] focus-visible:ring-2 focus-visible:ring-accent-indigo-soft focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className={ctaClass("secondary", "sm")}
             >
               Get In Touch
               <ArrowRight aria-hidden="true" className="size-4" />
@@ -354,7 +358,7 @@ export default function AboutPage() {
         </ul>
       </div>
 
-      <Footer />
+      <Footer className={pageGutters.railed} />
     </div>
   );
 }

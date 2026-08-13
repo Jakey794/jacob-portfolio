@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowRight,
-  Boxes,
-  CircuitBoard,
-  FileText,
-  GitBranch,
-  Layers,
-  ListChecks,
-  Sparkles,
-  Target,
-} from "lucide-react";
+import { ArrowRight, GitBranch } from "lucide-react";
 
 import {
   ArchitectureFlow,
@@ -29,7 +19,9 @@ import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { CaptureFrame } from "@/components/projects/capture-frame";
 import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionRail, anchorSections } from "@/components/section-rail";
+import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import { caseStudies, caseStudySlugs, getCaseStudy } from "@/lib/case-studies";
 import { allProjects, getProjectBySlug } from "@/lib/projects";
 
@@ -78,6 +70,12 @@ const railSections = [
   { id: "next-project", label: "Next Project" },
 ];
 
+/** Panel heads carry the same index the rail entry that targets them does. */
+function panelIndex(id: string) {
+  const position = railSections.findIndex((section) => section.id === id);
+  return position === -1 ? undefined : String(position + 1).padStart(2, "0");
+}
+
 export default async function ProjectCaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
@@ -101,7 +99,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
 
       {/* The wide right gutter only applies from xl, where the text-labelled
           rail is actually rendered. */}
-      <main className="relative z-10 px-6 pb-28 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-32 lg:pl-[5%] lg:pr-[5%] xl:pr-[15.5%]">
+      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.railed)}>
         {/* ---------------------------------------------------------- masthead */}
         <div className="grid gap-12 lg:grid-cols-[0.42fr_0.58fr] lg:items-start lg:gap-10">
           <div>
@@ -115,16 +113,13 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
               {project.oneLine}
             </p>
 
-            <ul className="mt-7 flex flex-wrap gap-2">
-              {project.displayTags.map((tag) => (
-                <li
-                  key={tag}
-                  className="border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] px-2.5 py-1 text-[0.74rem] text-accent-indigo-soft/85"
-                >
-                  {tag}
-                </li>
-              ))}
-            </ul>
+            {/* A line, not chips — the masthead is unboxed, and the same four
+                declarations already appear as chips in the index card this
+                page is opened from. */}
+            <TechLine
+              items={project.displayTags}
+              className="mt-7 text-[0.95rem] text-accent-indigo-soft/85"
+            />
 
             {/* Short meta pairs only — the full role narrative lives in the
                 Approach panel below, so this row stays on one line. */}
@@ -185,20 +180,44 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
               : "xl:grid-cols-3"
           }`}
         >
-          <Panel id="overview" title="Overview" icon={Sparkles} className="border-0">
+          <Panel
+            id="overview"
+            title="Overview"
+            index={panelIndex("overview")}
+            className="border-0"
+          >
             <PanelText>{project.summary}</PanelText>
           </Panel>
 
-          <Panel id="problem" title="Problem" icon={Target} className="border-0">
+          <Panel
+            id="problem"
+            title="Problem"
+            index={panelIndex("problem")}
+            className="border-0"
+          >
             <PanelText>{project.problem}</PanelText>
           </Panel>
 
-          <Panel id="approach" title="Approach" icon={Layers} className="border-0">
+          <Panel
+            id="approach"
+            title="Approach"
+            index={panelIndex("approach")}
+            className="border-0"
+          >
             <PanelText>{project.role}</PanelText>
           </Panel>
 
           {project.image ? (
-            <div className="flex min-h-[13rem] items-stretch bg-[#090c13] p-5 sm:col-span-2 xl:col-span-1">
+            /*
+              One cell, never two. Spanning both columns at sm put the crop in
+              a row of its own roughly 1300px wide against a 208px minimum
+              height, so `object-cover` zoomed a 730x460 detail crop by a
+              factor of four and clipped it mid-sentence — and it left the cell
+              beside "Approach" empty, which showed as a bare hole in the band.
+              As a single cell it fills that slot and lands at close to the
+              source's own 1.6:1, so almost nothing is trimmed at any width.
+            */
+            <div className="flex min-h-[13rem] items-stretch bg-[#090c13] p-5">
               <CaptureFrame chrome={false} className="w-full">
                 <ProjectThumb
                   src={project.imageDetail ?? project.image}
@@ -216,7 +235,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           <Panel
             id="architecture"
             title="System Architecture"
-            icon={CircuitBoard}
+            index={panelIndex("architecture")}
             className="border-0"
             bodyClassName="flex flex-col justify-center"
           >
@@ -230,7 +249,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           <Panel
             id="features"
             title="Key Features"
-            icon={ListChecks}
+            index={panelIndex("features")}
             className="border-0"
           >
             <PanelList items={caseStudy.whatBuilt} />
@@ -239,7 +258,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           <Panel
             id="results"
             title={caseStudy.results ? "Results" : "Validation"}
-            icon={FileText}
+            index={panelIndex("results")}
             className="border-0"
           >
             {caseStudy.results ? (
@@ -255,23 +274,13 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           <Panel
             id="stack"
             title="Technology Stack"
-            icon={Boxes}
+            index={panelIndex("stack")}
             className="border-0"
           >
-            <ul className="flex flex-wrap gap-2">
-              {project.stack.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 border border-white/12 bg-white/[0.02] px-3 py-2 text-[0.8rem] text-[#c3c8d2]"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="size-[5px] rounded-full bg-accent-indigo-soft/70"
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            {/* Set as a line rather than as bordered chips. Ten rectangles
+                inside an already-bordered panel is the same tag cloud the
+                homepage dropped, and it was the loudest object in the band. */}
+            <TechLine items={project.stack} className="text-[0.88rem]" />
 
             {project.github ? (
               <a
@@ -287,13 +296,14 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
           </Panel>
 
           <NextProjectPanel
-            index={String(
-              ((position + 1) % allProjects.length) + 1
-            ).padStart(2, "0")}
+            index={panelIndex("next-project")}
             title={nextProject.title}
             oneLine={nextProject.oneLine}
             href={`/projects/${nextProject.slug}`}
-            image={nextProject.image}
+            /* The detail crop, not the wide capture: this slot is under two
+               hundred pixels across, and a whole product window scaled into it
+               is noise rather than a preview. */
+            image={nextProject.imageDetail ?? nextProject.image}
             imageAlt={nextProject.imageAlt}
           />
         </div>
@@ -319,7 +329,7 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
         className="absolute right-[3.2%] top-[15.5rem] z-20 hidden xl:block"
       />
 
-      <Footer />
+      <Footer className={pageGutters.railed} />
     </div>
   );
 }
@@ -332,7 +342,7 @@ function NextProjectPanel({
   image,
   imageAlt,
 }: {
-  index: string;
+  index?: string;
   title: string;
   oneLine: string;
   href: string;
@@ -373,7 +383,7 @@ function NextProjectPanel({
           src={image}
           alt={imageAlt ?? `${title} preview`}
           sizes="(min-width: 1024px) 16vw, 40vw"
-          className="aspect-[16/10] w-full shrink-0 border border-white/12 sm:w-[11rem]"
+          className="aspect-[16/10] w-full shrink-0 border border-white/10 sm:w-[11rem]"
         />
 
         <span
