@@ -79,22 +79,22 @@ export const pageAtmospheres = {
    */
   about: {
     src: PLATES.about,
-    // Pulled back from 30rem at 0.82. This is the page the brief asks to be
-    // the quietest on the site, and it was carrying the tallest, brightest and
-    // most saturated band of the four — a lit summit filling the upper right
-    // of the fold at close to the weight of the homepage hero, which is the
-    // one place the photography is supposed to lead. Shorter, dimmer, cooler
-    // and slightly softened, the plate now sits behind the writing.
+    // Pulled back from 30rem at 0.82, then nudged forward again: at 0.66
+    // opacity with a 0.6px blur the summit read as barely more than a navy
+    // gradient, which lost the one thing this plate was chosen for — a single
+    // lit peak. Opacity and brightness are up and the blur is gone so the ridge
+    // texture survives; height, scrim and reach are untouched, so the title
+    // column is exactly as dark as before and the page is still the quietest
+    // on the site.
     height: "h-[21rem] lg:h-[26rem]",
     position: "62% 38%",
-    brightness: 0.9,
-    contrast: 1.03,
-    saturate: 0.7,
-    opacity: 0.66,
+    brightness: 0.98,
+    contrast: 1.05,
+    saturate: 0.78,
+    opacity: 0.76,
     scrim: 0.8,
     reach: 74,
     dissolve: 96,
-    blur: 0.6,
     decor: true,
   },
   /**
@@ -105,11 +105,23 @@ export const pageAtmospheres = {
   projects: {
     src: PLATES.projects,
     height: "h-[16rem] lg:h-[19rem]",
-    position: "72% 34%",
-    brightness: 1.0,
-    contrast: 1.02,
-    saturate: 0.82,
-    opacity: 0.72,
+    // The band is short and wide relative to the plate, so at a lg viewport
+    // the crop is width-locked and only a ~300px-tall horizontal slice of the
+    // 941px source survives. At 34% that slice held the cloud glow around the
+    // strike but cut the bolt itself off at the ankle. Moved down so the full
+    // fork — the thing "visible at a glance" actually depends on — is inside
+    // the slice instead of bleeding off the bottom edge.
+    position: "74% 52%",
+    // Contrast carries this plate: the strike is a bright filament inside a
+    // dark cloud bank, and contrast is what keeps that filament reading as
+    // a line rather than a soft glow. Raised together with opacity so the
+    // cloud structure around it is legible at a glance. Scrim and reach are
+    // unchanged — the strike already sits clear of the masthead at 72% 34%,
+    // so making it louder does not touch the title's own contrast.
+    brightness: 1.03,
+    contrast: 1.1,
+    saturate: 0.88,
+    opacity: 0.82,
     scrim: 0.8,
     reach: 76,
     dissolve: 74,
@@ -124,14 +136,21 @@ export const pageAtmospheres = {
     src: PLATES.experience,
     height: "h-[18rem] lg:h-[23rem]",
     position: "76% 44%",
-    brightness: 0.94,
-    contrast: 1.06,
-    saturate: 0.44,
-    opacity: 0.78,
+    // The source plate is the brightest of the four — high-key snow under an
+    // overcast sky — but the wash and a sub-1 brightness were holding it back
+    // to the same weight as the others, so the one plate that could carry the
+    // most detail was carrying the least. Brightness now clears 1 and the
+    // wash is lighter, so the snowfield's own micro-contrast comes through;
+    // this is deliberately the loudest of the four bands per the brief. Scrim
+    // and reach are untouched, so the masthead's own contrast doesn't move.
+    brightness: 1.04,
+    contrast: 1.08,
+    saturate: 0.5,
+    opacity: 0.86,
     scrim: 0.84,
     reach: 70,
     dissolve: 82,
-    wash: "linear-gradient(180deg, rgba(18,24,44,0.38) 0%, rgba(10,13,22,0.18) 62%, transparent 100%)",
+    wash: "linear-gradient(180deg, rgba(18,24,44,0.26) 0%, rgba(10,13,22,0.1) 62%, transparent 100%)",
     horizon: true,
     decor: true,
   },
@@ -143,25 +162,39 @@ export const pageAtmospheres = {
   contact: {
     src: PLATES.contact,
     height: "h-[26rem] lg:h-[34rem]",
-    // Held on the ridge and the water line beneath it. Cropping lower put the
-    // band entirely inside the dark half of the lake, which read as a missing
-    // image rather than as a quiet one — but at 34% the still water this plate
-    // was chosen for barely entered frame, and the band was another ridge. A
-    // few points lower brings the reflection up into the dissolve without
-    // losing the summit.
-    position: "62% 41%",
-    brightness: 1.0,
-    contrast: 0.98,
+    // The band-to-page handoff at the foot of this component always resolves
+    // to solid background, which is what let the plate dissolve cleanly into
+    // the page below — but it means whatever source pixels land at the very
+    // bottom of the crop window are the most heavily obscured, and at 41% the
+    // window's lower half (where the water sits) fell inside exactly that
+    // zone. The water was technically in frame and invisible anyway. Moved
+    // to the foot of the source frame instead, which trades the summit's tip
+    // for the shoreline and the reflection actually surviving the fade — the
+    // plate this page was chosen for is the water, not the peak.
+    position: "58% 100%",
+    brightness: 1.06,
+    contrast: 1.0,
     // The only plate with dusk light in it. At 0.72 the ridge kept a warm tan
     // cast that was the one non-cool colour on the site; pulled down, the
-    // band stays legible but sits in the same navy as everything else.
-    saturate: 0.5,
-    opacity: 0.78,
-    wash: "linear-gradient(180deg, rgba(20,26,50,0.30) 0%, rgba(12,16,28,0.14) 58%, transparent 100%)",
+    // band stays legible but sits in the same navy as everything else. Lifted
+    // slightly from 0.5 now that opacity is higher, so the water keeps some
+    // colour rather than reading as grey.
+    saturate: 0.56,
+    opacity: 0.86,
+    wash: "linear-gradient(180deg, rgba(20,26,50,0.22) 0%, rgba(12,16,28,0.1) 58%, transparent 100%)",
     scrim: 0.72,
     reach: 62,
-    dissolve: 100,
-    blur: 1.5,
+    // Dropped from 100: at full height the dissolve's clear zone starts only
+    // at the very top of a 34rem band, so the reflection — now most of what
+    // is left in the crop — sat in the same heavily-obscured lower stretch it
+    // was hidden in before. Ending the fade earlier leaves the water in the
+    // band's clearer upper two-thirds while the last few rows still resolve
+    // to flat background underneath the content.
+    dissolve: 66,
+    // 1.5px of blur was softening the reflection and the shoreline rocks —
+    // the two things that make this plate read as water rather than another
+    // ridge. Reduced, not removed: the page is still the calmest of the four.
+    blur: 0.6,
     decor: false,
   },
   /**
