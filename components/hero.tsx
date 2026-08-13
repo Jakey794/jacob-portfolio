@@ -1,190 +1,259 @@
-"use client";
+import Image from "next/image";
 
-import { motion } from "framer-motion";
+import { CtaLink } from "@/components/cta-link";
+import { SectionRail } from "@/components/section-rail";
 import {
-  ArrowRight,
-  Cpu,
-  Download,
-  GitBranch,
-  GraduationCap,
-  Link as LinkIcon,
-  LineChart,
-} from "lucide-react";
+  CoordinateBlock,
+  CrossMark,
+  DotGrid,
+  GuideLine,
+  ScrollCue,
+  WireframePeaks,
+} from "@/components/technical-decor";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-
-const proofItems = [
-  "University of Toronto Engineering Science",
-  "Machine Intelligence + Mathematics",
-  "Schulich Leader Scholar",
+const disciplines = [
+  "Machine Learning",
+  "Software Engineering",
+  "Quantitative Research",
 ];
 
 export function Hero() {
   return (
     <section
+      id="top"
       aria-labelledby="hero-title"
-      className="relative overflow-hidden px-6 pb-24 pt-20 sm:px-8 lg:px-12 lg:pb-32 lg:pt-28"
+      className="relative isolate flex min-h-[44rem] flex-col justify-center overflow-hidden bg-background lg:min-h-svh"
     >
-      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          className="max-w-4xl"
-        >
-          <Badge className="mb-6 border-cyan-300/25 bg-cyan-300/10 text-cyan-100">
-            ML systems / quant modeling / full-stack AI
-          </Badge>
+      <HeroBackdrop />
+      <HeroPortrait />
+      <HeroFog />
+      <HeroDecor />
+
+      {/* Below lg the portrait is stacked under the copy rather than beside
+          it, so the reserved bottom padding keeps the two from colliding. */}
+      <div className="relative z-20 w-full px-6 pb-[20rem] pt-36 sm:px-10 sm:pb-[24rem] sm:pt-40 lg:px-[6.4rem] lg:pb-0 lg:pt-0">
+        {/* The trailing pad biases the centred block slightly above the
+            optical centre of the viewport, as in the reference composition. */}
+        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 motion-safe:ease-out lg:pb-12">
           <h1
             id="hero-title"
-            className="max-w-4xl text-5xl font-semibold text-slate-50 sm:text-6xl lg:text-7xl"
+            className="text-[clamp(2.3rem,5.3vw,5.5rem)] font-medium leading-[1.1] tracking-[-0.025em]"
           >
-            Jacob Allan
-          </h1>
-          <p className="mt-5 max-w-3xl text-2xl font-medium leading-tight text-cyan-100 sm:text-3xl">
-            Machine Learning & Quantitative Software Engineering
-          </p>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-            Engineering Science student at the University of Toronto building ML
-            systems, full-stack AI tools, and quantitative modeling projects.
-          </p>
-
-          <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3 text-sm text-slate-300">
-            {proofItems.map((item, index) => (
-              <div key={item} className="flex items-center gap-3">
-                {index > 0 ? (
-                  <span className="hidden h-1 w-1 rounded-full bg-cyan-300/70 sm:block" />
-                ) : null}
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Button
-              size="lg"
-              nativeButton={false}
-              className="h-11 bg-cyan-300 px-4 text-slate-950 hover:bg-cyan-200"
-              render={<a href="#projects" />}
-            >
-              View Projects
-              <ArrowRight aria-hidden="true" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              nativeButton={false}
-              className="h-11 border-slate-700 bg-slate-950/50 px-4 text-slate-100 hover:bg-slate-900"
-              render={
-                <a
-                  href="/resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              }
-            >
-              Download Resume
-              <Download aria-hidden="true" />
-            </Button>
-            <Button
-              size="icon-lg"
-              variant="outline"
-              nativeButton={false}
-              className="border-slate-700 bg-slate-950/50 text-slate-100 hover:bg-slate-900"
-              aria-label="GitHub"
-              render={
-                <a
-                  href="https://github.com/Jakey794"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              }
-            >
-              <GitBranch aria-hidden="true" />
-            </Button>
-            <Button
-              size="icon-lg"
-              variant="outline"
-              nativeButton={false}
-              className="border-slate-700 bg-slate-950/50 text-slate-100 hover:bg-slate-900"
-              aria-label="LinkedIn"
-              render={
-                <a
-                  href="https://www.linkedin.com/in/jacob-allan-ml/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              }
-            >
-              <LinkIcon aria-hidden="true" />
-            </Button>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
-        >
-          <Card className="border border-cyan-300/15 bg-slate-950/70 shadow-2xl shadow-cyan-950/30 backdrop-blur">
-            <CardContent className="p-6 sm:p-8">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-mono text-xs uppercase text-cyan-300">
-                    Focus
-                  </p>
-                  <h2 className="mt-3 text-2xl font-semibold text-slate-50">
-                    ML Systems · Quant Modeling · Full-stack AI
-                  </h2>
-                </div>
-                <div className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 p-3 text-cyan-200">
-                  <Cpu aria-hidden="true" className="size-6" />
-                </div>
-              </div>
-
-              <Separator className="my-6 bg-slate-800" />
-
-              <dl className="space-y-5">
-                <div className="grid gap-2 sm:grid-cols-[8rem_1fr]">
-                  <dt className="flex items-center gap-2 text-sm text-slate-400">
-                    <GraduationCap aria-hidden="true" className="size-4" />
-                    Current
-                  </dt>
-                  <dd className="font-medium text-slate-100">
-                    Engineering Science @ UofT
-                  </dd>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-[8rem_1fr]">
-                  <dt className="flex items-center gap-2 text-sm text-slate-400">
-                    <LineChart aria-hidden="true" className="size-4" />
-                    Best Work
-                  </dt>
-                  <dd className="font-medium text-slate-100">
-                    Incident Triage Copilot, FormatClip, RF Signal
-                    Classification Research
-                  </dd>
-                </div>
-              </dl>
-
-              <div
+            <span className="block bg-gradient-to-b from-[#a7adb9] to-[#bcc1cb] bg-clip-text text-transparent">
+              I build
+            </span>
+            <span className="block bg-gradient-to-b from-[#c0c5cf] to-[#d6dae2] bg-clip-text text-transparent">
+              intelligent systems
+              <span
                 aria-hidden="true"
-                className="mt-8 grid grid-cols-6 gap-2 opacity-80"
+                className="ml-[0.05em] inline-block size-[0.145em] rounded-full bg-accent-indigo-soft align-baseline"
+              />
+            </span>
+          </h1>
+
+          {/* Wraps until the viewport is wide enough for the single line to
+              clear the figure; only then does it run full width. */}
+          <p className="mt-7 flex max-w-[26rem] flex-col items-start gap-y-1 text-[1.05rem] text-accent-indigo-soft sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-[0.85rem] sm:text-[1.2rem] lg:mt-8 lg:max-[1399px]:max-w-[26rem] lg:text-[1.18rem] xl:max-[1399px]:max-w-[35rem] xl:text-[1.28rem]">
+            {/* Each label keeps its trailing separator in the same flex item,
+                so a wrap can end a line with the dot but never start one.
+                Below sm there is not room for two disciplines on a line at
+                all, so the list is stacked and the separators are dropped —
+                one per line, each ending in a dot, read as three unfinished
+                fragments. */}
+            {disciplines.map((discipline, index) => (
+              <span
+                key={discipline}
+                className="inline-flex items-center gap-x-[0.85rem]"
               >
-                {Array.from({ length: 24 }).map((_, index) => (
+                {discipline}
+                {index < disciplines.length - 1 ? (
                   <span
-                    key={index}
-                    className="h-2 rounded-sm bg-cyan-300/20 data-[hot=true]:bg-cyan-300"
-                    data-hot={index % 7 === 0 || index % 11 === 0}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                    aria-hidden="true"
+                    className="hidden text-accent-indigo-soft/45 sm:inline"
+                  >
+                    ·
+                  </span>
+                ) : null}
+              </span>
+            ))}
+          </p>
+
+          <p className="mt-6 max-w-[24rem] text-[1.02rem] leading-[1.78] text-[#a2a8b5] lg:mt-7 lg:text-[1.19rem]">
+            Engineering Science @ UofT building ML systems, full-stack AI tools,
+            and quantitative software.
+          </p>
+
+          {/* Stacked full-width below sm. Left to wrap, the two buttons broke
+              onto separate lines at their own natural widths — a 200px primary
+              above a 165px secondary, which reads as a mistake rather than as
+              a pair. */}
+          <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:mt-10 lg:gap-9">
+            <CtaLink href="#projects" className="w-full sm:w-auto">
+              View Projects
+            </CtaLink>
+            <CtaLink
+              href="/about"
+              variant="secondary"
+              className="w-full sm:w-auto"
+            >
+              About Me
+            </CtaLink>
+          </div>
+        </div>
       </div>
+
+      <SectionRail className="absolute right-[4.4%] top-[51.5%] z-20 hidden -translate-y-1/2 lg:block" />
+
+      <ScrollCue className="absolute bottom-[6%] right-[3.1%] z-20 hidden lg:flex" />
     </section>
+  );
+}
+
+/** Mountain photography plus the atmospheric grading that sits over it. */
+function HeroBackdrop() {
+  return (
+    <div aria-hidden="true" className="absolute inset-0 z-0">
+      {/* The plate is already graded dark and stormy, so it is lifted only
+          enough to keep the ridgeline legible behind the figure. Lifting it
+          harder washes the cloud break out to a flat tan and costs the scene
+          its depth. */}
+      <Image
+        src="/images/hero/mountains.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[62%_center] brightness-[1.22] contrast-[1.06] saturate-[0.92]"
+      />
+      {/* Left column: just enough to hold the headline, no more. */}
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,8,14,0.80)_0%,rgba(6,8,14,0.54)_15%,rgba(6,8,14,0.26)_34%,rgba(6,8,14,0.07)_56%,transparent_70%)]" />
+      {/* Knocks the upper-right cloud break back so the coordinates, dot grid
+          and numbered rail stay legible — but only partly, because that break
+          is what separates the figure's head and shoulder from the ridge. */}
+      <div className="absolute inset-0 bg-[radial-gradient(42%_54%_at_104%_14%,rgba(6,8,14,0.88)_0%,rgba(6,8,14,0.44)_48%,transparent_100%)]" />
+      {/* Cool indigo cast: ties the photography to the page accent instead of
+          letting the lifted cloud drift warm. */}
+      <div className="absolute inset-0 bg-[radial-gradient(80%_70%_at_52%_38%,rgba(32,38,74,0.22)_0%,rgba(11,14,26,0.34)_62%,rgba(6,8,14,0.54)_100%)] mix-blend-multiply" />
+      {/* Vignette. Keeps the eye on the headline/figure axis. */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_95%_at_52%_46%,transparent_48%,rgba(4,6,11,0.5)_100%)]" />
+      {/*
+        Anchors the composition to the bottom of the viewport, and hands the
+        plate over to the page.
+
+        This used to run from transparent to solid background across a quarter
+        of the hero, with most of that travel packed into the last fifty
+        pixels. The plate did not dissolve so much as stop, and the resulting
+        horizontal seam was the first thing visible on scrolling. The same
+        distance is now spent on four stops, so the ridge sinks through haze
+        into the page instead of meeting an edge.
+      */}
+      <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.90)_8%,rgba(8,11,18,0.62)_17%,rgba(8,11,18,0.30)_29%,rgba(8,11,18,0.10)_40%,transparent_52%)]" />
+      {/* Settles the navigation into the scene. */}
+      <div className="absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(6,8,14,0.62),transparent)]" />
+      {/* Below lg the copy sits over the full width of the plate rather than
+          its dark left third, so it needs its own scrim. */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,14,0.78)_0%,rgba(6,8,14,0.58)_45%,rgba(6,8,14,0.2)_74%,transparent_100%)] lg:hidden" />
+    </div>
+  );
+}
+
+/**
+ * The lg geometry is solved from the concept: matching the subject's face
+ * box (142x215 centred at 1086,308 in a 1672x941 frame) puts the plate at
+ * 65.7% width, inset 2% from the right, with its base lifted 8.4% so the
+ * figure settles into the fog rather than butting the viewport edge.
+ *
+ * `top` matters as much as the width. The plate is `object-contain`, so on a
+ * short viewport it scales to the box height instead of its width and the
+ * crown climbs into the navigation — at a 713px-tall viewport the head landed
+ * directly behind "About". Starting the box below the nav bounds the drawn
+ * height, so the crown can never reach it, and at the reference 941px height
+ * the plate is still width-limited and the composition is unchanged.
+ *
+ * The bottom mask is what settles the figure into the scene: the torso runs
+ * off the source frame, so without it the jacket ends on a hard horizontal
+ * cut. The fade hands over to `HeroFog` at roughly the same height.
+ */
+function HeroPortrait() {
+  return (
+    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_30%)] [mask-image:linear-gradient(to_top,transparent_0,#000_30%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_15%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_15%)]">
+      <Image
+        src="/images/hero/portrait.png"
+        alt="Jacob Allan"
+        fill
+        priority
+        sizes="(min-width: 1024px) 66vw, (min-width: 640px) 120vw, 150vw"
+        className="object-contain object-bottom"
+      />
+    </div>
+  );
+}
+
+/**
+ * Full-bleed fog that settles the figure and the ridgeline into the base of
+ * the viewport. Kept above the portrait so no container edge is visible.
+ */
+function HeroFog() {
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[34%] bg-[linear-gradient(0deg,var(--background)_0%,rgba(8,11,18,0.78)_16%,rgba(8,11,18,0.42)_38%,rgba(8,11,18,0.16)_62%,transparent_100%)]"
+      />
+      {/*
+        A shallow bank of haze drifting across the base of the figure, so the
+        cutout meets the rock through atmosphere rather than at a line.
+
+        The bloom is centred inside its own box and decays before reaching any
+        edge of it. Anchored to the bottom edge — where it was — the element
+        was clipped at the brightest point of the gradient, which drew exactly
+        the hard horizontal line the haze exists to prevent.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-[4%] z-[16] h-[22%] bg-[radial-gradient(58%_66%_at_62%_56%,rgba(126,140,178,0.13)_0%,transparent_74%)]"
+      />
+    </>
+  );
+}
+
+function HeroDecor() {
+  return (
+    <>
+      {/* Left-hand guide marks */}
+      <GuideLine className="absolute left-[2%] top-[10%] z-10 hidden h-[64%] lg:block" />
+      <CrossMark
+        size={11}
+        className="absolute left-[4.5%] top-[12.4%] z-10 hidden text-white/30 lg:block"
+      />
+      <CrossMark
+        size={20}
+        className="absolute left-[2.35%] top-[16%] z-10 hidden text-white/40 lg:block"
+      />
+
+      {/* Upper-right technical readout. The coordinates and the dot grid share
+          this corner, so they are stacked rather than overlaid: grid above,
+          readout below, both clear of the rail at right-4.4%. */}
+      <DotGrid className="absolute right-[9.5%] top-[12.5%] z-10 hidden lg:block" />
+      <CrossMark
+        size={16}
+        className="absolute left-[80.5%] top-[22.4%] z-10 hidden text-white/40 lg:block"
+      />
+      <CoordinateBlock
+        lines={["43° 39′ 46″ N", "79° 23′ 45″ W"]}
+        className="absolute left-[83.5%] top-[21.2%] z-10 hidden lg:block"
+      />
+
+      {/* Topographic wireframe. Sits in the gap between the figure's shoulder
+          and the numbered rail — anywhere further left is covered by the
+          portrait, which renders above it. */}
+      <WireframePeaks className="absolute left-[83%] top-[30%] z-0 hidden w-[10.5%] lg:block" />
+
+      {/* Location readout */}
+      <CoordinateBlock
+        lines={["43.6629° N", "79.3957° W", "Toronto, ON"]}
+        className="absolute bottom-[8%] left-[4.5%] z-20 hidden lg:block"
+      />
+    </>
   );
 }
