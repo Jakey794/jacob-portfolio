@@ -7,6 +7,7 @@ import {
   FeaturedProjectShowcase,
 } from "@/components/projects";
 import { ResumeCta } from "@/components/resume-cta";
+import { HeroSpill } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
 import { Skills } from "@/components/skills";
 
@@ -16,6 +17,9 @@ export default function Home() {
       <SiteNav />
       <main>
         <Hero />
+        {/* Zero-height bridge anchored to the hero's bottom edge. Keeps the
+            plate's atmosphere alive across the fold — see `HeroSpill`. */}
+        <HeroSpill />
         <About />
         <FeaturedProjectShowcase />
         <CaseStudyPreviewGrid />

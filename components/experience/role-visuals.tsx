@@ -131,7 +131,7 @@ export function RoleSchematic({
                 )}
               />
 
-              <div className="min-w-0 flex-1 border-b border-white/[0.07] pb-3.5 last:border-b-0 last:pb-0">
+              <div className="min-w-0 flex-1 border-b border-white/10 pb-3.5 last:border-b-0 last:pb-0">
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-[0.58rem] uppercase tracking-[0.16em] text-accent-indigo-soft/70">
                     {stage.label}

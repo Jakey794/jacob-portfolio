@@ -1,6 +1,6 @@
 import { ArrowLink } from "@/components/cta-link";
-import { PageEyebrow } from "@/components/page-title";
-import { HairlineCell, HairlineGrid, HomeSection } from "@/components/section-shell";
+import { SectionHeading } from "@/components/section-heading";
+import { HomeSection, SpecList, SpecRow, TechLine } from "@/components/section-shell";
 import { aboutBody, aboutLede, aboutStats, technicalFocus } from "@/lib/about";
 
 /**
@@ -8,69 +8,75 @@ import { aboutBody, aboutLede, aboutStats, technicalFocus } from "@/lib/about";
  * shares its content from `lib/about.ts` rather than restating it, so the two
  * can never drift apart.
  *
- * No top rule: this is the first band under the hero, and the fog should
- * resolve into the page rather than meeting a hairline.
+ * Laid out as a magazine opener rather than a two-column dashboard: the lede
+ * runs at display scale across the measure, the prose and the focus areas sit
+ * beneath it, and the figures close the band on one rule. The focus areas were
+ * three bordered cards, which is what made the first band under the hero read
+ * as a component library.
  */
 export function About() {
   return (
-    <HomeSection id="about" labelledBy="about-title" divide={false} glow="left">
-      <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
-        <div>
-          <PageEyebrow index="02" label="About" />
+    <HomeSection id="about" labelledBy="about-title" glow="left">
+      <SectionHeading
+        index="02"
+        eyebrow="About"
+        title={aboutLede}
+        id="about-title"
+      />
 
-          <h2
-            id="about-title"
-            className="mt-5 max-w-[26rem] bg-gradient-to-b from-[#c4c9d3] to-[#e4e7ed] bg-clip-text text-[1.62rem]/[1.28] font-medium tracking-[-0.02em] text-transparent sm:text-[1.9rem]/[1.26]"
-          >
-            {aboutLede}
-          </h2>
-
-          <ArrowLink href="/about" className="mt-8">
-            More about me
-          </ArrowLink>
-
-          {/* Counts and figures computed from the data files. They sit in the
-              short column so the two halves of the band end together. */}
-          <ul className="mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-white/10 pt-8">
-            {aboutStats.map((stat) => (
-              <li key={stat.label}>
-                <span className="block text-[1.75rem] font-medium leading-none tracking-[-0.03em] text-accent-indigo-soft">
-                  {stat.value}
-                </span>
-                <span className="mt-3 block text-[0.76rem] leading-[1.5] text-white/45">
-                  {stat.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
+      <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
         <div>
           <div className="space-y-5">
             {aboutBody.map((paragraph) => (
               <p
                 key={paragraph}
-                className="max-w-[34rem] text-[1.02rem] leading-[1.76] text-[#a2a8b5]"
+                className="max-w-[34rem] text-[1.05rem] leading-[1.78] text-[#a2a8b5]"
               >
                 {paragraph}
               </p>
             ))}
           </div>
 
-          <HairlineGrid className="mt-10 sm:grid-cols-3">
-            {technicalFocus.map((area) => (
-              <HairlineCell key={area.title} className="px-5 py-4.5">
-                <p className="text-[0.9rem] font-medium text-[#dfe2e9]">
-                  {area.title}
-                </p>
-                <p className="mt-2 text-[0.78rem] leading-[1.55] text-[#8d93a1]">
-                  {area.skills.slice(0, 3).join(", ")}
-                </p>
-              </HairlineCell>
-            ))}
-          </HairlineGrid>
+          <ArrowLink href="/about" className="mt-9">
+            More about me
+          </ArrowLink>
         </div>
+
+        {/* Focus areas as numbered label/value rules — the same primitive the
+            stack band uses further down, so the two agree. */}
+        <SpecList>
+          {technicalFocus.map((area, index) => (
+            <SpecRow
+              key={area.title}
+              label={String(index + 1).padStart(2, "0")}
+              accent
+              className="sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-8"
+            >
+              <p className="text-[0.98rem] leading-[1.5] text-[#dfe2e9]">
+                {area.title}
+              </p>
+              <TechLine
+                items={area.skills.slice(0, 3)}
+                className="mt-2.5 text-[0.8rem]"
+              />
+            </SpecRow>
+          ))}
+        </SpecList>
       </div>
+
+      {/* Counts and figures computed from the data files. */}
+      <ul className="mt-14 grid gap-y-8 border-t border-white/10 pt-9 sm:grid-cols-3 sm:gap-x-10 lg:mt-16">
+        {aboutStats.map((stat) => (
+          <li key={stat.label}>
+            <span className="block text-[2rem] font-medium leading-none tracking-[-0.03em] text-accent-indigo-soft lg:text-[2.35rem]">
+              {stat.value}
+            </span>
+            <span className="mt-3.5 block text-[0.78rem] leading-[1.5] text-white/45">
+              {stat.label}
+            </span>
+          </li>
+        ))}
+      </ul>
     </HomeSection>
   );
 }

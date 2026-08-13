@@ -26,7 +26,11 @@ export function SiteNav({
 } = {}) {
   return (
     <header className="absolute inset-x-0 top-0 z-40">
-      <div className="flex flex-col gap-4 px-6 pt-6 sm:px-10 md:flex-row md:items-center md:justify-between md:gap-10 lg:pl-[2.375rem] lg:pr-[5.25rem] lg:pt-[2.15rem]">
+      {/* The left padding is solved so the wordmark — not the accent bar,
+          which is an outdented margin mark — lands on the page gutter at
+          6.4rem: 3.175rem + the 2px bar + the 3.1rem gap. The nav, the hero
+          headline and every section masthead therefore share one axis. */}
+      <div className="flex flex-col gap-4 px-6 pt-6 sm:px-10 md:flex-row md:items-center md:justify-between md:gap-10 lg:pl-[3.175rem] lg:pr-[6.4rem] lg:pt-[2.15rem]">
         <Link
           href="/"
           className="flex shrink-0 items-center gap-8 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent lg:gap-[3.1rem]"

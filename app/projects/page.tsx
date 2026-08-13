@@ -8,7 +8,9 @@ import {
   ProjectsExplorer,
   type ProjectIndexItem,
 } from "@/components/projects/projects-explorer";
+import { pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import { allProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
@@ -43,7 +45,7 @@ export default function ProjectsIndexPage() {
 
       {/* Shallowest masthead of the standalone pages: the work is the point
           here, so the header hands over to the first capture quickly. */}
-      <main className="relative z-10 px-6 pb-24 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%]">
+      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.wide)}>
         <PageEyebrow index="03" label="Projects" />
 
         <PageTitle className="mt-2">Projects</PageTitle>
@@ -60,7 +62,7 @@ export default function ProjectsIndexPage() {
         <PageDecorFoot />
       </main>
 
-      <Footer />
+      <Footer className={pageGutters.wide} />
     </div>
   );
 }

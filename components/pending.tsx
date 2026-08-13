@@ -39,7 +39,7 @@ export function PendingText({
 
 export function PendingTile({ hint }: { hint: string }) {
   return (
-    <div className="border border-dashed border-white/12 bg-white/[0.012] px-4 py-3.5">
+    <div className="border border-dashed border-white/10 bg-white/[0.012] px-4 py-3.5">
       <p className="text-[1.35rem] font-medium leading-none text-white/20">—</p>
       <p className="mt-2 font-mono text-[0.64rem] uppercase leading-[1.45] tracking-[0.14em] text-white/30">
         {hint}
@@ -59,7 +59,7 @@ export function PendingPlate({
   return (
     <div
       className={cn(
-        "relative grid place-items-center overflow-hidden border border-dashed border-white/12 bg-[linear-gradient(135deg,rgba(133,144,246,0.05),transparent_60%)]",
+        "relative grid place-items-center overflow-hidden border border-dashed border-white/10 bg-[linear-gradient(135deg,rgba(133,144,246,0.05),transparent_60%)]",
         className
       )}
     >

@@ -31,7 +31,7 @@ export function CaptureFrame({
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden border border-white/12 bg-[#0a0d15]",
+        "relative flex flex-col overflow-hidden border border-white/10 bg-[#0a0d15]",
         className
       )}
     >

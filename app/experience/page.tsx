@@ -8,7 +8,9 @@ import { Footer } from "@/components/footer";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
+import { pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
+import { cn } from "@/lib/utils";
 import {
   experience,
   featuredExperience,
@@ -56,7 +58,7 @@ export default function ExperienceIndexPage() {
         <PageDecorTop variant="instrument" />
       ) : null}
 
-      <main className="relative z-10 px-6 pb-24 pt-[8.5rem] sm:px-10 md:pt-[7.1rem] lg:pb-28 lg:pl-[5%] lg:pr-[9.5%]">
+      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.wide)}>
         <PageEyebrow index="04" label="Experience" />
 
         <PageTitle size="index" className="mt-2">
@@ -80,7 +82,7 @@ export default function ExperienceIndexPage() {
         <PageDecorFoot />
       </main>
 
-      <Footer />
+      <Footer className={pageGutters.wide} />
     </div>
   );
 }

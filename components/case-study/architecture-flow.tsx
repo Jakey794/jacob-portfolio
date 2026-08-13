@@ -38,8 +38,8 @@ export function ArchitectureFlow({
             <article
               className={
                 isDetailed
-                  ? "flex w-[8.75rem] flex-col border border-white/12 bg-white/[0.02] px-3 py-3"
-                  : "flex w-[7.25rem] flex-col justify-between border border-white/12 bg-white/[0.02] px-2.5 py-3"
+                  ? "flex w-[8.75rem] flex-col border border-white/10 bg-white/[0.02] px-3 py-3"
+                  : "flex w-[7.25rem] flex-col justify-between border border-white/10 bg-white/[0.02] px-2.5 py-3"
               }
             >
               <p className="font-mono text-[0.58rem] uppercase leading-tight tracking-[0.12em] text-accent-indigo-soft/75">

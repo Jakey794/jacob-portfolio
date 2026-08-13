@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { CaptureFrame } from "@/components/projects/capture-frame";
 import { ProjectThumb } from "@/components/projects/project-thumb";
 import { SectionRail } from "@/components/section-rail";
+import { Tag } from "@/components/section-shell";
 import { cn } from "@/lib/utils";
 
 /** Serialisable slice of a project, prepared on the server. */
@@ -147,7 +148,10 @@ function FeaturedCard({
       id={`project-${project.slug}`}
       className="group relative grid scroll-mt-28 overflow-hidden border border-white/10 bg-[#090c13]/60 transition-colors hover:border-white/20 lg:grid-cols-[0.365fr_0.635fr]"
     >
-      <div className="flex flex-col justify-between gap-6 p-7 sm:p-8 lg:px-9 lg:py-9">
+      {/* Not `justify-between`: the cell is as tall as the capture beside it,
+          so pinning the link to the bottom opened a 130px hole under the tags.
+          Held together at the top, the leftover height reads as padding. */}
+      <div className="flex flex-col items-start gap-8 p-7 sm:p-8 lg:px-9 lg:py-9">
         <div>
           <span className="font-mono text-[0.78rem] tracking-[0.12em] text-white/40">
             {String(index).padStart(2, "0")}
@@ -265,12 +269,7 @@ function TagRow({
   return (
     <ul className={cn("flex flex-wrap gap-2", className)}>
       {tags.map((tag) => (
-        <li
-          key={tag}
-          className="border border-accent-indigo-soft/25 bg-accent-indigo-soft/[0.07] px-2.5 py-1 text-[0.72rem] tracking-[0.02em] text-accent-indigo-soft/85"
-        >
-          {tag}
-        </li>
+        <Tag key={tag}>{tag}</Tag>
       ))}
     </ul>
   );

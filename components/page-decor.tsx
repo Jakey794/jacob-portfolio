@@ -74,20 +74,26 @@ export function PageDecorTop({
  */
 export function PageDecorFoot() {
   return (
-    <>
-      <CoordinateBlock
-        lines={LOCATION}
-        className="absolute bottom-8 left-[4.5%] z-10 hidden lg:block"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute bottom-10 right-[3.4%] z-10 hidden flex-col items-end gap-3 lg:flex"
-      >
-        <span className="h-16 w-px bg-gradient-to-b from-transparent to-white/30" />
+    /*
+      In flow rather than absolutely positioned in the page's bottom padding.
+      Overlaid, the readout landed at 4.5% of the viewport — on neither the
+      content axis nor the footer's — so the foot of every standalone page
+      carried three different left edges within 150px of each other, and on the
+      shorter pages it sat barely twenty pixels under the last content rule.
+      As a block it inherits the gutter and gets real space above it.
+    */
+    <div
+      aria-hidden="true"
+      className="mt-20 hidden items-end justify-between gap-10 lg:flex"
+    >
+      <CoordinateBlock lines={LOCATION} />
+
+      <div className="flex flex-col items-end gap-3">
+        <span className="h-16 w-px bg-gradient-to-b from-transparent to-white/25" />
         <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-white/30">
           End
         </span>
       </div>
-    </>
+    </div>
   );
 }
