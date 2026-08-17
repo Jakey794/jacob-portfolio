@@ -1,6 +1,9 @@
 # Jacob Allan Portfolio
 
-Personal portfolio website for showcasing my machine learning, data engineering, and full-stack AI projects.
+Personal portfolio website for showcasing machine learning, data engineering,
+and full-stack AI projects.
+
+**Live site:** [jacob-portfolio-six.vercel.app](https://jacob-portfolio-six.vercel.app/)
 
 ## Featured Projects
 
@@ -30,5 +33,28 @@ Machine learning system for classifying RF spectrograms from RTL-SDR captures us
 ## Local Development
 
 ```bash
-npm install
+npm ci
 npm run dev
+```
+
+## Verification
+
+```bash
+npm run check
+npm audit --audit-level=high
+```
+
+`npm run check` runs ESLint, TypeScript validation, and a production Next.js
+build. GitHub Actions runs the same checks on pushes and pull requests.
+
+## Security
+
+The portfolio contains no user accounts, data collection, or server-side
+credentials. Keep deployment configuration in the hosting provider and do not
+commit `.env` files or private keys. See [SECURITY.md](SECURITY.md) for the
+reporting policy.
+
+## License
+
+Source code is available under the [MIT License](LICENSE). The name, resume,
+photographs, and other personal portfolio content are not licensed for reuse.
