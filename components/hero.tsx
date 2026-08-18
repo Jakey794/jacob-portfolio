@@ -221,7 +221,7 @@ function HeroBackdrop() {
  */
 function HeroPortrait() {
   return (
-    <div className="pointer-events-none absolute -right-1/4 bottom-0 z-10 h-[17rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_30%)] [mask-image:linear-gradient(to_top,transparent_0,#000_30%)] sm:-right-[10%] sm:h-[22rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_15%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_15%)]">
+    <div className="pointer-events-none absolute -right-1/4 bottom-[1rem] z-10 h-[22rem] w-[150%] [-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_30%)] [mask-image:linear-gradient(to_top,transparent_0,#000_30%)] sm:-right-[10%] sm:h-[24rem] sm:w-[120%] lg:bottom-[8.4%] lg:right-[2%] lg:top-[5.25rem] lg:h-auto lg:w-[65.7%] lg:[-webkit-mask-image:linear-gradient(to_top,transparent_0,#000_15%)] lg:[mask-image:linear-gradient(to_top,transparent_0,#000_15%)]">
       <Image
         src="/images/hero/portrait.png"
         alt="Jacob Allan"

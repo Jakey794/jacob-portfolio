@@ -181,7 +181,7 @@ function FilterRow({
       <div
         role="group"
         aria-label="Filter projects by discipline"
-        className="flex flex-wrap items-center gap-x-7 gap-y-2 sm:gap-x-9"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-9 sm:gap-y-2"
       >
         {filters.map((option) => {
           const isActive = option.key === value;
@@ -193,7 +193,7 @@ function FilterRow({
               aria-pressed={isActive}
               onClick={() => onChange(option.key)}
               className={cn(
-                "relative -mb-[13px] pb-3 text-[0.95rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "relative -mb-[10px] pb-2 text-[0.9rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:-mb-[13px] sm:pb-3 sm:text-[0.95rem]",
                 isActive
                   ? "text-accent-indigo-soft"
                   : "text-white/55 hover:text-white/85"
