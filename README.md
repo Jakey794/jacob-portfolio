@@ -1,34 +1,44 @@
 # Jacob Allan Portfolio
 
-Personal portfolio website for showcasing my machine learning, data engineering, and full-stack AI projects.
+Personal portfolio for my work across machine learning, quantitative software,
+backend systems, and applied research.
 
-## Featured Projects
+[![CI](https://github.com/Jakey794/jacob-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Jakey794/jacob-portfolio/actions/workflows/ci.yml)
 
-### Incident Triage Copilot
-Full-stack AI incident triage app that converts alerts, logs, deployment notes, service context, and metrics into structured severity, root-cause, next-action, and confidence outputs.
+[View the live site](https://jacob-portfolio-six.vercel.app)
 
-**Stack:** Next.js, React, TypeScript, FastAPI, Python, Pydantic, Groq, Vercel, Google Cloud Run, pytest
+## Project coverage
 
-### FormatClip
-Chrome MV3 side-panel extension and FastAPI backend for saving snippets, formatting selected text, and reusing cleaned outputs with provider-swappable LLM support.
+- LLM Reliability + EvalOps Platform
+- Incident Triage Copilot
+- Low-Latency Event-Driven Trading Engine
+- Market Regime + Portfolio Risk Platform
+- FormatClip
+- RF Signal Classification Research
+- Collaborative Market Regime Modeling
 
-**Stack:** Chrome MV3, WXT, React, TypeScript, Tailwind, FastAPI, Python, Pydantic, Groq/OpenAI provider modes, pytest, Ruff, Biome
+The case studies distinguish verified outcomes, public evidence, limitations,
+and ownership boundaries.
 
-### RF Signal Classifier
-Machine learning system for classifying RF spectrograms from RTL-SDR captures using custom Python data collection, preprocessing, and PyTorch CNN training pipelines.
+## Site stack
 
-**Stack:** Python, PyTorch, NumPy, SciPy, RTL-SDR, CNNs, data pipelines
-
-## Focus Areas
-
-- Software engineering
-- Data engineering
-- Applied machine learning
-- Full-stack AI applications
-- Model evaluation and deployment
+- Next.js App Router
+- React and TypeScript
+- Tailwind CSS
+- Framer Motion
+- Vercel
 
 ## Local Development
 
 ```bash
-npm install
+npm ci
 npm run dev
+```
+
+## Quality checks
+
+```bash
+npm run media
+npm run check
+npm audit
+```

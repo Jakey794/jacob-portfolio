@@ -594,7 +594,7 @@ const projects: Project[] = [
     displayDate: "August 2026",
     dateStart: "2026-08",
     dateEnd: "2026-08",
-    statusLabel: "Public research demo",
+    statusLabel: "Open-source research platform",
     featured: true,
     archive: false,
     sortOrder: 4,
@@ -714,7 +714,7 @@ const projects: Project[] = [
       "Unit, integration, and Streamlit AppTest coverage.",
       "A deterministic synthetic-data path so tests run without remote market data.",
       "Future-mutation tests that fail if a future observation can influence a past decision.",
-      "The deployed public Streamlit interface exposes all nine named pages.",
+      "Nine Streamlit pages are implemented in the checked-in application and covered by AppTests.",
     ],
 
     metrics: [
@@ -728,10 +728,10 @@ const projects: Project[] = [
       },
       {
         value: "9",
-        label: "Streamlit research pages in the live interface",
+        label: "Streamlit research pages in the application",
         methodology:
-          "Counted from the deployed public app navigation on 2026-08-17.",
-        date: "2026-08-17",
+          "Counted from the checked-in application navigation; repository state rechecked 2026-08-18.",
+        date: "2026-08-18",
       },
       {
         value: "5",
@@ -747,8 +747,8 @@ const projects: Project[] = [
       "No brokerage or live order-execution integration.",
       "No claim of profitable live performance.",
       "No claim that any regime method discovers a uniquely “true” market state.",
-      "The public demo may use sample or synthetic data.",
-      "Hosted Streamlit instances can cold-start.",
+      "The dashboard uses sample or synthetic data unless configured otherwise.",
+      "No public hosted demo is currently offered; the source remains available.",
       "Model outputs depend on the chosen universe, period, data source, and assumptions.",
       "Backtest output is historical and simulated; it is not evidence of future returns.",
     ],
@@ -759,12 +759,6 @@ const projects: Project[] = [
       "Runs on a configured ETF universe and a tracked synthetic dataset. No personal holdings, brokerage credentials, or account data are involved.",
 
     links: [
-      {
-        kind: "live",
-        label: "Open research dashboard",
-        href: "https://market-regime-risk-platform-pyrwnqzpknmexl7x22aduf.streamlit.app/",
-        note: "Streamlit may take a moment to wake from a cold start.",
-      },
       {
         kind: "source",
         label: "View source",
@@ -778,7 +772,7 @@ const projects: Project[] = [
       social: "/images/og/market-regime-risk.jpg",
       alt: "Market risk research dashboard showing portfolio metrics, regime diagnostics, stress tests, and chronologically controlled backtesting.",
       caption:
-        "Public research interface on the bundled sample portfolio; results are illustrative and not investment advice.",
+        "Research interface on the bundled sample portfolio; results are illustrative and not investment advice.",
       tone: "dark",
       kind: "screenshot",
     },

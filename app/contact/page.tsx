@@ -53,6 +53,12 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact | Jacob Allan",
+    description,
+    images: [absoluteUrl("/images/og/contact.jpg")],
+  },
 };
 
 /** lucide-react v1 has no brand glyphs; the repo already substitutes these. */

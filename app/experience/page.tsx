@@ -36,6 +36,12 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Experience | Jacob Allan",
+    description,
+    images: [absoluteUrl("/images/og/experience.jpg")],
+  },
 };
 
 const items: ExperienceIndexItem[] = experience.map((item) => ({

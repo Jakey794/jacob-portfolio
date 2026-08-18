@@ -52,6 +52,12 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "About | Jacob Allan",
+    description,
+    images: [absoluteUrl("/images/og/about.jpg")],
+  },
 };
 
 /**
