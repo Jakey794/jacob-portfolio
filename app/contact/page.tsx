@@ -21,6 +21,8 @@ import { SiteNav } from "@/components/site-nav";
 import { cn } from "@/lib/utils";
 import {
   availabilityStatement,
+  contactHeadline,
+  contactLede,
   contactSections,
   contactTags,
   emailChannel,
@@ -28,14 +30,28 @@ import {
   openTo,
   universityBase,
 } from "@/lib/contact";
+import { absoluteUrl } from "@/lib/site";
+
+const description =
+  "Contact Jacob Allan about software engineering, machine learning, quantitative systems, research, or internship opportunities.";
 
 export const metadata: Metadata = {
-  title: "Contact | Jacob Allan",
-  description: availabilityStatement,
+  title: "Contact",
+  description,
+  alternates: { canonical: absoluteUrl("/contact") },
   openGraph: {
     title: "Contact | Jacob Allan",
-    description: availabilityStatement,
+    description,
+    url: absoluteUrl("/contact"),
     type: "website",
+    images: [
+      {
+        url: absoluteUrl("/images/og/contact.jpg"),
+        width: 1200,
+        height: 630,
+        alt: "Contact Jacob Allan",
+      },
+    ],
   },
 };
 
@@ -62,34 +78,43 @@ export default function ContactPage() {
       <PageAtmosphere config={pageAtmospheres.contact} />
       <SiteNav active="contact" />
 
-      <main className={cn("relative z-10 pb-28 pt-[8.5rem] md:pt-[7.1rem] lg:pb-24", pageGutters.railed)}>
+      <main
+        id="main-content"
+        className={cn(
+          "relative z-10 pb-28 pt-[8.5rem] md:pt-[7.1rem] lg:pb-24",
+          pageGutters.railed
+        )}
+      >
         {/* ---------------------------------------------------------- masthead */}
         <div id="overview" className="scroll-mt-28">
           <PageEyebrow index="05" label="Contact" />
 
           <PageTitle size="page" className="mt-2">
-            <span className="block">Let&rsquo;s build</span>
-            something difficult
+            {contactHeadline}
           </PageTitle>
 
           <p className="mt-6 max-w-[36rem] text-[1.08rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.14rem]">
+            {contactLede}
+          </p>
+
+          <p className="mt-5 max-w-[36rem] text-[0.98rem] leading-[1.72] text-[#8d93a1]">
             {availabilityStatement}
           </p>
 
-          {/* Only facts the repo records. Location, response window, timezone and
-            preferred channel are deliberately absent — see lib/contact.ts. */}
+          {/* Only facts the source evidence supports. No response window, no
+              timezone, no phone number, no address — see lib/contact.ts. */}
           <ul className="mt-7 flex flex-wrap items-center gap-x-9 gap-y-3 text-[0.86rem] text-[#9299a7]">
             <li className="inline-flex items-center gap-2.5">
               <GraduationCap
                 aria-hidden="true"
-                className="size-[0.95rem] text-white/35"
+                className="size-[0.95rem] text-white/55"
               />
               {universityBase.programme}, {universityBase.institution}
             </li>
             <li className="inline-flex items-center gap-2.5">
               <CalendarCheck
                 aria-hidden="true"
-                className="size-[0.95rem] text-white/35"
+                className="size-[0.95rem] text-white/55"
               />
               Open to opportunities
             </li>
@@ -113,7 +138,7 @@ export default function ContactPage() {
         >
           <h2
             id="reach-out-title"
-            className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-white/35"
+            className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-white/55"
           >
             {emailChannel.label}
           </h2>
@@ -167,7 +192,7 @@ export default function ContactPage() {
                     <span className="flex items-center gap-3 sm:w-[9rem] sm:shrink-0">
                       <Icon
                         aria-hidden="true"
-                        className="size-[1rem] shrink-0 text-white/35 transition-colors group-hover:text-accent-indigo-soft"
+                        className="size-[1rem] shrink-0 text-white/55 transition-colors group-hover:text-accent-indigo-soft"
                       />
                       <span className="text-[1rem] font-medium text-[#dfe2e9]">
                         {channel.label}
@@ -235,8 +260,8 @@ export default function ContactPage() {
               Thanks for stopping by.
             </h2>
             <p className="mt-3 max-w-[34rem] text-[0.95rem] leading-[1.7] text-[#8d93a1]">
-              If you think we could build something meaningful together, I&rsquo;d
-              love to hear from you.
+              If you are building something where careful engineering and
+              measurable evidence matter, I&rsquo;d like to hear about it.
             </p>
           </div>
 

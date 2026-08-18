@@ -1,18 +1,23 @@
 import { ArrowLink } from "@/components/cta-link";
+import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
-import { HomeSection, SpecList, SpecRow, TechLine } from "@/components/section-shell";
-import { aboutBody, aboutLede, aboutStats, technicalFocus } from "@/lib/about";
+import {
+  HomeSection,
+  SpecList,
+  SpecRow,
+  TechLine,
+} from "@/components/section-shell";
+import { homeStats, technicalFocus } from "@/lib/about";
+import { profile } from "@/lib/site";
 
 /**
- * Concise homepage preview. The full profile lives at /about — this section
- * shares its content from `lib/about.ts` rather than restating it, so the two
- * can never drift apart.
+ * Homepage preview of the full profile at /about.
  *
- * Laid out as a magazine opener rather than a two-column dashboard: the lede
- * runs at display scale across the measure, the prose and the focus areas sit
- * beneath it, and the figures close the band on one rule. The focus areas were
- * three bordered cards, which is what made the first band under the hero read
- * as a component library.
+ * Content is shared from `lib/about.ts` and `lib/site.ts` rather than
+ * restated, so the two pages cannot drift. Laid out as a magazine opener
+ * rather than a two-column dashboard: the heading runs at display scale, the
+ * prose and focus areas sit beneath it, and the computed figures close the
+ * band on one rule.
  */
 export function About() {
   return (
@@ -20,25 +25,28 @@ export function About() {
       <SectionHeading
         index="02"
         eyebrow="About"
-        title={aboutLede}
+        title="Secure systems, careful evaluation, and explicit failure boundaries."
         id="about-title"
       />
 
       <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
         <div>
           <div className="space-y-5">
-            {aboutBody.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="max-w-[34rem] text-[1.05rem] leading-[1.78] text-[#a2a8b5]"
-              >
-                {paragraph}
-              </p>
-            ))}
+            <p className="max-w-[34rem] text-[1.05rem] leading-[1.78] text-[#a2a8b5]">
+              I am an Engineering Science student at the University of Toronto
+              specializing in Machine Intelligence and Mathematics. Most of my
+              work is Python: PyTorch models, portfolio-risk and regime
+              research, evaluation harnesses, and the FastAPI and PostgreSQL
+              services around them &mdash; plus deterministic Rust where
+              latency and reproducibility matter.
+            </p>
+            <p className="max-w-[34rem] text-[1.05rem] leading-[1.78] text-[#a2a8b5]">
+              {profile.longBio[1]}
+            </p>
           </div>
 
           <ArrowLink href="/about" className="mt-9">
-            More about me
+            Education, skills, and approach
           </ArrowLink>
         </div>
 
@@ -64,19 +72,19 @@ export function About() {
         </SpecList>
       </div>
 
-      {/* Counts and figures computed from the data files. */}
-      <ul className="mt-14 grid gap-y-8 border-t border-white/10 pt-9 sm:grid-cols-3 sm:gap-x-10 lg:mt-16">
-        {aboutStats.map((stat) => (
-          <li key={stat.label}>
+      {/* Counts computed from the content collections, never typed in. */}
+      <Reveal className="mt-14 grid gap-y-8 border-t border-white/10 pt-9 sm:grid-cols-2 sm:gap-x-10 lg:mt-16 lg:grid-cols-4">
+        {homeStats.map((stat) => (
+          <div key={stat.label}>
             <span className="block text-[2rem] font-medium leading-none tracking-[-0.03em] text-accent-indigo-soft lg:text-[2.35rem]">
               {stat.value}
             </span>
-            <span className="mt-3.5 block text-[0.78rem] leading-[1.5] text-white/45">
+            <span className="mt-3.5 block text-[0.78rem] leading-[1.5] text-white/55">
               {stat.label}
             </span>
-          </li>
+          </div>
         ))}
-      </ul>
+      </Reveal>
     </HomeSection>
   );
 }

@@ -43,7 +43,7 @@ export function CaptureFrame({
             <span className="size-[6px] rounded-full bg-white/14" />
           </span>
           {label ? (
-            <span className="min-w-0 truncate font-mono text-[0.62rem] uppercase tracking-[0.16em] text-white/35">
+            <span className="min-w-0 truncate font-mono text-[0.62rem] uppercase tracking-[0.16em] text-white/55">
               {label}
             </span>
           ) : null}

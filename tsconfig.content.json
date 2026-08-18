@@ -1,0 +1,31 @@
+{
+  // Compiles the content collections and the integrity runner to plain
+  // CommonJS under node_modules/.cache so `npm run check:content` can execute
+  // them with node. The content modules import each other relatively for
+  // exactly this reason: a `@/` alias would survive into the emitted JS and
+  // node could not resolve it.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "incremental": false,
+    "composite": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "node_modules/.cache/content-check",
+    "types": ["node"],
+    "plugins": []
+  },
+  "include": [
+    "lib/awards.ts",
+    "lib/certifications.ts",
+    "lib/content-integrity.ts",
+    "lib/content-types.ts",
+    "lib/education.ts",
+    "lib/experience.ts",
+    "lib/projects.ts",
+    "lib/site.ts",
+    "lib/skills.ts",
+    "lib/volunteering.ts",
+    "scripts/check-content.ts"
+  ]
+}

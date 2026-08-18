@@ -48,7 +48,7 @@ export function SectionMasthead({
         index ? (
           <PageEyebrow index={index} label={eyebrow} className="shrink-0" />
         ) : (
-          <p className="shrink-0 font-mono text-[0.78rem] uppercase tracking-[0.2em] text-white/45">
+          <p className="shrink-0 font-mono text-[0.78rem] uppercase tracking-[0.2em] text-white/55">
             {eyebrow}
           </p>
         )

@@ -1,56 +1,47 @@
-import { skillGroups } from "@/lib/skills";
+import { ArrowLink } from "@/components/cta-link";
+import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
-import {
-  HomeSection,
-  SpecList,
-  SpecRow,
-  TechLine,
-} from "@/components/section-shell";
+import { HomeSection, TechLine } from "@/components/section-shell";
+import { homeStack } from "@/lib/skills";
 
 /**
  * Supporting band rather than a numbered section — it backs up the work above
  * instead of introducing a new one, so it carries a plain eyebrow.
  *
- * Drawn as the same label/value rules the rest of the page uses. It was
- * thirty-five bordered chips over four rows, which read as a tag cloud and was
- * the most generic object on the homepage; the words are unchanged, the boxes
- * are gone.
+ * A deliberate short list, not the full inventory. Thirteen names a reader
+ * takes in at a glance says more than ninety they skim past; the complete
+ * grouped set is on About, one link away.
  */
 export function Skills() {
   return (
     <HomeSection id="skills" labelledBy="skills-title" glow="right">
       <SectionHeading
-        eyebrow="Stack"
-        title="A compact technical stack"
+        eyebrow="Core stack"
+        title="What I build with"
         id="skills-title"
+        aside={
+          <ArrowLink href="/about#skills" className="hidden lg:inline-flex">
+            Full technical profile
+          </ArrowLink>
+        }
       >
         <p>
-          Languages, ML tooling, quant concepts, and software platforms used
-          across research and product projects.
+          The tools that appear across the projects and roles above. The
+          complete grouped inventory, including quantitative and signals work,
+          is on the About page.
         </p>
       </SectionHeading>
 
-      <SpecList className="mt-14 lg:mt-[4.5rem]">
-        {skillGroups.map((group) => (
-          <SpecRow
-            key={group.category}
-            label={group.category}
-            accent
-            /* The label track was 17rem against labels that are never more
-               than eight characters, which opened a 250px hole between every
-               category and its values while the row's rule ran on to the page
-               gutter. Tightened, and the value measure widened to the point
-               where each group sets on one line — which also stops a wrap
-               leaving a separator dangling at the end of a line. */
-            className="py-6 sm:gap-12 lg:grid-cols-[14rem_minmax(0,1fr)] lg:py-7"
-          >
-            <TechLine
-              items={group.skills}
-              className="max-w-[62rem] gap-x-[0.7rem] gap-y-1.5 text-[0.9rem]"
-            />
-          </SpecRow>
-        ))}
-      </SpecList>
+      <Reveal className="mt-12 border-t border-white/10 pt-9 lg:mt-14">
+        <TechLine
+          items={homeStack}
+          className="max-w-[62rem] gap-x-[0.9rem] gap-y-2.5 text-[1.05rem] text-[#c3c8d2] lg:text-[1.15rem]"
+        />
+      </Reveal>
+
+      <ArrowLink href="/about#skills" className="mt-9 lg:hidden">
+        Full technical profile
+      </ArrowLink>
     </HomeSection>
   );
 }

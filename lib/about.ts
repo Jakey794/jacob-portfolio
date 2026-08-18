@@ -1,164 +1,270 @@
 /**
- * Single source of truth for About content, shared by the standalone
- * `/about` page and the concise homepage `#about` preview.
+ * About-page and homepage-preview content.
  *
- * Everything here is drawn from existing portfolio content: the original
- * About prose, `lib/skills.ts`, `lib/projects.ts`, `lib/experience.ts`, and
- * the contact links in `components/resume-cta.tsx`. Nothing is invented —
- * see the notes on individual fields.
+ * Everything numeric here is computed from the collections rather than typed
+ * in. The old file hard-coded a "case studies" figure that counted the whole
+ * project array including records with no detail page; counting the records
+ * themselves means the figure cannot drift when one is added or archived.
  */
 
-import {
-  availabilityStatement,
-  contactChannels,
-  contactEmail,
-  universityBase,
-} from "@/lib/contact";
-import { allProjects } from "@/lib/projects";
-import { experience } from "@/lib/experience";
+import { awards } from "./awards";
+import { certifications } from "./certifications";
+import { education } from "./education";
+import { experience } from "./experience";
+import { allProjects } from "./projects";
+import { profile } from "./site";
+import { volunteering } from "./volunteering";
 
-/** Lede and body, carried over verbatim from the original About section. */
 export const aboutLede =
-  "I build practical systems: ML pipelines, full-stack AI tools, and models that turn messy data into decisions.";
+  "I build secure backend software and applied ML systems for operational and financial workflows.";
 
-export const aboutBody = [
-  "I'm an Engineering Science student at the University of Toronto focused on machine learning, quantitative finance, and software engineering.",
-  "My current work spans RF signal classification, customer-personalization ML, incident triage automation, and portfolio/risk modeling.",
-];
+export const aboutBody = profile.longBio;
 
-/** The disciplines already used on the homepage hero. */
 export const aboutTags = [
-  "Machine Learning",
   "Software Engineering",
+  "Machine Learning",
   "Quantitative Research",
-  "Full-stack AI",
+  "Reliable AI",
+  "Systems Programming",
 ];
+
+/** Public demos and releases a visitor can actually open or install today. */
+const liveArtifacts = allProjects.filter((project) =>
+  project.links.some((link) => link.kind === "live" || link.kind === "release")
+);
 
 /**
- * Counts and figures computed from the real data files, so they cannot drift
- * out of sync with the portfolio.
+ * Repositories Jacob owns and has published. Counted rather than typed, so the
+ * figure in the homepage highlights cannot drift from the project collection —
+ * and the collaborative record is excluded, because it is not his repository.
  */
+const ownedPublicRepos = allProjects.filter(
+  (project) =>
+    project.ownership === "owned" &&
+    project.links.some((link) => link.kind === "source")
+);
+
 export const aboutStats = [
   {
-    value: String(allProjects.length).padStart(2, "0"),
-    label: "Case studies",
+    value: String(allProjects.length),
+    label: "Project and research records",
     href: "/projects",
   },
   {
-    value: String(experience.length).padStart(2, "0"),
-    label: "Roles & research",
+    value: String(experience.length),
+    label: "Work experiences",
     href: "/experience",
   },
   {
+    value: String(liveArtifacts.length),
+    label: "Public demos and releases",
+    href: "/projects",
+  },
+  {
     value: "150K",
-    label: "Largest dataset curated",
-    href: "/experience/royal-military-college-ml-researcher",
+    label: "Largest research dataset, in samples",
+    href: "/projects/rf-signal-classification-research",
+  },
+];
+
+/** The shorter set used on the homepage, where three figures fit the band. */
+export const homeStats = [
+  aboutStats[0],
+  aboutStats[1],
+  {
+    value: String(awards.length),
+    label: "Honors and awards",
+    href: "/about#recognition",
+  },
+  {
+    value: "May 2029",
+    label: "Expected graduation",
+    href: "/about#education",
   },
 ];
 
 /**
- * `honour` is the Schulich Leader Scholar line carried from the portfolio's
- * original hero (commit 7805328). No dates are recorded anywhere in the repo,
- * so none are shown.
+ * The four facts under the hero.
+ *
+ * This band used to carry test counts — 1,286 / 221 / 247 / 150K. They were
+ * accurate but they answered a question nobody asks first: a reader arriving
+ * on the homepage wants to know who this is and whether the work is real, not
+ * how many assertions a suite runs. Each entry here is a credential, a role,
+ * or a body of work, and each links to the page that evidences it.
+ *
+ * `href` is validated by the content checks against the actual route set, so
+ * one of these cannot quietly start pointing at a 404.
  */
-export const education = {
-  programme: "Engineering Science",
-  institution: "University of Toronto",
-  honour: "Schulich Leader Scholar",
-};
+export const homeHighlights = [
+  {
+    value: "Schulich Leader",
+    label: "$120,000 STEM scholarship, 2025",
+    href: "/about#recognition",
+  },
+  {
+    value: "Northstar",
+    label: "Software Engineering Intern — Python, PostgreSQL, AWS",
+    href: "/experience/northstar-downhole-software-engineering-intern",
+  },
+  {
+    value: "UTEFA",
+    label: "Portfolio Manager — 20+ member investing group",
+    href: "/experience/utefa-portfolio-manager",
+  },
+  {
+    value: `${ownedPublicRepos.length} public repos`,
+    label: "Live demos, releases, and source",
+    href: "/projects",
+  },
+];
 
-/**
- * The three focus areas from the original About section, each backed by the
- * matching group in `lib/skills.ts`.
- */
 export const technicalFocus = [
   {
-    title: "Machine learning systems",
+    title: "Python for applied ML",
     skills: [
+      "Python",
       "PyTorch",
       "scikit-learn",
       "XGBoost",
-      "clustering",
-      "autoencoders",
-      "model evaluation",
+      "NumPy",
+      "Pandas",
+      "Model evaluation",
+      "Time-series validation",
     ],
   },
   {
-    title: "Full-stack AI tools",
-    skills: ["Next.js", "React", "FastAPI", "Chrome Extensions", "LLM APIs"],
+    title: "Backend and cloud platforms",
+    skills: [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "REST APIs",
+      "AWS",
+      "Terraform",
+      "Docker",
+      "Django",
+    ],
   },
   {
-    title: "Quantitative modeling",
+    title: "Quantitative research and risk",
     skills: [
       "VaR",
-      "efficient frontier optimization",
-      "factor modeling",
-      "return prediction",
-      "portfolio risk",
+      "Stress testing",
+      "Efficient-frontier optimization",
+      "Market regimes",
+      "Transaction costs",
+      "Portfolio P&L",
+    ],
+  },
+  {
+    title: "Systems programming",
+    skills: [
+      "Rust",
+      "Event-driven design",
+      "Deterministic replay",
+      "Property tests",
+      "Golden tests",
+      "Reproducible benchmarks",
     ],
   },
 ];
 
 /**
- * How I work — each principle is evidenced by a shipped project rather than
- * asserted, and links to the case study that demonstrates it.
+ * How I work.
+ *
+ * Each principle names the record that demonstrates it, and links there. A
+ * principle without a link is an opinion; with one it is a claim a reader can
+ * check in about fifteen seconds.
  */
 export const workingPrinciples = [
   {
-    title: "Typed contracts over loose model output",
+    title: "Typed contracts over loose model output.",
     evidence:
-      "Pydantic response contracts keep severity, root-cause and confidence structured.",
-    href: "/projects/incident-triage-copilot",
+      "Incident Triage validates structured responses across Next.js and FastAPI before rendering.",
     source: "Incident Triage Copilot",
+    href: "/projects/incident-triage-copilot",
   },
   {
-    title: "A fallback path so a demo never depends on a provider",
+    title: "Evaluation gates before model changes ship.",
     evidence:
-      "Heuristic and mock paths run when Groq, Gemini or the LLM backend are unavailable.",
-    href: "/projects/formatclip",
+      "EvalOps checks pass rate, score, estimated cost, and p95 latency across versioned evaluation runs.",
+    source: "LLM EvalOps",
+    href: "/projects/llm-evalops-platform",
+  },
+  {
+    title: "Temporal safeguards in quantitative research.",
+    evidence:
+      "Market Risk uses chronological splits, train-only scaling, shifted signals, and future-mutation tests.",
+    source: "Market Regime & Risk",
+    href: "/projects/market-regime-risk-platform",
+  },
+  {
+    title: "Determinism before optimization.",
+    evidence:
+      "The Rust engine uses deterministic JSONL replay, golden scenarios, and property tests before comparing benchmarks.",
+    source: "Event-Driven Trading Engine",
+    href: "/projects/low-latency-trading-engine",
+  },
+  {
+    title: "Explicit privacy and failure boundaries.",
+    evidence:
+      "FormatClip stores snippets locally and sends selected text only after an explicit Format action.",
     source: "FormatClip",
+    href: "/projects/formatclip",
   },
   {
-    title: "Measure on unseen data",
+    title: "Metrics keep their methodology.",
     evidence:
-      "90% average accuracy on unseen RF signals; one year of unseen market data for the regime models.",
-    href: "/projects/rf-signal-classification-research",
+      "RF results retain their unseen-signal and approximation qualifiers, and Northstar latency stays scoped to a synthetic workload.",
     source: "RF Signal Classification",
-  },
-  {
-    title: "Cover backend behaviour with tests",
-    evidence:
-      "pytest coverage around response structure, not just the happy path.",
-    href: "/projects/incident-triage-copilot",
-    source: "Incident Triage Copilot",
+    href: "/projects/rf-signal-classification-research",
   },
 ];
 
-/** Journey, derived from the real experience entries. */
-export const journey = experience.map((item) => ({
-  slug: item.slug,
-  dates: item.dates,
-  organization: item.shortName,
-  role: item.role,
-}));
+/**
+ * Selected journey.
+ *
+ * The five roles that carry the technical and finance story, in the order the
+ * specification sets — which is by relevance, not strictly by date, so the
+ * two overlapping UTEFA roles read as a promotion rather than as a conflict.
+ */
+const journeyOrder = [
+  "northstar-downhole-software-engineering-intern",
+  "utefa-portfolio-manager",
+  "utmist-flybits-machine-learning-engineer",
+  "royal-military-college-machine-learning-researcher",
+  "utefa-sales-trading-analyst",
+];
 
-/** Availability line and contact destinations both live in `lib/contact.ts`. */
-export const availability = availabilityStatement;
+export const journey = journeyOrder
+  .map((slug) => experience.find((item) => item.slug === slug))
+  .filter((item): item is (typeof experience)[number] => Boolean(item))
+  .map((item) => ({
+    slug: item.slug,
+    dates: item.displayDates,
+    organization: item.shortOrganization,
+    role: item.role,
+  }));
+
+export const availability = profile.availability;
 
 export const aboutContact = {
-  email: contactEmail,
-  github: contactChannels.find((c) => c.key === "github")!.href,
-  linkedin: contactChannels.find((c) => c.key === "linkedin")!.href,
-  resume: contactChannels.find((c) => c.key === "resume")!.href,
-  institution: universityBase.institution,
+  institution: "University of Toronto",
 };
 
-/** Rail entries for the standalone page. */
+/**
+ * Rail entries. Numbered by `anchorSections`, so the order here is the order
+ * the bands render in and the two cannot disagree.
+ */
 export const aboutSections = [
-  { id: "overview", index: "01", label: "Overview" },
-  { id: "education", index: "02", label: "Education" },
-  { id: "focus", index: "03", label: "Technical Focus" },
-  { id: "skills", index: "04", label: "Skills" },
-  { id: "how-i-work", index: "05", label: "How I Work" },
-  { id: "journey", index: "06", label: "Journey" },
+  { id: "overview", label: "Overview" },
+  { id: "education", label: "Education" },
+  { id: "recognition", label: "Recognition" },
+  { id: "focus", label: "Focus" },
+  { id: "skills", label: "Skills" },
+  { id: "how-i-work", label: "How I Work" },
+  { id: "journey", label: "Journey" },
+  { id: "volunteering", label: "Volunteering" },
 ];
+
+export { awards, certifications, education, volunteering };

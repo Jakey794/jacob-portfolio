@@ -1,36 +1,37 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, GitBranch } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
-import {
-  ArchitectureFlow,
-} from "@/components/case-study/architecture-flow";
-import {
-  Panel,
-  PanelList,
-  PanelText,
-  StatTiles,
-} from "@/components/case-study/panel";
+import { ArchitectureFlow } from "@/components/case-study/architecture-flow";
+import { Panel, PanelList, PanelText } from "@/components/case-study/panel";
+import { MetricGrid, ResourceActions } from "@/components/evidence";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
+import { RecordVisual } from "@/components/media/record-visual";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
-import { CaptureFrame } from "@/components/projects/capture-frame";
-import { ProjectThumb } from "@/components/projects/project-thumb";
+import { Reveal } from "@/components/reveal";
 import { SectionRail, anchorSections } from "@/components/section-rail";
 import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
 import { cn } from "@/lib/utils";
-import { caseStudies, caseStudySlugs, getCaseStudy } from "@/lib/case-studies";
-import { allProjects, getProjectBySlug } from "@/lib/projects";
+import { experience } from "@/lib/experience";
+import {
+  allProjects,
+  getAdjacentProjects,
+  getProjectBySlug,
+  ownershipLabels,
+  projectSlugs,
+} from "@/lib/projects";
+import { absoluteUrl } from "@/lib/site";
 
-type PageProps = {
-  params: Promise<{ slug: string }>;
-};
+type PageProps = { params: Promise<{ slug: string }> };
 
+/** Every record in the collection gets a route. No allowlist. */
 export function generateStaticParams() {
-  return caseStudySlugs.map((slug) => ({ slug }));
+  return projectSlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -39,55 +40,76 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = getProjectBySlug(slug);
 
-  if (!project || !caseStudies[slug]) {
-    return { title: "Project Not Found | Jacob Allan" };
-  }
+  if (!project) return { title: "Project not found" };
+
+  const url = absoluteUrl(`/projects/${project.slug}`);
+  const image = project.media?.social ?? `/images/og/${project.slug}.jpg`;
 
   return {
-    title: `${project.title} | Jacob Allan Case Study`,
-    description: project.summary,
+    title: project.seo.title,
+    description: project.seo.description,
+    alternates: { canonical: url },
     openGraph: {
-      title: `${project.title} | Jacob Allan Case Study`,
-      description: project.summary,
+      title: `${project.seo.title} | Jacob Allan`,
+      description: project.seo.description,
+      url,
       type: "article",
+      images: [
+        {
+          url: absoluteUrl(image),
+          width: 1200,
+          height: 630,
+          alt: project.media?.alt ?? project.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${project.title} | Jacob Allan Case Study`,
-      description: project.summary,
+      title: `${project.seo.title} | Jacob Allan`,
+      description: project.seo.description,
+      images: [absoluteUrl(image)],
     },
   };
-}
-
-const railSections = [
-  { id: "overview", label: "Overview" },
-  { id: "problem", label: "Problem" },
-  { id: "approach", label: "Approach" },
-  { id: "architecture", label: "Architecture" },
-  { id: "features", label: "Features" },
-  { id: "results", label: "Results" },
-  { id: "stack", label: "Stack" },
-  { id: "next-project", label: "Next Project" },
-];
-
-/** Panel heads carry the same index the rail entry that targets them does. */
-function panelIndex(id: string) {
-  const position = railSections.findIndex((section) => section.id === id);
-  return position === -1 ? undefined : String(position + 1).padStart(2, "0");
 }
 
 export default async function ProjectCaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
-  const caseStudy = getCaseStudy(slug);
 
-  if (!project || !caseStudy) {
-    notFound();
-  }
+  if (!project) notFound();
 
   const position = allProjects.findIndex((item) => item.slug === slug);
   const eyebrowIndex = String(position + 1).padStart(2, "0");
-  const nextProject = allProjects[(position + 1) % allProjects.length];
+  const { previous, next } = getAdjacentProjects(slug);
+
+  const relatedRoles = project.relatedExperienceSlugs
+    .map((related) => experience.find((item) => item.slug === related))
+    .filter((item): item is (typeof experience)[number] => Boolean(item));
+
+  /* The rail is built from what renders, so no entry ever scrolls to a
+     section that this particular record does not have. */
+  const railSections = [
+    { id: "overview", label: "Overview" },
+    { id: "problem", label: "Problem" },
+    { id: "approach", label: "Approach" },
+    ...(project.architecture.length
+      ? [{ id: "architecture", label: "Architecture" }]
+      : []),
+    { id: "features", label: "What I built" },
+    ...(project.technicalDecisions.length
+      ? [{ id: "decisions", label: "Decisions" }]
+      : []),
+    ...(project.metrics.length ? [{ id: "evidence", label: "Evidence" }] : []),
+    { id: "limitations", label: "Limitations" },
+    { id: "stack", label: "Stack" },
+    ...(relatedRoles.length ? [{ id: "related", label: "Related" }] : []),
+    { id: "next-project", label: "Next" },
+  ];
+
+  const panelIndex = (id: string) => {
+    const index = railSections.findIndex((section) => section.id === id);
+    return index === -1 ? undefined : String(index + 1).padStart(2, "0");
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
@@ -97,36 +119,45 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
         <PageDecorTop variant="spec" />
       ) : null}
 
-      {/* The wide right gutter only applies from xl, where the text-labelled
-          rail is actually rendered. */}
-      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.railed)}>
+      <main
+        id="main-content"
+        className={cn(
+          "relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20",
+          pageGutters.railed
+        )}
+      >
         {/* ---------------------------------------------------------- masthead */}
-        <div className="grid gap-12 lg:grid-cols-[0.42fr_0.58fr] lg:items-start lg:gap-10">
-          <div>
-            <PageEyebrow index={eyebrowIndex} label="Project Case Study" />
+        <div className="grid gap-12 lg:grid-cols-[0.44fr_0.56fr] lg:items-start lg:gap-10">
+          <div className="min-w-0">
+            <PageEyebrow index={eyebrowIndex} label={project.eyebrow} />
 
             <PageTitle size="detail" className="mt-6">
               {project.title}
             </PageTitle>
 
-            <p className="mt-6 max-w-[27rem] text-[0.99rem] leading-[1.75] text-[#a2a8b5] lg:text-[1.04rem]">
+            <p className="mt-6 max-w-[28rem] text-[0.99rem] leading-[1.75] text-[#a2a8b5] lg:text-[1.04rem]">
               {project.oneLine}
             </p>
 
-            {/* A line, not chips — the masthead is unboxed, and the same four
-                declarations already appear as chips in the index card this
-                page is opened from. */}
+            {project.attribution ? (
+              <p className="mt-4 max-w-[28rem] border-l border-accent-indigo-soft/35 pl-4 text-[0.86rem] leading-[1.6] text-white/55">
+                {project.attribution}
+              </p>
+            ) : null}
+
             <TechLine
               items={project.displayTags}
               className="mt-7 text-[0.95rem] text-accent-indigo-soft/85"
             />
 
-            {/* Short meta pairs only — the full role narrative lives in the
-                Approach panel below, so this row stays on one line. */}
             <dl className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(7rem,max-content))] gap-x-12 gap-y-5">
-              {caseStudy.highlights.map(([label, value]) => (
+              {[
+                ["Ownership", ownershipLabels[project.ownership]],
+                ["Timeline", project.displayDate],
+                ["Status", project.statusLabel],
+              ].map(([label, value]) => (
                 <div key={label}>
-                  <dt className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-white/35">
+                  <dt className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-white/55">
                     {label}
                   </dt>
                   <dd className="mt-2 text-[0.88rem] leading-[1.6] text-[#c3c8d2]">
@@ -135,51 +166,43 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
                 </div>
               ))}
             </dl>
+
+            <ResourceActions
+              links={project.links}
+              recordTitle={project.title}
+              className="mt-9"
+            />
           </div>
 
-          {/*
-            Product capture. The concept angles this plate hard; at
-            rotateY(-13deg) over an already dark grade the interface stopped
-            being readable, which defeats the point of showing it. The tilt is
-            kept but shallow, and the capture sits in the same drawn window
-            chrome the index uses so the two pages agree.
-          */}
           <div className="relative lg:-mt-2">
-            <div className="[perspective:2200px]">
-              <CaptureFrame
-                label={project.title}
-                className="shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] lg:[transform:rotateY(-5deg)_rotateX(1.5deg)]"
-                bodyClassName="aspect-[16/9]"
-              >
-                <ProjectThumb
-                  src={project.image}
-                  alt={
-                    project.imageAlt ?? `${project.title} interface screenshot`
-                  }
-                  sizes="(min-width: 1024px) 52vw, 100vw"
-                  priority
-                  className="absolute inset-0"
-                />
-              </CaptureFrame>
+            <div className={project.media ? "[perspective:2200px]" : undefined}>
+              <RecordVisual
+                media={project.media}
+                nodes={project.architecture}
+                caption="System architecture"
+                framed={Boolean(project.media)}
+                frameLabel={project.title}
+                frameBodyClassName="aspect-[16/10]"
+                sizes="(min-width: 1024px) 52vw, 100vw"
+                priority
+                className={
+                  project.media
+                    ? "shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] lg:[transform:rotateY(-5deg)_rotateX(1.5deg)]"
+                    : "border border-white/10 shadow-[0_44px_110px_-45px_rgba(0,0,0,0.95)]"
+                }
+              />
             </div>
+
+            {project.media ? (
+              <p className="mt-3.5 text-[0.78rem] leading-[1.55] text-white/55">
+                {project.media.caption}
+              </p>
+            ) : null}
           </div>
         </div>
 
         {/* -------------------------------------------------- summary band */}
-        {/*
-          The fourth cell used to be a second copy of the same screenshot under
-          heavy scrims, which rendered as an empty black rectangle. It now
-          carries the detail crop — a different region of the product — and is
-          dropped entirely for projects with no capture, so the band closes at
-          three panels instead of leaving a hole.
-        */}
-        <div
-          className={`mt-16 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-20 ${
-            project.image
-              ? "xl:grid-cols-[repeat(3,minmax(0,1fr))_1.15fr]"
-              : "xl:grid-cols-3"
-          }`}
-        >
+        <Reveal className="mt-16 grid gap-px bg-white/10 sm:grid-cols-2 lg:mt-20 xl:grid-cols-3">
           <Panel
             id="overview"
             title="Overview"
@@ -200,128 +223,184 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
 
           <Panel
             id="approach"
-            title="Approach"
+            title="My role"
             index={panelIndex("approach")}
             className="border-0"
           >
             <PanelText>{project.role}</PanelText>
           </Panel>
+        </Reveal>
 
-          {project.image ? (
-            /*
-              One cell, never two. Spanning both columns at sm put the crop in
-              a row of its own roughly 1300px wide against a 208px minimum
-              height, so `object-cover` zoomed a 730x460 detail crop by a
-              factor of four and clipped it mid-sentence — and it left the cell
-              beside "Approach" empty, which showed as a bare hole in the band.
-              As a single cell it fills that slot and lands at close to the
-              source's own 1.6:1, so almost nothing is trimmed at any width.
-            */
-            <div className="flex min-h-[13rem] items-stretch bg-[#090c13] p-5">
-              <CaptureFrame chrome={false} className="w-full">
-                <ProjectThumb
-                  src={project.imageDetail ?? project.image}
-                  alt=""
-                  sizes="(min-width: 1280px) 26vw, 100vw"
-                  className="absolute inset-0"
-                />
-              </CaptureFrame>
-            </div>
+        {/* --------------------------------------- architecture / what built */}
+        <Reveal className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1.15fr_1fr]">
+          {project.architecture.length ? (
+            <Panel
+              id="architecture"
+              title="System architecture"
+              index={panelIndex("architecture")}
+              className="border-0"
+              bodyClassName="flex flex-col justify-center"
+            >
+              <ArchitectureFlow stages={project.architecture} size="detailed" />
+            </Panel>
           ) : null}
-        </div>
-
-        {/* ------------------------------------------ architecture / features */}
-        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1.24fr_0.86fr_0.9fr]">
-          <Panel
-            id="architecture"
-            title="System Architecture"
-            index={panelIndex("architecture")}
-            className="border-0"
-            bodyClassName="flex flex-col justify-center"
-          >
-            <ArchitectureFlow
-              stages={caseStudy.architecture}
-              feedbackLabel="Structured response contract"
-              feedbackNote="Typed outputs flow back into the product surface"
-            />
-          </Panel>
 
           <Panel
             id="features"
-            title="Key Features"
+            title="What I built"
             index={panelIndex("features")}
             className="border-0"
           >
-            <PanelList items={caseStudy.whatBuilt} />
+            <PanelList
+              items={project.whatBuilt}
+              className={
+                project.architecture.length
+                  ? undefined
+                  : "sm:grid-cols-2 sm:gap-x-10"
+              }
+            />
           </Panel>
+        </Reveal>
+
+        {/* --------------------------------------- decisions / validation */}
+        <Reveal className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-2">
+          {project.technicalDecisions.length ? (
+            <Panel
+              id="decisions"
+              title="Technical decisions"
+              index={panelIndex("decisions")}
+              className="border-0"
+            >
+              <PanelList items={project.technicalDecisions} />
+            </Panel>
+          ) : null}
 
           <Panel
-            id="results"
-            title={caseStudy.results ? "Results" : "Validation"}
-            index={panelIndex("results")}
+            id="validation"
+            title="Testing and validation"
             className="border-0"
           >
-            {caseStudy.results ? (
-              <StatTiles tiles={caseStudy.results} />
-            ) : (
-              <PanelList items={caseStudy.metricsProof} />
-            )}
+            <PanelList items={project.testingAndValidation} />
           </Panel>
-        </div>
+        </Reveal>
 
-        {/* ------------------------------------------------ stack / next up */}
-        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1.15fr_1fr]">
+        {/* ------------------------------------------------------- evidence */}
+        {project.metrics.length ? (
+          <Reveal className="mt-6 lg:mt-8">
+            <Panel
+              id="evidence"
+              title="Measured evidence"
+              index={panelIndex("evidence")}
+            >
+              {/* Each figure keeps the run that produced it. That is the whole
+                  argument of this page, so the methodology is rendered rather
+                  than tucked into a tooltip. */}
+              <MetricGrid metrics={project.metrics} columns={2} />
+
+              <p className="mt-8 border-t border-white/10 pt-5 text-[0.86rem] leading-[1.7] text-[#a0a6b4]">
+                {project.outcome}
+              </p>
+            </Panel>
+          </Reveal>
+        ) : null}
+
+        {/* ---------------------------------------- limitations / privacy */}
+        <Reveal className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[1fr_0.85fr]">
+          <Panel
+            id="limitations"
+            title="Limitations"
+            index={panelIndex("limitations")}
+            className="border-0"
+          >
+            <PanelList items={project.limitations} />
+          </Panel>
+
           <Panel
             id="stack"
-            title="Technology Stack"
+            title="Technology stack"
             index={panelIndex("stack")}
             className="border-0"
           >
-            {/* Set as a line rather than as bordered chips. Ten rectangles
-                inside an already-bordered panel is the same tag cloud the
-                homepage dropped, and it was the loudest object in the band. */}
             <TechLine items={project.stack} className="text-[0.88rem]" />
 
-            {project.github ? (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2.5 rounded-sm text-[0.9rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-              >
-                <GitBranch aria-hidden="true" className="size-4" />
-                View source on GitHub
-              </a>
+            {project.securityAndPrivacy ? (
+              <div className="mt-7 border-t border-white/10 pt-5">
+                <p className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/55">
+                  Data and privacy
+                </p>
+                <PanelText className="mt-2.5">
+                  {project.securityAndPrivacy}
+                </PanelText>
+              </div>
             ) : null}
           </Panel>
+        </Reveal>
 
-          <NextProjectPanel
-            index={panelIndex("next-project")}
-            title={nextProject.title}
-            oneLine={nextProject.oneLine}
-            href={`/projects/${nextProject.slug}`}
-            /* The detail crop, not the wide capture: this slot is under two
-               hundred pixels across, and a whole product window scaled into it
-               is noise rather than a preview. */
-            image={nextProject.imageDetail ?? nextProject.image}
-            imageAlt={nextProject.imageAlt}
-          />
+        {/* -------------------------------------------- related / next up */}
+        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[0.85fr_1fr]">
+          {relatedRoles.length ? (
+            <Panel
+              id="related"
+              title="Related experience"
+              index={panelIndex("related")}
+              className="border-0"
+            >
+              <ul className="grid gap-4">
+                {relatedRoles.map((role) => (
+                  <li key={role.slug}>
+                    <Link
+                      href={`/experience/${role.slug}`}
+                      className="group/related inline-flex items-baseline gap-2.5 rounded-sm text-[0.9rem] text-[#c3c8d2] transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                    >
+                      <span>
+                        {role.shortOrganization}
+                        <span className="text-white/55"> — {role.role}</span>
+                      </span>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-[0.85rem] shrink-0 transition-transform duration-200 group-hover/related:translate-x-1"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          ) : null}
+
+          {next ? (
+            <NextRecordPanel
+              index={panelIndex("next-project")}
+              eyebrow="Next project"
+              title={next.title}
+              oneLine={next.oneLine}
+              href={`/projects/${next.slug}`}
+            />
+          ) : null}
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-7">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-white/10 pt-7">
           <Link
             href="/projects"
             className="inline-flex items-center gap-3 rounded-sm text-[0.92rem] text-white/60 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
           >
-            <ArrowRight aria-hidden="true" className="size-4 rotate-180" />
+            <ArrowLeft aria-hidden="true" className="size-4" />
             All projects
           </Link>
+
+          {previous ? (
+            <Link
+              href={`/projects/${previous.slug}`}
+              className="inline-flex items-center gap-3 rounded-sm text-[0.92rem] text-white/60 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            >
+              <ArrowLeft aria-hidden="true" className="size-4" />
+              {`Previous: ${previous.shortTitle}`}
+            </Link>
+          ) : null}
         </div>
 
         <PageDecorFoot />
       </main>
 
-      {/* Section rail — anchors into the panels above. */}
       <SectionRail
         variant="labelled"
         gap="1.35rem"
@@ -330,24 +409,79 @@ export default async function ProjectCaseStudyPage({ params }: PageProps) {
       />
 
       <Footer className={pageGutters.railed} />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Projects",
+                  item: absoluteUrl("/projects"),
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: project.title,
+                  item: absoluteUrl(`/projects/${project.slug}`),
+                },
+              ],
+            },
+            {
+              /* SoftwareApplication only where something is genuinely usable;
+                 everything else is a CreativeWork. No rating, review, offer or
+                 download-count markup — there is no evidence for any of it. */
+              "@type": project.links.some(
+                (link) => link.kind === "live" || link.kind === "release"
+              )
+                ? "SoftwareApplication"
+                : project.links.some((link) => link.kind === "source")
+                  ? "SoftwareSourceCode"
+                  : "CreativeWork",
+              name: project.title,
+              headline: project.seo.title,
+              description: project.seo.description,
+              url: absoluteUrl(`/projects/${project.slug}`),
+              ...(project.slug === "formatclip"
+                ? { applicationCategory: "BrowserApplication" }
+                : {}),
+              author: {
+                "@type": "Person",
+                name: "Jacob Allan",
+                url: absoluteUrl("/"),
+              },
+              ...(project.links.find((link) => link.kind === "source")
+                ? {
+                    codeRepository: project.links.find(
+                      (link) => link.kind === "source"
+                    )!.href,
+                  }
+                : {}),
+              keywords: project.stack.join(", "),
+            },
+          ],
+        }}
+      />
     </div>
   );
 }
 
-function NextProjectPanel({
+function NextRecordPanel({
   index,
+  eyebrow,
   title,
   oneLine,
   href,
-  image,
-  imageAlt,
 }: {
   index?: string;
+  eyebrow: string;
   title: string;
   oneLine: string;
   href: string;
-  image?: string;
-  imageAlt?: string;
 }) {
   return (
     <section
@@ -357,40 +491,37 @@ function NextProjectPanel({
     >
       <Link
         href={href}
-        className="flex h-full flex-col gap-6 p-6 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:flex-row sm:items-center sm:p-7"
+        className="flex h-full flex-col justify-between gap-6 p-6 outline-none transition-colors duration-300 hover:bg-white/[0.02] focus-visible:bg-white/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-indigo-soft/70 sm:p-7"
       >
-        <div className="flex-1">
+        <div>
           <div className="flex items-center gap-3">
-            <span className="font-mono text-[0.78rem] tracking-[0.12em] text-accent-indigo-soft">
-              {index}
-            </span>
+            {index ? (
+              <span className="font-mono text-[0.78rem] tracking-[0.12em] text-accent-indigo-soft">
+                {index}
+              </span>
+            ) : null}
             <span
               id="next-project-title"
               className="text-[1.02rem] font-medium tracking-[-0.01em] text-[#dfe2e9]"
             >
-              Next Project
+              {eyebrow}
             </span>
           </div>
-          <p className="mt-5 text-[1.15rem] font-medium tracking-[-0.015em] text-[#e2e5ec]">
+
+          <p className="mt-5 text-[1.3rem] font-medium leading-snug tracking-[-0.018em] text-[#e2e5ec]">
             {title}
           </p>
-          <p className="mt-2.5 max-w-[22rem] text-[0.85rem] leading-[1.62] text-[#8d93a1]">
+          <p className="mt-2.5 max-w-[26rem] text-[0.85rem] leading-[1.62] text-[#8d93a1]">
             {oneLine}
           </p>
         </div>
 
-        <ProjectThumb
-          src={image}
-          alt={imageAlt ?? `${title} preview`}
-          sizes="(min-width: 1024px) 16vw, 40vw"
-          className="aspect-[16/10] w-full shrink-0 border border-white/10 sm:w-[11rem]"
-        />
-
         <span
           aria-hidden="true"
-          className="hidden size-10 shrink-0 place-items-center border border-white/15 text-white/50 transition-all duration-200 group-hover:border-accent-indigo-soft/50 group-hover:text-accent-indigo-soft sm:grid"
+          className="inline-flex items-center gap-2.5 text-[0.88rem] text-accent-indigo-soft transition-colors group-hover:text-white"
         >
-          <ArrowRight className="size-4" />
+          Continue
+          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
         </span>
       </Link>
     </section>

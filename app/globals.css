@@ -4,6 +4,74 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/**
+ * `rise` — the one entrance animation on the site.
+ *
+ * A short fade with ten pixels of lift, used for the hero's staggered
+ * headline and for nothing else. Callers set their own `animation-delay`
+ * inline.
+ *
+ * Declared inside `prefers-reduced-motion: no-preference` rather than being
+ * switched off later: the rule simply does not exist for a reader who asked
+ * for less motion, so there is no `!important` fight and no chance of an
+ * element being left at the animation's starting opacity.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.72s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/**
+ * Reduced motion.
+ *
+ * `scroll-smooth` on <html> is the one that matters most here: smooth
+ * scrolling is a full-viewport animation and it ignores the preference
+ * unless it is turned off explicitly, so every in-page anchor on the site
+ * would animate for a reader who asked it not to.
+ *
+ * The blanket rule below covers the hero's entrance and any Tailwind
+ * transition. The `Reveal` component handles itself in JavaScript — under
+ * this preference it renders a plain element with no animation attached at
+ * all, rather than a fast one.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /*
+   * Scroll reveals are driven by JavaScript, which writes an inline
+   * `opacity: 0` that no `transition-duration` reset can clear. This shows
+   * the content outright instead — the same escape hatch the `<noscript>`
+   * block in the root layout uses, for the same reason.
+   */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

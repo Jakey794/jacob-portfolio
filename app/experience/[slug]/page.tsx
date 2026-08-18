@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 
 import { ArchitectureFlow } from "@/components/case-study/architecture-flow";
+import { Panel, PanelList, PanelText } from "@/components/case-study/panel";
+import { MetricGrid } from "@/components/evidence";
 import {
-  Panel,
-  PanelList,
-  PanelText,
-  StatTiles,
-} from "@/components/case-study/panel";
-import { MetaRow } from "@/components/experience/experience-explorer";
-import { ResultMark, RoleSchematic } from "@/components/experience/role-visuals";
+  MetaRow,
+  RoleHistory,
+} from "@/components/experience/experience-explorer";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
+import { RecordVisual } from "@/components/media/record-visual";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
-import { PendingPlate } from "@/components/pending";
-import { ProjectThumb } from "@/components/projects/project-thumb";
+import { Reveal } from "@/components/reveal";
 import { SectionRail, anchorSections } from "@/components/section-rail";
 import { TechLine, pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
@@ -27,13 +26,14 @@ import {
   experienceSlugs,
   getAdjacentExperience,
   getExperienceBySlug,
-  type ResultTile,
+  roleHistory,
 } from "@/lib/experience";
+import { allProjects } from "@/lib/projects";
+import { absoluteUrl } from "@/lib/site";
 
-type PageProps = {
-  params: Promise<{ slug: string }>;
-};
+type PageProps = { params: Promise<{ slug: string }> };
 
+/** All ten records get a route, resolved from the collection. */
 export function generateStaticParams() {
   return experienceSlugs.map((slug) => ({ slug }));
 }
@@ -44,19 +44,32 @@ export async function generateMetadata({
   const { slug } = await params;
   const item = getExperienceBySlug(slug);
 
-  if (!item) {
-    return { title: "Experience Not Found | Jacob Allan" };
-  }
+  if (!item) return { title: "Experience not found" };
 
-  const description = item.summary ?? item.bullets[0];
+  const url = absoluteUrl(`/experience/${item.slug}`);
 
   return {
-    title: `${item.organization} | Jacob Allan Experience`,
-    description,
+    title: item.seo.title,
+    description: item.seo.description,
+    alternates: { canonical: url },
     openGraph: {
-      title: `${item.role} — ${item.organization}`,
-      description,
+      title: `${item.seo.title} | Jacob Allan`,
+      description: item.seo.description,
+      url,
       type: "article",
+      images: [
+        {
+          url: absoluteUrl("/images/og/experience.jpg"),
+          width: 1200,
+          height: 630,
+          alt: `${item.role} — ${item.organization}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${item.seo.title} | Jacob Allan`,
+      description: item.seo.description,
     },
   };
 }
@@ -65,61 +78,49 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const item = getExperienceBySlug(slug);
 
-  if (!item) {
-    notFound();
-  }
+  if (!item) notFound();
 
   const position = experience.findIndex((entry) => entry.slug === slug);
   const eyebrowIndex = String(position + 1).padStart(2, "0");
-  const next = getAdjacentExperience(slug);
+  const { previous, next } = getAdjacentExperience(slug);
+  const history = roleHistory(item);
 
-  /**
-   * With no photograph to show, the masthead carries the workflow schematic —
-   * and then the horizontal flow panel further down would repeat it verbatim.
-   * Only one of the two renders.
-   */
-  const schematicInMasthead = !item.image && Boolean(item.workflow?.length);
+  const relatedProjects = item.relatedProjectSlugs
+    .map((related) => allProjects.find((project) => project.slug === related))
+    .filter((project): project is (typeof allProjects)[number] =>
+      Boolean(project)
+    );
+
+  const hasContext = Boolean(item.context);
+  const hasMetrics = item.metrics.length > 0;
+  const hasWorkflow = Boolean(item.workflow?.length);
+  const hasCaveats = item.claimCaveats.length > 0;
 
   /*
-    Which panels this role actually has content for.
-
-    `summary`, `context`, `team` and `location` are unset for every role in
-    `lib/experience.ts`, so the page used to render five skeleton placeholders
-    per role — "role summary pending" directly under the job title, then
-    "overview pending", "problem / context pending", "team / collaboration
-    pending" and "location pending". A reader met four grey stubs before any
-    real work. Empty slots are dropped instead: the bands close up around what
-    exists, and the outstanding fields stay documented in the data file rather
-    than on the page.
+    The workflow diagram renders once. When the masthead carries it — which is
+    the case for every role with no photography — the horizontal panel version
+    is dropped, so the same stages are never drawn twice on one page.
   */
-  const hasOverview = Boolean(item.summary);
-  const hasContext = Boolean(item.context);
-  const hasTeam = Boolean(item.team?.length);
-  const hasResults = Boolean(item.results?.length);
-  const hasWorkflow = Boolean(item.workflow?.length);
+  const workflowInMasthead = !item.media && hasWorkflow;
 
-  /* Ordered as the panels are laid out, so the rail counts down the page — and
-     built from what renders, so no entry scrolls to a section that is absent. */
   const railSections = [
     { id: "contributions", label: "Contributions" },
-    ...(hasOverview ? [{ id: "overview", label: "Overview" }] : []),
+    { id: "overview", label: "Overview" },
     ...(hasContext ? [{ id: "context", label: "Context" }] : []),
     ...(hasWorkflow ? [{ id: "workflow", label: "Workflow" }] : []),
-    ...(hasResults ? [{ id: "results", label: "Results" }] : []),
+    ...(hasMetrics ? [{ id: "outcomes", label: "Outcomes" }] : []),
     { id: "tools", label: "Tools" },
-    ...(hasTeam ? [{ id: "team", label: "Team" }] : []),
-    ...(next ? [{ id: "next-role", label: "Next Role" }] : []),
+    ...(hasCaveats || item.confidentialityNote
+      ? [{ id: "scope", label: "Scope" }]
+      : []),
+    ...(relatedProjects.length ? [{ id: "related", label: "Related" }] : []),
+    ...(next ? [{ id: "next-role", label: "Next" }] : []),
   ];
 
-  /** Panel heads carry the same index the rail entry that targets them does. */
   const panelIndex = (id: string) => {
-    const position = railSections.findIndex((section) => section.id === id);
-    return position === -1
-      ? undefined
-      : String(position + 1).padStart(2, "0");
+    const index = railSections.findIndex((section) => section.id === id);
+    return index === -1 ? undefined : String(index + 1).padStart(2, "0");
   };
-
-  const summaryPanels = 1 + Number(hasOverview) + Number(hasContext);
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
@@ -129,13 +130,17 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
         <PageDecorTop variant="instrument" />
       ) : null}
 
-      {/* The wide right gutter only applies from xl, where the text-labelled
-          rail is actually rendered. */}
-      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.railed)}>
+      <main
+        id="main-content"
+        className={cn(
+          "relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20",
+          pageGutters.railed
+        )}
+      >
         {/* ---------------------------------------------------------- masthead */}
-        <div className="grid gap-12 lg:grid-cols-[0.46fr_0.54fr] lg:items-start lg:gap-10">
-          <div>
-            <PageEyebrow index={eyebrowIndex} label="Experience Detail" />
+        <div className="grid gap-12 lg:grid-cols-[0.5fr_0.5fr] lg:items-start lg:gap-10">
+          <div className="min-w-0">
+            <PageEyebrow index={eyebrowIndex} label="Experience" />
 
             <PageTitle size="compact" className="mt-2">
               {item.organization}
@@ -145,240 +150,215 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
               {item.role}
             </p>
 
-            {item.summary ? (
-              <p className="mt-3.5 max-w-[28rem] text-[0.95rem] leading-[1.6] text-[#a2a8b5]">
-                {item.summary}
-              </p>
-            ) : null}
+            <p className="mt-3.5 max-w-[30rem] text-[0.95rem] leading-[1.65] text-[#a2a8b5]">
+              {item.summary}
+            </p>
 
-            <MetaRow dates={item.dates} location={item.location} className="mt-5" />
+            <MetaRow
+              dates={item.displayDates}
+              location={item.location}
+              workMode={item.workMode}
+              className="mt-5"
+            />
 
-            {/* A line, not chips — the masthead is unboxed, and the same tools
-                already appear as chips in the index card this page opens
-                from. */}
+            <RoleHistory history={history} className="mt-3" />
+
             <TechLine
-              items={item.tools}
-              className="mt-4 text-[0.95rem] text-accent-indigo-soft/85"
+              items={item.tools.slice(0, 8)}
+              className="mt-4 text-[0.92rem] text-accent-indigo-soft/85"
             />
           </div>
 
-          {/*
-            No photography exists for any role, so where there is none the
-            masthead draws the role itself: the pipeline its bullets describe,
-            as a signal chain. This slot previously held a dashed "role imagery
-            pending" plate over the atmosphere band, which was the single most
-            unfinished-looking element on the site.
-
-            When the schematic lands here it takes the `workflow` anchor with
-            it and the panel version below is dropped, so the same five stages
-            are never drawn twice on one page.
-          */}
           <div
-            id={schematicInMasthead ? "workflow" : undefined}
+            id={workflowInMasthead ? "workflow" : undefined}
             className="relative scroll-mt-28 lg:-mt-2"
           >
-            {item.image ? (
-              <div className="overflow-hidden border border-white/10 bg-[#0b0e16]">
-                <ProjectThumb
-                  src={item.image}
-                  alt={item.imageAlt ?? `${item.organization} imagery`}
-                  sizes="(min-width: 1024px) 54vw, 100vw"
-                  priority
-                  className="aspect-[16/10]"
-                />
-              </div>
-            ) : schematicInMasthead ? (
-              // The fill stays opaque — the corner readout sits behind this
-              // slot and ghosts through anything translucent — but it is lifted
-              // off the plate with a soft cast shadow, so the panel reads as
-              // resting over the scene rather than as cut out of it.
-              <RoleSchematic
-                stages={item.workflow!}
-                caption="System workflow"
-                className="border border-white/10 shadow-[0_44px_110px_-45px_rgba(0,0,0,0.95)]"
-              />
-            ) : (
-              <PendingPlate hint="Role imagery" className="aspect-[16/10]" />
-            )}
+            <RecordVisual
+              media={item.media}
+              nodes={workflowInMasthead ? item.workflow : undefined}
+              caption="Public-scope workflow"
+              sizes="(min-width: 1024px) 48vw, 100vw"
+              priority
+              className="border border-white/10 shadow-[0_44px_110px_-45px_rgba(0,0,0,0.95)]"
+            />
           </div>
         </div>
 
         {/* -------------------------------------------------- summary band */}
-        {/*
-          Contributions leads: it is the one panel populated for every role.
-          The band sizes itself to however many of the three have content, so a
-          role with no written summary or context opens on one full-width panel
-          of real work rather than on one panel and two stubs.
-        */}
-        <div
+        <Reveal
           className={cn(
-            "mt-14 grid gap-px bg-white/10 lg:mt-16",
-            summaryPanels === 3 &&
-              "sm:grid-cols-2 xl:grid-cols-[1.4fr_1fr_1fr]",
-            summaryPanels === 2 && "xl:grid-cols-[1.4fr_1fr]"
+            "mt-16 grid gap-px bg-white/10 lg:mt-20",
+            hasContext ? "xl:grid-cols-[1.35fr_1fr]" : ""
           )}
         >
           <Panel
             id="contributions"
-            title="Technical Contributions"
+            title="Contributions"
             index={panelIndex("contributions")}
-            className={cn(
-              "border-0",
-              summaryPanels === 3 && "sm:col-span-2 xl:col-span-1"
-            )}
+            className="border-0"
           >
-            {/* Alone, the panel runs the full measure of the page, so the
-                bullets are set in two tracks rather than as fourteen-hundred
-                pixel lines. */}
-            <PanelList
-              items={item.bullets}
-              className={cn(
-                summaryPanels === 1 && "gap-x-14 lg:grid-cols-2 xl:gap-x-20"
-              )}
-            />
+            <PanelList items={item.responsibilities} />
           </Panel>
 
-          {hasOverview ? (
+          {hasContext ? (
+            <Panel
+              id="context"
+              title="Context"
+              index={panelIndex("context")}
+              className="border-0"
+            >
+              <PanelText>{item.context}</PanelText>
+
+              <div id="overview" className="mt-6 scroll-mt-28">
+                <p className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/55">
+                  In one line
+                </p>
+                <PanelText className="mt-2.5">{item.oneLine}</PanelText>
+              </div>
+            </Panel>
+          ) : (
             <Panel
               id="overview"
               title="Overview"
               index={panelIndex("overview")}
               className="border-0"
             >
-              <PanelText>{item.summary}</PanelText>
+              <PanelText>{item.oneLine}</PanelText>
             </Panel>
-          ) : null}
-
-          {hasContext ? (
-            <Panel
-              id="context"
-              title="Problem / Context"
-              index={panelIndex("context")}
-              className="border-0"
-            >
-              <PanelText>{item.context}</PanelText>
-            </Panel>
-          ) : null}
-        </div>
-
-        {/* ------------------------------------------- workflow / results */}
-        <div
-          className={cn(
-            "mt-6 grid gap-px bg-white/10 lg:mt-8",
-            !schematicInMasthead && hasWorkflow && hasResults &&
-              "xl:grid-cols-[1.15fr_1fr]"
           )}
-        >
-          {!schematicInMasthead && hasWorkflow ? (
+        </Reveal>
+
+        {/* --------------------------------------------- workflow / outcomes */}
+        {!workflowInMasthead && hasWorkflow ? (
+          <Reveal className="mt-6 lg:mt-8">
             <Panel
               id="workflow"
-              title="System Workflow"
+              title="Workflow"
               index={panelIndex("workflow")}
-              className="border-0"
               bodyClassName="flex flex-col justify-center"
             >
-              <ArchitectureFlow
-                stages={item.workflow!}
-                size="detailed"
-                feedbackLabel={item.feedbackLabel}
-              />
+              <ArchitectureFlow stages={item.workflow!} />
             </Panel>
-          ) : null}
+          </Reveal>
+        ) : null}
 
-          {hasResults ? (
+        {hasMetrics ? (
+          <Reveal className="mt-6 lg:mt-8">
             <Panel
-              id="results"
-              title="Key Results"
-              index={panelIndex("results")}
-              className="border-0"
+              id="outcomes"
+              title="Measured outcomes"
+              index={panelIndex("outcomes")}
             >
-              <StatTiles tiles={item.results!} columns={3} />
+              <MetricGrid metrics={item.metrics} columns={2} />
             </Panel>
-          ) : null}
-        </div>
+          </Reveal>
+        ) : null}
 
-        {/* ------------------------------------------------ tools / team / next */}
-        <div
-          className={cn(
-            "mt-6 grid gap-px bg-white/10 lg:mt-8",
-            /* Without a team panel the band is two cells, and the tools line
-               is a single line of text: giving it the wider track left a
-               quarter of a screen of empty panel beside it. The narrower track
-               holds the line and the next-role card gets the width, which also
-               shortens the band. */
-            hasTeam ? "xl:grid-cols-[1fr_0.85fr_1fr]" : "xl:grid-cols-[0.76fr_1fr]"
-          )}
-        >
+        {/* -------------------------------------------------- tools / scope */}
+        <Reveal className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[0.85fr_1fr]">
           <Panel
             id="tools"
-            title="Tools & Stack"
+            title="Tools & stack"
             index={panelIndex("tools")}
             className="border-0"
           >
-            {/* Set as a line rather than as bordered chips. Six rectangles
-                inside an already-bordered panel is the same tag cloud the
-                homepage dropped, and it read as the loudest thing in the
-                band. */}
             <TechLine items={item.tools} className="text-[0.88rem]" />
           </Panel>
 
-          {hasTeam ? (
+          {hasCaveats || item.confidentialityNote ? (
             <Panel
-              id="team"
-              title="Team / Collaboration"
-              index={panelIndex("team")}
+              id="scope"
+              title="Scope of this page"
+              index={panelIndex("scope")}
               className="border-0"
             >
-              <div className="grid gap-6 sm:grid-cols-2">
-                {item.team!.map((group) => (
-                  <div key={group.label}>
-                    <p className="font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
-                      {group.label}
-                    </p>
-                    <ul className="mt-3 grid gap-2">
-                      {group.items.map((entry) => (
-                        <li
-                          key={entry}
-                          className="text-[0.82rem] leading-[1.5] text-[#a0a6b4]"
-                        >
-                          {entry}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {item.confidentialityNote ? (
+                <p className="flex gap-3 text-[0.84rem] leading-[1.7] text-[#949aa8]">
+                  <Lock
+                    aria-hidden="true"
+                    className="mt-[0.22rem] size-[0.85rem] shrink-0 text-white/55"
+                  />
+                  {item.confidentialityNote}
+                </p>
+              ) : null}
+
+              {hasCaveats ? (
+                <PanelList
+                  items={item.claimCaveats}
+                  className={item.confidentialityNote ? "mt-5" : undefined}
+                />
+              ) : null}
+            </Panel>
+          ) : null}
+        </Reveal>
+
+        {/* -------------------------------------------- related / next role */}
+        <div className="mt-6 grid gap-px bg-white/10 lg:mt-8 xl:grid-cols-[0.85fr_1fr]">
+          {relatedProjects.length ? (
+            <Panel
+              id="related"
+              title="Related public work"
+              index={panelIndex("related")}
+              className="border-0"
+            >
+              <ul className="grid gap-4">
+                {relatedProjects.map((project) => (
+                  <li key={project.slug}>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="group/related inline-flex items-baseline gap-2.5 rounded-sm text-[0.9rem] text-[#c3c8d2] transition-colors outline-none hover:text-accent-indigo-soft focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                    >
+                      {project.shortTitle}
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-[0.85rem] shrink-0 transition-transform duration-200 group-hover/related:translate-x-1"
+                      />
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
+
+              <p className="mt-5 border-t border-white/10 pt-4 text-[0.78rem] leading-[1.55] text-white/55">
+                Personal projects, listed for the shared themes. Neither was
+                built for this organisation.
+              </p>
             </Panel>
           ) : null}
 
           {next ? (
-            <NextExperiencePanel
+            <NextRolePanel
               index={panelIndex("next-role")}
-              organization={next.organization}
+              organization={next.shortOrganization}
               role={next.role}
-              summary={next.summary ?? next.bullets[0]}
+              oneLine={next.oneLine}
               href={`/experience/${next.slug}`}
-              image={next.image}
-              imageAlt={next.imageAlt}
-              results={next.results}
             />
           ) : null}
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-7">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-white/10 pt-7">
           <Link
             href="/experience"
             className="inline-flex items-center gap-3 rounded-sm text-[0.92rem] text-white/60 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
           >
-            <ArrowRight aria-hidden="true" className="size-4 rotate-180" />
+            <ArrowLeft aria-hidden="true" className="size-4" />
             All experience
           </Link>
+
+          {previous ? (
+            <Link
+              href={`/experience/${previous.slug}`}
+              className="inline-flex items-center gap-3 rounded-sm text-[0.92rem] text-white/60 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            >
+              <ArrowLeft aria-hidden="true" className="size-4" />
+              {`Previous: ${previous.shortOrganization}`}
+            </Link>
+          ) : null}
         </div>
 
         <PageDecorFoot />
       </main>
 
-      {/* Section rail — anchors into the panels above. */}
       <SectionRail
         variant="labelled"
         gap="1.35rem"
@@ -387,28 +367,43 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
       />
 
       <Footer className={pageGutters.railed} />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Experience",
+              item: absoluteUrl("/experience"),
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: `${item.role} — ${item.organization}`,
+              item: absoluteUrl(`/experience/${item.slug}`),
+            },
+          ],
+        }}
+      />
     </div>
   );
 }
 
-function NextExperiencePanel({
+function NextRolePanel({
   index,
   organization,
   role,
-  summary,
+  oneLine,
   href,
-  image,
-  imageAlt,
-  results,
 }: {
   index?: string;
   organization: string;
   role: string;
-  summary: string;
+  oneLine: string;
   href: string;
-  image?: string;
-  imageAlt?: string;
-  results?: ResultTile[];
 }) {
   return (
     <section
@@ -418,58 +413,39 @@ function NextExperiencePanel({
     >
       <Link
         href={href}
-        className="flex h-full flex-col gap-5 p-6 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:p-7"
+        className="flex h-full flex-col justify-between gap-6 p-6 outline-none transition-colors duration-300 hover:bg-white/[0.02] focus-visible:bg-white/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-indigo-soft/70 sm:p-7"
       >
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[0.78rem] tracking-[0.12em] text-accent-indigo-soft">
-            {index}
-          </span>
-          <span
-            id="next-role-title"
-            className="text-[1.02rem] font-medium tracking-[-0.01em] text-[#dfe2e9]"
-          >
-            Next Experience
-          </span>
-        </div>
-
-        <div className="flex flex-1 items-start gap-5">
-          <div className="min-w-0 flex-1">
-            <p className="text-[1.02rem] font-medium leading-snug tracking-[-0.015em] text-[#e2e5ec]">
-              {organization}
-            </p>
-            <p className="mt-1.5 text-[0.85rem] text-accent-indigo-soft/85">
-              {role}
-            </p>
-            <p className="mt-3 line-clamp-3 text-[0.82rem] leading-[1.6] text-[#8d93a1]">
-              {summary}
-            </p>
+        <div>
+          <div className="flex items-center gap-3">
+            {index ? (
+              <span className="font-mono text-[0.78rem] tracking-[0.12em] text-accent-indigo-soft">
+                {index}
+              </span>
+            ) : null}
+            <span
+              id="next-role-title"
+              className="text-[1.02rem] font-medium tracking-[-0.01em] text-[#dfe2e9]"
+            >
+              Next experience
+            </span>
           </div>
 
-          {image ? (
-            <ProjectThumb
-              src={image}
-              alt={imageAlt ?? `${organization} preview`}
-              sizes="(min-width: 1024px) 14vw, 34vw"
-              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 border border-white/10 sm:block"
-            />
-          ) : results?.length ? (
-            <ResultMark
-              results={results}
-              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 sm:grid"
-            />
-          ) : (
-            <PendingPlate
-              hint="Image"
-              className="hidden aspect-[16/10] w-[8.5rem] shrink-0 sm:grid"
-            />
-          )}
+          <p className="mt-5 text-[1.2rem] font-medium leading-snug tracking-[-0.015em] text-[#e2e5ec]">
+            {organization}
+          </p>
+          <p className="mt-1.5 text-[0.88rem] text-accent-indigo-soft/85">
+            {role}
+          </p>
+          <p className="mt-3 max-w-[26rem] text-[0.84rem] leading-[1.6] text-[#8d93a1]">
+            {oneLine}
+          </p>
         </div>
 
         <span
           aria-hidden="true"
           className="inline-flex items-center gap-2.5 text-[0.88rem] text-accent-indigo-soft transition-colors group-hover:text-white"
         >
-          View next role
+          Continue
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
         </span>
       </Link>

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build"
+    "media": "node scripts/build-media.mjs",
+    "check:content": "tsc -p tsconfig.content.json && node node_modules/.cache/content-check/scripts/check-content.js",
+    "check": "npm run lint && npm run typecheck && npm run check:content && npm run build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

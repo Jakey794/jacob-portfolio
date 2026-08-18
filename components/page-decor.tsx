@@ -1,3 +1,4 @@
+import { profile } from "@/lib/site";
 import {
   CoordinateBlock,
   CrossMark,
@@ -5,8 +6,12 @@ import {
   GuideLine,
 } from "@/components/technical-decor";
 
-/** Toronto / UofT St. George, matching the homepage readouts. */
-const LOCATION = ["43.6629° N", "79.3957° W", "Toronto, ON"];
+/**
+ * The campus readout, matching the hero and the closing band. Labelled with
+ * the institution so the coordinates are read as a design mark rather than as
+ * a home address.
+ */
+const LOCATION = [...profile.coordinates, ...profile.coordinateLabel];
 const LOCATION_DMS = ["43° 39′ 46″ N", "79° 23′ 45″ W"];
 
 /**
@@ -35,11 +40,11 @@ export function PageDecorTop({
       <GuideLine className="absolute left-[2%] top-[7rem] z-10 hidden h-[22rem] lg:block" />
       <CrossMark
         size={11}
-        className="absolute left-[4.5%] top-[8.5rem] z-10 hidden text-white/30 lg:block"
+        className="absolute left-[4.5%] top-[8.5rem] z-10 hidden text-white/55 lg:block"
       />
       <CrossMark
         size={20}
-        className="absolute left-[2.35%] top-[10.5rem] z-10 hidden text-white/40 lg:block"
+        className="absolute left-[2.35%] top-[10.5rem] z-10 hidden text-white/55 lg:block"
       />
 
       {/* Held back until xl: below that the page content reaches into this
@@ -48,7 +53,7 @@ export function PageDecorTop({
         <>
           <CrossMark
             size={16}
-            className="absolute left-[68.5%] top-[7.4rem] z-10 hidden text-white/40 xl:block"
+            className="absolute left-[68.5%] top-[7.4rem] z-10 hidden text-white/55 xl:block"
           />
           <CoordinateBlock
             lines={LOCATION_DMS}
@@ -90,7 +95,7 @@ export function PageDecorFoot() {
 
       <div className="flex flex-col items-end gap-3">
         <span className="h-16 w-px bg-gradient-to-b from-transparent to-white/25" />
-        <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-white/30">
+        <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-white/55">
           End
         </span>
       </div>

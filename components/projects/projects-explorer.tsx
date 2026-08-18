@@ -1,35 +1,60 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { ProofChips, ResourceLinkRow } from "@/components/evidence";
+import {
+  MetricPlate,
+  QuietPlate,
+  RecordVisual,
+} from "@/components/media/record-visual";
 import { CaptureFrame } from "@/components/projects/capture-frame";
-import { ProjectThumb } from "@/components/projects/project-thumb";
+import { Reveal } from "@/components/reveal";
 import { SectionRail } from "@/components/section-rail";
 import { Tag } from "@/components/section-shell";
+import type { FlowNode, Media, ResourceLink } from "@/lib/content-types";
 import { cn } from "@/lib/utils";
 
-/** Serialisable slice of a project, prepared on the server. */
+/**
+ * Serialisable slice of a project, prepared on the server.
+ *
+ * Deliberately a projection rather than the whole record: this is a client
+ * component, so everything here crosses into the bundle, and a project record
+ * carries several kilobytes of case-study prose that the index never renders.
+ */
 export type ProjectIndexItem = {
   slug: string;
   title: string;
   oneLine: string;
+  eyebrow: string;
+  ownershipLabel: string;
+  statusLabel: string;
+  displayDate: string;
+  archive: boolean;
+  attribution?: string;
   categories: string[];
   displayTags: string[];
-  image?: string;
-  imageAlt?: string;
-  imageDetail?: string;
+  proof: string;
+  /** First metric, shown in the thumbnail slot when there is no capture. */
+  headlineMetric?: { value: string; label: string };
+  links: ResourceLink[];
+  media?: Media;
+  architecture: FlowNode[];
 };
 
-const FILTERS = ["All", "ML", "Software", "Quant", "Research"] as const;
+export type ProjectFilter = { key: string; count: number };
 
 export function ProjectsExplorer({
   projects,
+  filters,
 }: {
   projects: ProjectIndexItem[];
+  filters: readonly ProjectFilter[];
 }) {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
+  const [filter, setFilter] = useState("All");
+  const statusId = useId();
 
   const visible = useMemo(
     () =>
@@ -39,25 +64,29 @@ export function ProjectsExplorer({
     [filter, projects]
   );
 
-  const [featured, ...rest] = visible;
+  /* The archive record always sorts last and is labelled, so a collaborative
+     contribution can never be mistaken for owned flagship work. */
+  const primary = visible.filter((project) => !project.archive);
+  const archived = visible.filter((project) => project.archive);
+  const [lead, ...rest] = primary;
 
   return (
     <div className="relative">
-      <FilterRow value={filter} onChange={setFilter} count={visible.length} />
+      <FilterRow
+        filters={filters}
+        value={filter}
+        onChange={setFilter}
+        count={visible.length}
+        statusId={statusId}
+      />
 
       <div className="mt-9 lg:mt-11">
-        {featured ? (
-          <FeaturedCard project={featured} index={1} />
-        ) : (
-          <p className="border border-white/10 px-6 py-16 text-center text-sm text-white/45">
-            No projects in this category yet.
-          </p>
-        )}
+        {lead ? (
+          <Reveal>
+            <FeaturedCard project={lead} index={1} />
+          </Reveal>
+        ) : null}
 
-        {/* Single column. A two-column grid left a visible empty cell whenever
-            the filtered count was odd — which it is for four of the five
-            filters — so the remainder is drawn as an index of full-width rows
-            that fills at any count. */}
         {rest.length > 0 ? (
           <ul className="mt-6 border-t border-white/10 lg:mt-8">
             {rest.map((project, index) => (
@@ -68,6 +97,40 @@ export function ProjectsExplorer({
               />
             ))}
           </ul>
+        ) : null}
+
+        {archived.length > 0 ? (
+          <section
+            aria-labelledby={`${statusId}-archive`}
+            className="mt-14 lg:mt-16"
+          >
+            <h2
+              id={`${statusId}-archive`}
+              className="flex items-center gap-4 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-white/55"
+            >
+              Collaborative / Archive
+              <span
+                aria-hidden="true"
+                className="h-px flex-1 bg-[linear-gradient(90deg,rgba(255,255,255,0.12),transparent)]"
+              />
+            </h2>
+
+            <ul className="mt-5 border-t border-white/10">
+              {archived.map((project, index) => (
+                <CompactRow
+                  key={project.slug}
+                  project={project}
+                  index={primary.length + index + 1}
+                />
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {visible.length === 0 ? (
+          <p className="border border-white/10 px-6 py-16 text-center text-sm text-white/55">
+            No projects match this filter.
+          </p>
         ) : null}
       </div>
 
@@ -86,33 +149,54 @@ export function ProjectsExplorer({
   );
 }
 
+/**
+ * The filter row.
+ *
+ * Native buttons with `aria-pressed`, and the result count in a polite live
+ * region that is present at every width. The previous version hid the count
+ * below `sm`, which meant the one announcement a screen-reader user gets when
+ * the list changes was also the element most likely to be display:none.
+ */
 function FilterRow({
+  filters,
   value,
   onChange,
   count,
+  statusId,
 }: {
+  filters: readonly ProjectFilter[];
   value: string;
-  onChange: (next: (typeof FILTERS)[number]) => void;
+  onChange: (next: string) => void;
   count: number;
+  statusId: string;
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-3">
-      <div className="flex flex-wrap items-center gap-x-7 gap-y-2 sm:gap-x-9">
-        {FILTERS.map((option) => {
-          const isActive = option === value;
+      <div
+        role="group"
+        aria-label="Filter projects by discipline"
+        className="flex flex-wrap items-center gap-x-7 gap-y-2 sm:gap-x-9"
+      >
+        {filters.map((option) => {
+          const isActive = option.key === value;
 
           return (
             <button
-              key={option}
+              key={option.key}
               type="button"
               aria-pressed={isActive}
-              onClick={() => onChange(option)}
+              onClick={() => onChange(option.key)}
               className={cn(
                 "relative -mb-[13px] pb-3 text-[0.95rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                isActive ? "text-accent-indigo-soft" : "text-white/55 hover:text-white/85"
+                isActive
+                  ? "text-accent-indigo-soft"
+                  : "text-white/55 hover:text-white/85"
               )}
             >
-              {option}
+              {option.key}
+              <span className="sr-only">{` (${option.count} projects)`}</span>
+              {/* The active filter is marked by an underline as well as by
+                  colour, so the selection is not carried by hue alone. */}
               {isActive ? (
                 <span
                   aria-hidden="true"
@@ -124,11 +208,10 @@ function FilterRow({
         })}
       </div>
 
-      {/* Hidden on the narrowest viewports: at 390px it lands hard against
-          the last filter, and the list beside it already shows the count. */}
       <p
+        id={statusId}
         aria-live="polite"
-        className="hidden font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/35 sm:block"
+        className="font-mono text-[0.72rem] uppercase tracking-[0.2em] text-white/55"
       >
         {count} {count === 1 ? "project" : "projects"}
       </p>
@@ -146,57 +229,72 @@ function FeaturedCard({
   return (
     <article
       id={`project-${project.slug}`}
-      className="group relative grid scroll-mt-28 overflow-hidden border border-white/10 bg-[#090c13]/60 transition-colors hover:border-white/20 lg:grid-cols-[0.365fr_0.635fr]"
+      className="group relative grid scroll-mt-28 overflow-hidden border border-white/10 bg-[#090c13]/60 transition-[transform,border-color] duration-300 ease-out hover:-translate-y-[2px] hover:border-white/20 lg:grid-cols-[0.4fr_0.6fr]"
     >
-      {/* Not `justify-between`: the cell is as tall as the capture beside it,
-          so pinning the link to the bottom opened a 130px hole under the tags.
-          Held together at the top, the leftover height reads as padding. */}
-      <div className="flex flex-col items-start gap-8 p-7 sm:p-8 lg:px-9 lg:py-9">
-        <div>
-          <span className="font-mono text-[0.78rem] tracking-[0.12em] text-white/40">
-            {String(index).padStart(2, "0")}
-          </span>
+      <div className="flex flex-col items-start gap-7 p-7 sm:p-8 lg:px-9 lg:py-9">
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.68rem] uppercase tracking-[0.18em]">
+            <span className="text-white/55">
+              {String(index).padStart(2, "0")}
+            </span>
+            <span className="text-accent-indigo-soft">{project.eyebrow}</span>
+          </p>
+
+          {/* h2, not h3: this is the first heading under the page h1, and
+              jumping straight to h3 is a level skip for a screen-reader user
+              navigating by heading. The compact rows below are h3. */}
           <h2 className="mt-4 text-[1.55rem] font-medium leading-tight tracking-[-0.02em] text-[#e2e5ec] sm:text-[1.75rem]">
-            {project.title}
+            <Link
+              href={`/projects/${project.slug}`}
+              className="rounded-sm outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            >
+              {project.title}
+            </Link>
           </h2>
-          <p className="mt-3.5 max-w-[20rem] text-[1rem] leading-[1.65] text-[#9ba1af]">
+
+          <p className="mt-3.5 max-w-[22rem] text-[1rem] leading-[1.65] text-[#9ba1af]">
             {project.oneLine}
           </p>
+
+          <ProofChips chips={[project.proof]} className="mt-5" />
           <TagRow tags={project.displayTags} className="mt-5" />
         </div>
 
-        <Link
-          href={`/projects/${project.slug}`}
-          className="inline-flex w-fit items-center gap-3 rounded-sm text-[0.98rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-        >
-          Explore Project
-          <ArrowRight
-            aria-hidden="true"
-            className="size-[1.05rem] transition-transform duration-200 group-hover:translate-x-1"
+        <div className="flex flex-col gap-4">
+          <Link
+            href={`/projects/${project.slug}`}
+            className="inline-flex w-fit items-center gap-3 rounded-sm text-[0.98rem] text-accent-indigo-soft transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+          >
+            {`Explore ${project.title}`}
+            <ArrowRight
+              aria-hidden="true"
+              className="size-[1.05rem] transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </Link>
+
+          <ResourceLinkRow
+            links={project.links}
+            recordTitle={project.title}
           />
-        </Link>
+        </div>
       </div>
 
-      {/* The capture is presented inside drawn app chrome rather than bled to
-          the card edge: it is a light-mode interface on a near-black page, and
-          framing it reads as a product shot instead of as a bright block that
-          has to be dimmed until it disappears. */}
       <div className="relative border-t border-white/10 p-5 sm:p-6 lg:border-l lg:border-t-0 lg:p-7">
-        {/* Held near the capture's own 1.68:1 so `object-cover` has little
-            left to trim. A short band cropped the interface to a strip. */}
-        <CaptureFrame
-          label={project.title}
-          className="shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)]"
-          bodyClassName="aspect-[2/1] lg:aspect-[2.55/1]"
-        >
-          <ProjectThumb
-            src={project.image}
-            alt={project.imageAlt ?? `${project.title} interface preview`}
-            sizes="(min-width: 1024px) 52vw, 100vw"
-            priority
-            className="absolute inset-0"
-          />
-        </CaptureFrame>
+        <RecordVisual
+          media={project.media}
+          nodes={project.architecture}
+          caption="System architecture"
+          frameLabel={project.title}
+          framed={Boolean(project.media)}
+          sizes="(min-width: 1024px) 52vw, 100vw"
+          priority
+          frameBodyClassName="aspect-[2/1] lg:aspect-[2.4/1]"
+          className={
+            project.media
+              ? "shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)]"
+              : "h-full min-h-[15rem] border border-white/10"
+          }
+        />
       </div>
     </article>
   );
@@ -212,37 +310,60 @@ function CompactRow({
   return (
     <li
       id={`project-${project.slug}`}
-      className="group scroll-mt-28 border-b border-white/10"
+      className="group relative scroll-mt-28 border-b border-white/10"
     >
-      <Link
-        href={`/projects/${project.slug}`}
-        className="flex h-full items-center gap-5 px-1 py-5 outline-none transition-colors hover:bg-white/[0.02] focus-visible:bg-white/[0.03] sm:gap-7 sm:px-3 sm:py-6"
-      >
-        <span className="hidden shrink-0 self-center font-mono text-[0.78rem] tracking-[0.12em] text-white/35 sm:block">
+      <div className="flex items-center gap-5 px-1 py-5 transition-colors duration-300 hover:bg-white/[0.02] sm:gap-7 sm:px-3 sm:py-6">
+        <span className="hidden shrink-0 self-center font-mono text-[0.78rem] tracking-[0.12em] text-white/55 sm:block">
           {String(index).padStart(2, "0")}
         </span>
 
-        {/* Detail crop: at this size the whole surface is noise, so the row
-            shows the one region of the product that still reads. */}
         <CaptureFrame
           chrome={false}
           className="aspect-[16/10] w-[7rem] shrink-0 sm:w-[9.5rem] lg:w-[11rem]"
         >
-          <ProjectThumb
-            src={project.imageDetail ?? project.image}
-            alt={project.imageAlt ?? `${project.title} preview`}
-            sizes="(min-width: 1024px) 15vw, 32vw"
-            className="absolute inset-0"
-          />
+          {project.media ? (
+            <RecordVisual
+              media={project.media}
+              caption=""
+              variant="detail"
+              decorative
+              sizes="(min-width: 1024px) 15vw, 32vw"
+              className="absolute inset-0"
+            />
+          ) : project.headlineMetric ? (
+            <MetricPlate
+              value={project.headlineMetric.value}
+              label={project.headlineMetric.label}
+              className="absolute inset-0"
+            />
+          ) : (
+            <QuietPlate className="absolute inset-0" />
+          )}
         </CaptureFrame>
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-[1.12rem] font-medium leading-snug tracking-[-0.01em] text-[#e2e5ec]">
-            {project.title}
+          <p className="font-mono text-[0.64rem] uppercase tracking-[0.16em] text-white/55">
+            {project.archive ? project.ownershipLabel : project.statusLabel}
+          </p>
+
+          <h3 className="mt-1.5 text-[1.12rem] font-medium leading-snug tracking-[-0.01em] text-[#e2e5ec]">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="rounded-sm outline-none transition-colors after:absolute after:inset-0 after:content-[''] hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+            >
+              {project.title}
+            </Link>
           </h3>
+
           <p className="mt-2 max-w-[38rem] text-[0.88rem] leading-[1.6] text-[#8d93a1]">
             {project.oneLine}
           </p>
+
+          {project.attribution ? (
+            <p className="mt-2 text-[0.78rem] leading-[1.5] text-white/55">
+              {project.attribution}
+            </p>
+          ) : null}
         </div>
 
         <TagRow
@@ -252,20 +373,14 @@ function CompactRow({
 
         <ArrowRight
           aria-hidden="true"
-          className="hidden size-[1.05rem] shrink-0 self-center text-white/35 transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent-indigo-soft sm:block"
+          className="hidden size-[1.05rem] shrink-0 self-center text-white/55 transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent-indigo-soft sm:block"
         />
-      </Link>
+      </div>
     </li>
   );
 }
 
-function TagRow({
-  tags,
-  className,
-}: {
-  tags: string[];
-  className?: string;
-}) {
+function TagRow({ tags, className }: { tags: string[]; className?: string }) {
   return (
     <ul className={cn("flex flex-wrap gap-2", className)}>
       {tags.map((tag) => (

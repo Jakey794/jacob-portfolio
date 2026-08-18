@@ -167,7 +167,7 @@ export function SpecRow({
       <dt
         className={cn(
           "font-mono text-[0.7rem] uppercase leading-[1.75] tracking-[0.16em]",
-          accent ? "text-accent-indigo-soft/80" : "text-white/40"
+          accent ? "text-accent-indigo-soft/85" : "text-white/55"
         )}
       >
         {label}

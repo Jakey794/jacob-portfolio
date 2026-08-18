@@ -1,22 +1,15 @@
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import { navItems, profile, type NavKey } from "@/lib/site";
 
 /**
- * Every entry must resolve to a destination that actually exists.
- * Add new items here only once the corresponding section or route ships.
+ * Primary navigation.
  *
- * Hrefs are root-relative so the same nav works on standalone routes such as
- * /projects and /projects/[slug], not just the homepage.
+ * Entries come from `lib/site.ts`, which is also what the 404 page lists, so
+ * a route can never be present in one and missing from the other.
  */
-const navItems = [
-  { key: "about", label: "About", href: "/about" },
-  { key: "projects", label: "Projects", href: "/projects" },
-  { key: "experience", label: "Experience", href: "/experience" },
-  { key: "contact", label: "Contact", href: "/contact" },
-];
-
-export type NavKey = (typeof navItems)[number]["key"];
+export type { NavKey };
 
 export function SiteNav({
   /** Marks the current section with an accent dot, as in the concepts. */
@@ -40,9 +33,9 @@ export function SiteNav({
             className="hidden h-9 w-[2px] bg-accent-indigo-soft/70 lg:block"
           />
           <span className="text-[1.4rem] font-medium tracking-[-0.01em] text-white lg:text-[1.85rem]">
-            Allan
+            Jacob
           </span>
-          <span className="sr-only">— home</span>
+          <span className="sr-only">{`${profile.displayName} — home`}</span>
         </Link>
 
         <nav aria-label="Primary">
@@ -55,8 +48,12 @@ export function SiteNav({
                   <Link
                     href={item.href}
                     aria-current={isActive ? "page" : undefined}
+                    /* `py-1` takes the hit area to 30px. The links clear WCAG
+                       2.5.8 on the spacing exception either way, but 22px is
+                       a small thumb target on a phone and the padding costs
+                       nothing in the layout. */
                     className={cn(
-                      "relative rounded-sm transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent",
+                      "relative inline-block rounded-sm py-1 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent",
                       isActive && "text-white"
                     )}
                   >
@@ -64,7 +61,7 @@ export function SiteNav({
                     {isActive ? (
                       <span
                         aria-hidden="true"
-                        className="absolute -bottom-[0.55rem] left-1/2 size-[5px] -translate-x-1/2 rounded-full bg-accent-indigo-soft"
+                        className="absolute -bottom-[0.2rem] left-1/2 size-[5px] -translate-x-1/2 rounded-full bg-accent-indigo-soft"
                       />
                     ) : null}
                   </Link>

@@ -22,7 +22,7 @@ export function CrossMark({
       stroke="currentColor"
       strokeWidth={1}
       vectorEffect="non-scaling-stroke"
-      className={cn("text-white/35", className)}
+      className={cn("text-white/55", className)}
     >
       <path d="M12 1.5v21M1.5 12h21" vectorEffect="non-scaling-stroke" />
     </svg>
@@ -52,7 +52,7 @@ export function CoordinateBlock({
     <div
       aria-hidden="true"
       className={cn(
-        "font-mono text-[0.78rem] uppercase leading-[1.95] tracking-[0.14em] text-white/40",
+        "font-mono text-[0.78rem] uppercase leading-[1.95] tracking-[0.14em] text-white/55",
         className
       )}
     >
@@ -83,7 +83,7 @@ export function DotGrid({
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className={cn("text-white/30", className)}
+      className={cn("text-white/55", className)}
     >
       <defs>
         <pattern
@@ -147,7 +147,7 @@ export function ScrollCue({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn("flex flex-col items-center gap-3", className)}
     >
-      <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-white/45">
+      <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-white/55">
         Scroll
       </span>
       <span className="h-16 w-px bg-gradient-to-b from-white/40 to-transparent" />

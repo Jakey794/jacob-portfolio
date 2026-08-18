@@ -62,6 +62,6 @@ viewport.
   `sips -s format jpeg -s formatOptions 90 mountains.png --out mountains.jpg`
   then update the `src` in `HeroBackdrop`.
 - The inner pages no longer share this plate — see
-  `public/images/atmosphere/README.md`. This file is now the homepage only,
+  `docs/assets/atmosphere.md`. This file is now the homepage only,
   because the hero composition is built around the portrait cutout and its
   geometry does not transfer.

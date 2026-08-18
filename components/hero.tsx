@@ -11,10 +11,15 @@ import {
   WireframePeaks,
 } from "@/components/technical-decor";
 
+import { profile } from "@/lib/site";
+
+/* Five disciplines is too many for the hero line at any width the headline
+   also has to fit on; the full set is on About. These three are the ones the
+   work below actually leads with. */
 const disciplines = [
   "Machine Learning",
-  "Software Engineering",
-  "Quantitative Research",
+  "Quantitative Finance",
+  "Backend Systems",
 ];
 
 export function Hero() {
@@ -34,16 +39,38 @@ export function Hero() {
       <div className="relative z-20 w-full px-6 pb-[20rem] pt-36 sm:px-10 sm:pb-[24rem] sm:pt-40 lg:px-[6.4rem] lg:pb-0 lg:pt-0">
         {/* The trailing pad biases the centred block slightly above the
             optical centre of the viewport, as in the reference composition. */}
-        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-700 motion-safe:ease-out lg:pb-12">
+        <div className="lg:pb-8">
+          {/*
+            Three lines rather than two. The claim is longer now, and the left
+            column only runs to roughly a third of the viewport before the
+            figure begins — so the type steps down a little and breaks earlier
+            instead of running under the portrait.
+
+            Each line enters on its own short delay. The stagger is the only
+            entrance animation on the page and it is over in under a second;
+            `rise` is inert under `prefers-reduced-motion`.
+          */}
           <h1
             id="hero-title"
-            className="text-[clamp(2.3rem,5.3vw,5.5rem)] font-medium leading-[1.1] tracking-[-0.025em]"
+            className="text-[clamp(2rem,4.15vw,4.25rem)] font-medium leading-[1.08] tracking-[-0.028em]"
           >
-            <span className="block bg-gradient-to-b from-[#a7adb9] to-[#bcc1cb] bg-clip-text text-transparent">
-              I build
+            <span
+              className="rise block bg-gradient-to-b from-[#a7adb9] to-[#bcc1cb] bg-clip-text text-transparent"
+              style={{ animationDelay: "40ms" }}
+            >
+              I build ML and
             </span>
-            <span className="block bg-gradient-to-b from-[#c0c5cf] to-[#d6dae2] bg-clip-text text-transparent">
-              intelligent systems
+            <span
+              className="rise block bg-gradient-to-b from-[#b4b9c4] to-[#c9ced8] bg-clip-text text-transparent"
+              style={{ animationDelay: "120ms" }}
+            >
+              quantitative
+            </span>
+            <span
+              className="rise block bg-gradient-to-b from-[#c0c5cf] to-[#d6dae2] bg-clip-text text-transparent"
+              style={{ animationDelay: "200ms" }}
+            >
+              finance systems
               <span
                 aria-hidden="true"
                 className="ml-[0.05em] inline-block size-[0.145em] rounded-full bg-accent-indigo-soft align-baseline"
@@ -53,7 +80,10 @@ export function Hero() {
 
           {/* Wraps until the viewport is wide enough for the single line to
               clear the figure; only then does it run full width. */}
-          <p className="mt-7 flex max-w-[26rem] flex-col items-start gap-y-1 text-[1.05rem] text-accent-indigo-soft sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-[0.85rem] sm:text-[1.2rem] lg:mt-8 lg:max-[1399px]:max-w-[26rem] lg:text-[1.18rem] xl:max-[1399px]:max-w-[35rem] xl:text-[1.28rem]">
+          <p
+            className="rise mt-7 flex max-w-[26rem] flex-col items-start gap-y-1 text-[1.05rem] text-accent-indigo-soft sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-[0.85rem] sm:text-[1.2rem] lg:mt-7 lg:max-[1399px]:max-w-[26rem] lg:text-[1.14rem] xl:max-[1399px]:max-w-[35rem] xl:text-[1.22rem]"
+            style={{ animationDelay: "280ms" }}
+          >
             {/* Each label keeps its trailing separator in the same flex item,
                 so a wrap can end a line with the dot but never start one.
                 Below sm there is not room for two disciplines on a line at
@@ -78,25 +108,40 @@ export function Hero() {
             ))}
           </p>
 
-          <p className="mt-6 max-w-[24rem] text-[1.02rem] leading-[1.78] text-[#a2a8b5] lg:mt-7 lg:text-[1.19rem]">
-            Engineering Science @ UofT building ML systems, full-stack AI tools,
-            and quantitative software.
+          {/*
+            Who, where, and what the work actually is. The display type above
+            states the claim; this is the line that has to make a recruiter
+            reading only the hero understand the person behind it, so it names
+            the programme, the concentrations, the scholarship, and the
+            language the work is written in.
+          */}
+          <p
+            className="rise mt-6 max-w-[27rem] text-[1rem] leading-[1.72] text-[#a2a8b5] lg:mt-6 lg:max-w-[31rem] lg:text-[1.08rem]"
+            style={{ animationDelay: "360ms" }}
+          >
+            Engineering Science student at the University of Toronto &mdash;
+            Machine Intelligence and Mathematics, Schulich Leader Scholar. I
+            write Python for machine learning, portfolio risk, and market
+            research, and build the systems around it.
           </p>
 
           {/* Stacked full-width below sm. Left to wrap, the two buttons broke
               onto separate lines at their own natural widths — a 200px primary
               above a 165px secondary, which reads as a mistake rather than as
               a pair. */}
-          <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:mt-10 lg:gap-9">
-            <CtaLink href="#projects" className="w-full sm:w-auto">
-              View Projects
+          <div
+            className="rise mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:mt-8 lg:gap-8"
+            style={{ animationDelay: "440ms" }}
+          >
+            <CtaLink href="/projects" className="w-full sm:w-auto">
+              View Selected Work
             </CtaLink>
             <CtaLink
               href="/about"
               variant="secondary"
               className="w-full sm:w-auto"
             >
-              About Me
+              About Jacob
             </CtaLink>
           </div>
         </div>
@@ -224,11 +269,11 @@ function HeroDecor() {
       <GuideLine className="absolute left-[2%] top-[10%] z-10 hidden h-[64%] lg:block" />
       <CrossMark
         size={11}
-        className="absolute left-[4.5%] top-[12.4%] z-10 hidden text-white/30 lg:block"
+        className="absolute left-[4.5%] top-[12.4%] z-10 hidden text-white/55 lg:block"
       />
       <CrossMark
         size={20}
-        className="absolute left-[2.35%] top-[16%] z-10 hidden text-white/40 lg:block"
+        className="absolute left-[2.35%] top-[16%] z-10 hidden text-white/55 lg:block"
       />
 
       {/* Upper-right technical readout. The coordinates and the dot grid share
@@ -237,7 +282,7 @@ function HeroDecor() {
       <DotGrid className="absolute right-[9.5%] top-[12.5%] z-10 hidden lg:block" />
       <CrossMark
         size={16}
-        className="absolute left-[80.5%] top-[22.4%] z-10 hidden text-white/40 lg:block"
+        className="absolute left-[80.5%] top-[22.4%] z-10 hidden text-white/55 lg:block"
       />
       <CoordinateBlock
         lines={["43° 39′ 46″ N", "79° 23′ 45″ W"]}
@@ -250,9 +295,16 @@ function HeroDecor() {
       <WireframePeaks className="absolute left-[83%] top-[30%] z-0 hidden w-[10.5%] lg:block" />
 
       {/* Location readout */}
+      {/*
+        A composition mark, not a home address — hence the campus label.
+
+        Gated on height as well as width: the copy block above it is roughly
+        500px tall, and below about an 820px viewport the call-to-action row
+        lands directly on this readout. Decoration yields to content.
+      */}
       <CoordinateBlock
-        lines={["43.6629° N", "79.3957° W", "Toronto, ON"]}
-        className="absolute bottom-[8%] left-[4.5%] z-20 hidden lg:block"
+        lines={[...profile.coordinates, ...profile.coordinateLabel]}
+        className="absolute bottom-[7%] left-[4.5%] z-20 hidden max-w-[16rem] lg:[@media(min-height:820px)]:block"
       />
     </>
   );

@@ -57,7 +57,7 @@ export function Panel({
         {index ? (
           <span
             aria-hidden="true"
-            className="shrink-0 font-mono text-[0.72rem] tracking-[0.12em] text-accent-indigo-soft/75"
+            className="shrink-0 font-mono text-[0.72rem] tracking-[0.12em] text-accent-indigo-soft/85"
           >
             {index}
           </span>

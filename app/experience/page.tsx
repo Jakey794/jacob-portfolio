@@ -5,49 +5,62 @@ import {
   type ExperienceIndexItem,
 } from "@/components/experience/experience-explorer";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
 import { PageAtmosphere, pageAtmospheres } from "@/components/page-atmosphere";
 import { PageDecorFoot, PageDecorTop } from "@/components/page-decor";
 import { PageEyebrow, PageTitle } from "@/components/page-title";
 import { pageGutters } from "@/components/section-shell";
 import { SiteNav } from "@/components/site-nav";
 import { cn } from "@/lib/utils";
-import {
-  experience,
-  featuredExperience,
-  supportingExperience,
-  type ExperienceItem,
-} from "@/lib/experience";
+import { experience, experienceFilters, roleHistory } from "@/lib/experience";
+import { absoluteUrl } from "@/lib/site";
+
+const description =
+  "Work across enterprise software, applied machine learning, quantitative finance, research, teaching, and technical leadership. Each record separates verified outcomes from context and avoids implying public access to private employer work.";
 
 export const metadata: Metadata = {
-  title: "Experience | Jacob Allan",
-  description:
-    "Research, machine learning engineering, and quantitative work by Jacob Allan.",
+  title: "Experience",
+  description,
+  alternates: { canonical: absoluteUrl("/experience") },
   openGraph: {
     title: "Experience | Jacob Allan",
-    description:
-      "Research, machine learning engineering, and quantitative work.",
+    description,
+    url: absoluteUrl("/experience"),
     type: "website",
+    images: [
+      {
+        url: absoluteUrl("/images/og/experience.jpg"),
+        width: 1200,
+        height: 630,
+        alt: "Experience — Jacob Allan",
+      },
+    ],
   },
 };
 
-/** No summary has been written yet, so the first bullet stands in for it. */
-function toIndexItem(item: ExperienceItem): ExperienceIndexItem {
-  return {
-    slug: item.slug,
-    organization: item.organization,
-    shortName: item.shortName,
-    role: item.role,
-    dates: item.dates,
-    categories: item.categories,
-    tools: item.tools,
-    summary: item.summary ?? item.bullets[0],
-    location: item.location,
-    image: item.image,
-    imageAlt: item.imageAlt,
-    results: item.results,
-    workflow: item.workflow,
-  };
-}
+const items: ExperienceIndexItem[] = experience.map((item) => ({
+  slug: item.slug,
+  organization: item.organization,
+  shortOrganization: item.shortOrganization,
+  role: item.role,
+  displayDates: item.displayDates,
+  current: item.current,
+  categories: item.categories,
+  tools: item.tools,
+  oneLine: item.oneLine,
+  summary: item.summary,
+  location: item.location,
+  workMode: item.workMode,
+  archive: item.archive,
+  proofChips: item.proofChips,
+  workflow: item.workflow,
+  media: item.media,
+  roleHistory: roleHistory(item).map((other) => ({
+    slug: other.slug,
+    role: other.role,
+    displayDates: other.displayDates,
+  })),
+}));
 
 export default function ExperienceIndexPage() {
   return (
@@ -58,31 +71,46 @@ export default function ExperienceIndexPage() {
         <PageDecorTop variant="instrument" />
       ) : null}
 
-      <main className={cn("relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20", pageGutters.wide)}>
+      <main
+        id="main-content"
+        className={cn(
+          "relative z-10 pb-24 pt-[8.5rem] md:pt-[7.1rem] lg:pb-20",
+          pageGutters.wide
+        )}
+      >
         <PageEyebrow index="04" label="Experience" />
 
         <PageTitle size="index" className="mt-2">
           Experience
         </PageTitle>
 
-        <p className="mt-3 max-w-[27.5rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
-          Roles, research positions, and technical work across engineering,
-          machine learning, and quantitative systems.
+        <p className="mt-3 max-w-[36rem] text-[1.02rem] leading-[1.7] text-[#a2a8b5] lg:text-[1.09rem]">
+          {description}
         </p>
 
         <div className="mt-9 lg:mt-10">
-          <ExperienceExplorer
-            featured={toIndexItem(featuredExperience)}
-            items={supportingExperience.map(toIndexItem)}
-          />
+          <ExperienceExplorer items={items} filters={experienceFilters} />
         </div>
-
-        <p className="sr-only">{`${experience.length} roles listed.`}</p>
 
         <PageDecorFoot />
       </main>
 
       <Footer className={pageGutters.wide} />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Experience — Jacob Allan",
+          numberOfItems: experience.length,
+          itemListElement: experience.map((item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: `${item.role} — ${item.organization}`,
+            url: absoluteUrl(`/experience/${item.slug}`),
+          })),
+        }}
+      />
     </div>
   );
 }

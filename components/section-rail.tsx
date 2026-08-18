@@ -85,7 +85,7 @@ export function SectionRail({
                         "font-mono text-[0.78rem] tracking-[0.12em] transition-colors",
                         isActive
                           ? "text-white/90"
-                          : "text-white/45 group-hover:text-white/80"
+                          : "text-white/55 group-hover:text-white/80"
                       )}
                     >
                       {section.index}
@@ -96,7 +96,7 @@ export function SectionRail({
                   <span>
                     <span
                       aria-hidden="true"
-                      className="block font-mono text-[0.74rem] tracking-[0.1em] text-white/40"
+                      className="block font-mono text-[0.74rem] tracking-[0.1em] text-white/55"
                     >
                       {section.index}
                     </span>

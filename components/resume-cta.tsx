@@ -5,14 +5,15 @@ import { SectionMasthead } from "@/components/section-heading";
 import { HomeSection } from "@/components/section-shell";
 import { CoordinateBlock } from "@/components/technical-decor";
 import { contactChannels } from "@/lib/contact";
+import { contactLinks, profile } from "@/lib/site";
 
 /** Destinations come from lib/contact.ts so there is one source of truth. */
-const links = (["email", "github", "linkedin"] as const).map((key) => {
+const links = (["email", "linkedin", "github"] as const).map((key) => {
   const channel = contactChannels.find((c) => c.key === key)!;
 
   return {
     key,
-    label: channel.key === "email" ? "Email" : channel.label,
+    label: channel.label,
     href: channel.href,
     text: channel.text,
     external: channel.external,
@@ -25,8 +26,7 @@ const links = (["email", "github", "linkedin"] as const).map((key) => {
  * The page has been getting quieter on the way down, so this brings the
  * atmosphere back: the same indigo haze that carries the hero rises through
  * the last band and under the footer, and the location readout that opens the
- * hero closes the page. Without it the homepage simply ran out of sections and
- * stopped on a rule.
+ * hero closes the page.
  */
 export function ResumeCta() {
   return (
@@ -41,7 +41,7 @@ export function ResumeCta() {
             id="resume-title"
             className="max-w-[26rem] bg-gradient-to-b from-[#b6bbc6] to-[#e4e7ed] bg-clip-text text-[clamp(1.9rem,3.05vw,2.9rem)]/[1.13] font-medium tracking-[-0.026em] text-transparent"
           >
-            Resume &mdash; Machine Learning, Software, and Quantitative Finance
+            Software, machine learning, and quantitative systems
             <span
               aria-hidden="true"
               className="ml-[0.06em] inline-block size-[0.12em] rounded-full bg-accent-indigo-soft align-baseline"
@@ -49,29 +49,34 @@ export function ResumeCta() {
           </h2>
 
           <p className="mt-6 max-w-[32rem] text-[1rem] leading-[1.74] text-[#8d93a1]">
-            A concise resume covering ML research, full-stack AI tools,
-            quantitative modeling, and engineering experience.
+            One-page resume covering current software engineering, applied ML
+            research, quantitative work, and public systems projects.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
+            {/*
+              `download` is set, so the label can honestly say "Download" and
+              the file lands with a sensible name rather than "resume.pdf" in
+              a downloads folder. Without the attribute this would have to read
+              "View".
+            */}
             <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={contactLinks.resume}
+              download={contactLinks.resumeDownloadName}
               className={ctaClass("primary")}
             >
-              Download Resume
+              Download Master Resume
               <Download aria-hidden="true" className="size-[1.05rem]" />
             </a>
             <CtaLink href="/contact" variant="secondary">
-              Get In Touch
+              Get in touch
             </CtaLink>
           </div>
 
           {/* Closes the loop with the readout in the hero's lower-left. */}
           <CoordinateBlock
-            lines={["43.6629° N", "79.3957° W", "Toronto, ON"]}
-            className="mt-12 hidden lg:block"
+            lines={[...profile.coordinates, ...profile.coordinateLabel]}
+            className="mt-12 hidden max-w-[18rem] lg:block"
           />
         </div>
 
@@ -90,16 +95,19 @@ export function ResumeCta() {
                 className="group flex items-center justify-between gap-6 rounded-sm py-5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent-indigo-soft/70 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
               >
                 <span className="min-w-0">
-                  <span className="block font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/35">
+                  <span className="block font-mono text-[0.66rem] uppercase tracking-[0.16em] text-white/55">
                     {link.label}
                   </span>
                   <span className="mt-2 block truncate text-[1rem] text-[#c9ced8] transition-colors group-hover:text-accent-indigo-soft">
                     {link.text}
                   </span>
+                  {link.external ? (
+                    <span className="sr-only">(opens in a new tab)</span>
+                  ) : null}
                 </span>
                 <ArrowUpRight
                   aria-hidden="true"
-                  className="size-[1.1rem] shrink-0 text-white/25 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-indigo-soft"
+                  className="size-[1.1rem] shrink-0 text-white/55 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-indigo-soft"
                 />
               </a>
             </li>
@@ -112,15 +120,9 @@ export function ResumeCta() {
 
 /**
  * Ground haze for the foot of the page. Sits at `-z-10` inside the band's own
- * stacking context and is allowed to run past the section, so the footer sits
- * inside the same weather rather than on flat black beneath it.
- *
- * It runs to `-bottom-[8rem]`, which is the height of the footer, and no
- * further. At `-bottom-[14rem]` the box ended ninety-two pixels below the last
- * thing on the page: because it is in normal flow inside the section it
- * counted toward the document height, so scrolling to the bottom of the
- * homepage ran past the footer into a strip of empty background. Ending the
- * haze on the footer's own bottom edge keeps the weather and drops the gap.
+ * stacking context and runs to `-bottom-[8rem]` — the height of the footer,
+ * and no further. Taken lower it counted toward the document height, so
+ * scrolling to the bottom ran past the footer into empty background.
  */
 function ClosingAtmosphere() {
   return (

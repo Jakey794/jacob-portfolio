@@ -1,133 +1,95 @@
 /**
- * Single source of truth for contact destinations and the availability copy.
+ * Contact-page content and the canonical outbound channels.
  *
- * Every value here already existed in the portfolio (the pre-redesign contact
- * section and `components/resume-cta.tsx` link lists, and the education
- * facts). Nothing about location, response time, timezone or
- * preferred channel is asserted, because none of it is recorded anywhere in
- * the repo — see `unverified` at the bottom.
+ * Destinations come from `lib/site.ts`; this file only decides how they are
+ * described and ordered. There is no contact form, and none should be added
+ * casually: a form needs spam handling, a privacy position, delivery
+ * guarantees, retention rules and failure states, none of which a mailto link
+ * requires.
+ *
+ * Nothing here may carry a telephone number, home address, birthday,
+ * citizenship, personal calendar or private social account.
  */
 
-export const contactEmail = "jacob.allan@mail.utoronto.ca";
+import { contactLinks, profile } from "./site";
+
+export const contactEmail = contactLinks.email;
 
 export type ContactChannel = {
   key: "email" | "linkedin" | "github" | "resume";
   label: string;
-  /** Shown as the human-readable destination. */
-  text: string;
   href: string;
+  /** What is displayed as the destination. */
+  text: string;
   description: string;
-  action: string;
   external: boolean;
 };
 
 export const contactChannels: ContactChannel[] = [
   {
     key: "email",
-    label: "Email / Direct Outreach",
-    text: contactEmail,
-    href: `mailto:${contactEmail}`,
-    description:
-      "The most direct way to reach me about roles, research, or a technical problem.",
-    action: "Send an email",
+    label: "Email",
+    href: contactLinks.emailHref,
+    text: contactLinks.email,
+    description: "Best for internship, research, and project conversations.",
     external: false,
   },
   {
     key: "linkedin",
     label: "LinkedIn",
+    href: contactLinks.linkedin,
     text: "linkedin.com/in/jacob-allan-ml",
-    href: "https://www.linkedin.com/in/jacob-allan-ml/",
-    description: "Professional background, roles, and updates.",
-    action: "View profile",
+    description: "Current experience, education, and professional updates.",
     external: true,
   },
   {
     key: "github",
     label: "GitHub",
+    href: contactLinks.github,
     text: "github.com/Jakey794",
-    href: "https://github.com/Jakey794",
-    description: "Source for the projects and case studies on this site.",
-    action: "View profile",
+    description:
+      "Public source, documentation, tests, releases, and project evidence.",
     external: true,
   },
   {
     key: "resume",
-    label: "Résumé",
+    label: "Resume",
+    href: contactLinks.resume,
     text: "resume.pdf",
-    href: "/resume.pdf",
-    description:
-      "ML research, full-stack AI tools, quantitative modeling, and engineering experience.",
-    action: "Download PDF",
-    external: true,
+    description: "Current one-page Master Resume in PDF format.",
+    external: false,
   },
 ];
 
 export const emailChannel = contactChannels[0];
 export const linkChannels = contactChannels.slice(1);
 
-/** Availability line, carried over verbatim from the original contact section. */
+/* No terminal full stop: `PageTitle` draws the accent dot that closes it. */
+export const contactHeadline = "Let's build reliable systems";
+
+export const contactLede =
+  "I am open to software engineering, machine learning, quantitative development, research, and technically rigorous collaboration.";
+
 export const availabilityStatement =
-  "Open to machine learning, software engineering, quantitative development, quantitative research, and ML research assistant opportunities.";
+  "I am currently studying Engineering Science at the University of Toronto and working as a Software Engineering Intern at Northstar. For a role, research collaboration, or project conversation, email is the best way to reach me.";
 
-/**
- * The five areas named in the availability statement, plus internships —
- * the recruiting focus recorded in AGENTS.md. No other role targets are
- * claimed.
- */
-export const openTo = [
-  "Machine learning",
-  "Software engineering",
-  "Quantitative development",
-  "Quantitative research",
-  "ML research assistant",
-  "Internships",
-];
+export const openTo = profile.targetRoles;
 
-/** Short chips for the masthead. */
 export const contactTags = [
-  "Machine Learning",
   "Software Engineering",
-  "Quantitative Research",
-  "Open to Opportunities",
+  "Machine Learning",
+  "Quantitative Systems",
+  "Research",
 ];
 
-/** Verified education facts, reused from the About page. */
 export const universityBase = {
-  institution: "University of Toronto",
   programme: "Engineering Science",
-  campus: "Toronto, ON",
-  coordinates: "43.6629° N, 79.3957° W",
+  institution: "University of Toronto",
 };
 
-/**
- * Fields the Contact concept shows that the repo does not support. Listed so
- * the omission is deliberate and easy to revisit:
- *   - city of residence / current base (only the university is recorded)
- *   - time zone
- *   - response window
- *   - preferred communication method
- *   - full-time availability
- *   - speaking, mentoring or advising
- *   - research collaboration and partnership offers
- */
-export const unverified = [
-  "current base",
-  "time zone",
-  "response window",
-  "preferred channel",
-] as const;
-
-/**
- * Rail entries for the standalone page.
- *
- * `channels` used to be a sixth entry pointing at a panel that relisted the
- * same four destinations shown directly above it. The duplicate panel is gone,
- * so the rail no longer advertises it.
- */
 export const contactSections = [
-  { id: "overview", index: "01", label: "Overview" },
-  { id: "reach-out", index: "02", label: "Reach Out" },
-  { id: "links", index: "03", label: "Links" },
-  { id: "availability", index: "04", label: "Availability" },
-  { id: "next", index: "05", label: "Next" },
+  { id: "overview", label: "Overview" },
+  { id: "reach-out", label: "Reach out" },
+  { id: "links", label: "Links" },
+  { id: "availability", label: "Open to" },
 ];

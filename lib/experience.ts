@@ -1,244 +1,846 @@
 /**
- * Experience data.
+ * The experience collection: all ten current roles, complete.
  *
- * `organization`, `role`, `dates` and `bullets` are the original verified
- * entries. The structured fields added around them are either drawn directly
- * from the bullet text (`tools`, `results`, `workflow`) or left undefined so
- * the pages render an explicit placeholder — never invented.
+ * The index, the filters, the counts, every detail route, the previous/next
+ * links and the structured data are derived from this array. There is no
+ * hard-coded list of "roles that have a detail page" anywhere in the UI.
  *
- * Fields still to be filled in: `location`, `summary`, `context`, `image`,
- * and `team`. Anything left undefined shows a "pending" marker in the UI
- * rather than fabricated copy.
+ * Two rules do most of the work here:
+ *
+ * 1. Dates come from the live LinkedIn record, not from the previous version
+ *    of this site. UTMIST/Flybits ends Aug 2026; the old file said "Present".
+ *    The two overlapping UTEFA roles are both kept, because the overlap is
+ *    what the source shows and silently editing either date would be a
+ *    fabrication in the opposite direction.
+ *
+ * 2. An employer summary is bounded by what the public resume and LinkedIn
+ *    already say. Northstar's OdooRedo work can be described because those
+ *    documents describe it; the repository, its data, its configuration and
+ *    its interface stay private, and `confidentialityNote` says so on the
+ *    page rather than leaving a reader to assume otherwise.
+ *
+ * `current: true` means ongoing as of `lastVerified` — not a promise that it
+ * stays current, which is why the field exists.
  */
 
-export const experienceCategories = [
-  "Industry",
-  "Research",
-  "Leadership",
-  "Quant",
-] as const;
+import type {
+  ExperienceCategory,
+  ExperienceItem,
+  FlowNode,
+  Metric,
+} from "./content-types";
+import { experienceCategories } from "./content-types";
 
-export type ExperienceCategory = (typeof experienceCategories)[number];
+export type { ExperienceCategory, ExperienceItem, FlowNode, Metric };
+export { experienceCategories };
 
-/** One stage of a workflow diagram. */
-export type WorkflowStage = {
-  label: string;
-  title: string;
-  /** Optional sub-items listed inside the stage box. */
-  items?: string[];
-};
+const VERIFIED = "2026-08-17";
 
-export type ResultTile = {
-  value: string;
-  label: string;
-};
-
-export type ExperienceItem = {
-  slug: string;
-  organization: string;
-  /** Shorter label for compact rows where the full name will not fit. */
-  shortName: string;
-  role: string;
-  dates: string;
-  categories: ExperienceCategory[];
-  /** Technologies named explicitly in `bullets`. */
-  tools: string[];
-  bullets: string[];
-  /** Figures quoted in `bullets`, surfaced as tiles. */
-  results?: ResultTile[];
-  /** Pipeline described by `bullets`. */
-  workflow?: WorkflowStage[];
-  feedbackLabel?: string;
-  /** Marks the entry shown in the index hero slot. */
-  featured?: boolean;
-
-  // ---- Not yet supplied. Leave undefined to render a pending marker. ----
-  location?: string;
-  summary?: string;
-  context?: string;
-  image?: string;
-  imageAlt?: string;
-  team?: { label: string; items: string[] }[];
-};
-
-export const experience: ExperienceItem[] = [
+const roles: ExperienceItem[] = [
+  // ------------------------------------------------------------------- 01
   {
-    slug: "royal-military-college-ml-researcher",
-    organization: "Royal Military College of Canada",
-    shortName: "Royal Military College of Canada",
-    role: "Machine Learning Researcher",
-    dates: "May 2025 - Sept 2025",
-    categories: ["Research"],
+    slug: "northstar-downhole-software-engineering-intern",
+    organization: "Northstar Downhole Specialists",
+    shortOrganization: "Northstar",
+    role: "Software Engineering Intern",
+    dateStart: "2026-06",
+    current: true,
+    displayDates: "Jun 2026 – Present",
+    location: "Calgary, Alberta, Canada",
+    categories: ["Software & ML", "Industry"],
     featured: true,
+    archive: false,
+    sortOrder: 1,
+
+    oneLine:
+      "Building secure enterprise backend and applied-ML workflows across OdooRedo, data migration, AWS infrastructure, CI, and end-to-end verification.",
+    summary:
+      "Enterprise backend development, data integrity, cloud infrastructure, automation, and verification across OdooRedo, an internal operational system.",
+    context:
+      "The public resume and LinkedIn record describe work across OdooRedo, an enterprise operational system. This page names it and summarizes that approved scope; the code, data, deployment details, and repository are private.",
+
+    responsibilities: [
+      "Built and extended backend workflows using Python 3.13, Django 5.2, and PostgreSQL 17.",
+      "Worked on controlled Documents and IPR workflows and related RCA/CAPA, approval, notification, external-intake/submission, RBAC, and audit-trail behavior.",
+      "Implemented and validated rollback-safe migration and reconciliation paths with explicit data-integrity checks.",
+      "Worked with AWS services and Terraform-managed infrastructure spanning ECS, RDS, S3, SES, ALB, and WAF.",
+      "Contributed to a nine-job CI workflow and a PostgreSQL-backed automated test suite.",
+      "Used end-to-end browser coverage to verify critical user journeys.",
+      "Ran a scoped synthetic load exercise with 40 simulated users and 200 requests.",
+    ],
+
+    metrics: [
+      {
+        value: "1,286",
+        label: "PostgreSQL-backed tests in CI",
+        methodology: "Validation snapshot reported in the current resume.",
+        qualifier: "Point-in-time count, not a live counter.",
+      },
+      {
+        value: "13",
+        label: "Playwright end-to-end tests",
+        methodology: "Validation snapshot reported in the current resume.",
+      },
+      {
+        value: "9",
+        label: "CI jobs spanning integration, E2E, typing, containers, security",
+        methodology: "Pipeline composition as described in the current resume.",
+      },
+      {
+        value: "≈128 ms",
+        label: "p95 response time, 40 simulated users / 200 requests",
+        methodology:
+          "Scoped synthetic load exercise with zero unexpected errors observed in that specific test.",
+        qualifier:
+          "Synthetic point-in-time validation for the tested scenario; not a production SLA or a claim about every endpoint.",
+      },
+    ],
+
+    proofChips: [
+      "1,286 PostgreSQL-backed tests",
+      "13 Playwright end-to-end tests",
+      "9-job CI pipeline",
+    ],
+
+    tools: [
+      "Python 3.13",
+      "Django 5.2",
+      "PostgreSQL 17",
+      "pytest",
+      "Playwright",
+      "GitHub Actions",
+      "AWS ECS",
+      "AWS RDS",
+      "Amazon S3",
+      "Amazon SES",
+      "Application Load Balancer",
+      "AWS WAF",
+      "Terraform",
+      "Docker",
+      "Git",
+    ],
+
+    workflow: [
+      { label: "Intake", title: "Operational requirement" },
+      { label: "Backend", title: "Backend workflow + authorization" },
+      { label: "Data", title: "Data / migration control" },
+      { label: "Infra", title: "Infrastructure-as-code change" },
+      { label: "Test", title: "Unit + PostgreSQL validation" },
+      { label: "Verify", title: "End-to-end verification" },
+      { label: "Release", title: "Controlled release / rollback readiness" },
+    ],
+
+    confidentialityNote:
+      "This summary is limited to information already present in Jacob's current public resume and LinkedIn profile. The underlying repository, customer data, operational configuration, and internal documentation are not public, and no employer screenshot, hostname, or internal architecture is shown.",
+
+    claimCaveats: [
+      "The 40-user, 200-request result is a synthetic validation workload, not production traffic.",
+      "No uptime, customer count, compliance, or production-scale claim is made.",
+    ],
+
+    relatedProjectSlugs: ["llm-evalops-platform", "incident-triage-copilot"],
+    seo: {
+      title: "Software Engineering Intern at Northstar",
+      description:
+        "Public-scope summary of Jacob Allan's Python, Django, PostgreSQL, AWS, Terraform, migration, CI, and verification work at Northstar Downhole Specialists.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 02
+  {
+    slug: "utefa-portfolio-manager",
+    legacySlugs: ["uoft-efa-portfolio-manager"],
+    organization: "University of Toronto Engineering Finance Association",
+    shortOrganization: "UTEFA",
+    role: "Portfolio Manager",
+    parentRoleGroup: "UTEFA",
+    dateStart: "2026-02",
+    current: true,
+    displayDates: "Feb 2026 – Present",
+    workMode: "Remote",
+    categories: ["Finance"],
+    featured: true,
+    archive: false,
+    sortOrder: 2,
+
+    oneLine:
+      "Leading portfolio research and risk-aware modeling across factor analysis, portfolio construction, stress testing, and transaction-cost-aware evaluation.",
+    summary:
+      "Leads and reviews quantitative and fundamental research with an emphasis on disciplined portfolio construction, risk, and transparent assumptions.",
+    context:
+      "UTEFA is a student finance organization. This is student-led investment research and education, not regulated investment management or professional advisory activity.",
+
+    responsibilities: [
+      "Lead portfolio research and review for a 20+ member investing group.",
+      "Publish research notes, trade rationale, and position disclosures to a 20+ member student group.",
+      "Promoted into this role from Sales & Trading Analyst.",
+      "Apply probability, factor analysis, Value at Risk, stress testing, and efficient-frontier concepts to portfolio construction.",
+      "Consider portfolio constraints, concentration, correlations, and transaction costs rather than presenting frictionless allocations.",
+      "Translate macroeconomic and security-level research into structured portfolio discussions.",
+      "Support analyst development and communicate assumptions, risks, and research limitations.",
+    ],
+
+    metrics: [
+      {
+        value: "20+",
+        label: "Members in the investing group",
+        methodology:
+          "Group size for the 2026 UTEFA portfolio team, reported directly by Jacob in August 2026.",
+        qualifier: "Self-reported team size; no performance figure attached.",
+      },
+    ],
+    proofChips: [
+      "20+ member investing group",
+      "Promoted from Sales & Trading Analyst",
+      "VaR, stress testing, efficient frontier",
+    ],
+
+    tools: [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "Factor modeling",
+      "Value at Risk",
+      "Stress testing",
+      "Efficient-frontier optimization",
+      "Transaction costs",
+      "Market research",
+    ],
+
+    claimCaveats: [
+      "Student-led research and education; not investment advice and not a claim of managed client capital.",
+      "No return, alpha, benchmark outperformance, assets under management, trade volume, or client outcome is published, because none was verified.",
+    ],
+
+    relatedProjectSlugs: ["market-regime-risk-platform", "ml-analysis-tool"],
+    seo: {
+      title: "UTEFA Portfolio Manager",
+      description:
+        "Jacob Allan's student-led portfolio research and leadership across factor analysis, portfolio risk, stress testing, optimization, and transaction costs.",
+    },
+    lastVerified: "2026-08-18",
+  },
+
+  // ------------------------------------------------------------------- 03
+  {
+    slug: "utefa-sales-trading-analyst",
+    organization: "University of Toronto Engineering Finance Association",
+    shortOrganization: "UTEFA",
+    role: "Sales & Trading Analyst",
+    parentRoleGroup: "UTEFA",
+    dateStart: "2025-09",
+    dateEnd: "2026-04",
+    current: false,
+    displayDates: "Sep 2025 – Apr 2026",
+    workMode: "On-site",
+    categories: ["Finance"],
+    featured: false,
+    archive: false,
+    sortOrder: 3,
+
+    oneLine:
+      "Built a 22-factor XGBoost research model and developed market, fixed-income, options, optimization, and transaction-cost analysis through UTEFA.",
+    summary:
+      "Combined quantitative modeling with market education, building a 22-factor XGBoost model for a 50-participant competition.",
+
+    responsibilities: [
+      "Built a 22-factor XGBoost model for a 50-participant competition using macro, rates, momentum, and volatility features.",
+      "Applied feature engineering and model-evaluation concepts to a financial research setting.",
+      "Studied and used CAPM, yield curves, bond pricing, and options-pricing concepts.",
+      "Explored optimization, transaction-cost analysis, and regime-aware risk.",
+      "Communicated market views and model assumptions in a team environment.",
+    ],
+
+    metrics: [
+      {
+        value: "22",
+        label: "Modeled factors",
+        methodology:
+          "Feature count of the competition model as reported in the current resume.",
+      },
+      {
+        value: "50",
+        label: "Competition participants",
+        methodology: "Competition size as reported in the current resume.",
+      },
+    ],
+
+    proofChips: ["22-factor XGBoost model", "50-participant competition"],
+
+    tools: [
+      "Python",
+      "XGBoost",
+      "Pandas",
+      "NumPy",
+      "Feature engineering",
+      "Model evaluation",
+      "CAPM",
+      "Yield curves",
+      "Bond pricing",
+      "Options pricing",
+      "Transaction-cost analysis",
+    ],
+
+    claimCaveats: [
+      "Student competition and educational research; no claim of live trading, investment advice, or profitable performance.",
+      "No competition placement, return, predictive accuracy, alpha, or trading profit is published, because none was verified.",
+    ],
+
+    relatedProjectSlugs: ["market-regime-risk-platform", "ml-analysis-tool"],
+    seo: {
+      title: "UTEFA Sales & Trading Analyst",
+      description:
+        "Student quantitative-finance work spanning a 22-factor XGBoost model, CAPM, fixed income, options, optimization, and transaction-cost analysis.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 04
+  {
+    slug: "utmist-flybits-machine-learning-engineer",
+    legacySlugs: ["uoft-mist-flybits-ml-engineer"],
+    organization:
+      "University of Toronto Machine Intelligence Student Team (UTMIST), in collaboration with Flybits",
+    shortOrganization: "UTMIST / Flybits",
+    role: "Machine Learning Engineer",
+    dateStart: "2025-09",
+    /* The previous site said "Present". The live LinkedIn record, checked
+       2026-08-17, ends this engagement at Aug 2026. */
+    dateEnd: "2026-08",
+    current: false,
+    displayDates: "Sep 2025 – Aug 2026",
+    location: "Toronto, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Software & ML"],
+    featured: true,
+    archive: false,
+    sortOrder: 4,
+
+    oneLine:
+      "Developed privacy-preserving customer archetypes from more than 100,000 synthetic personas for a personalized digital-credit-offer prototype.",
+    summary:
+      "On a six-person UTMIST team working with Flybits, helped build a privacy-preserving prototype for personalized digital-credit offers.",
+    context:
+      "A UTMIST student-team collaboration with Flybits. The inputs were synthetic personas, not real bank or customer records, and the work was a prototype rather than a production financial product or deployed credit-decision system.",
+
+    responsibilities: [
+      "Processed and analyzed more than 100,000 synthetic customer personas.",
+      "Explored clustering and autoencoder approaches for representation and segmentation.",
+      "Helped identify more than five interpretable archetypes.",
+      "Contributed to a six-person machine-learning engineering team.",
+      "Supported the prototype's analysis, evaluation, and communication.",
+    ],
+
+    metrics: [
+      {
+        value: "100,000+",
+        label: "Synthetic customer personas processed",
+        methodology:
+          "Scale of the generated persona dataset as reported in the current resume and LinkedIn record.",
+        qualifier: "Synthetic personas — no real bank or customer records.",
+      },
+      {
+        value: "5+",
+        label: "Interpretable customer archetypes identified",
+        methodology:
+          "Archetype count reported for the prototype segmentation work.",
+      },
+      {
+        value: "6",
+        label: "Person machine-learning engineering team",
+        methodology: "Team size as reported in the current LinkedIn record.",
+      },
+    ],
+
+    proofChips: [
+      "100,000+ synthetic personas",
+      "5+ discovered archetypes",
+      "6-person team",
+    ],
+
+    tools: [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "scikit-learn",
+      "Clustering",
+      "Autoencoders",
+      "Synthetic data",
+      "Model evaluation",
+    ],
+
+    workflow: [
+      { label: "Input", title: "Synthetic persona inputs" },
+      { label: "Prepare", title: "Validation + preprocessing" },
+      { label: "Represent", title: "Representation learning" },
+      { label: "Cluster", title: "Clustering" },
+      { label: "Interpret", title: "Archetype interpretation" },
+      { label: "Prototype", title: "Prototype offer logic" },
+      { label: "Review", title: "Team review" },
+    ],
+
+    confidentialityNote:
+      "No public repository or live demo exists for this work, and none is linked. Flybits branding and any partner-internal material are deliberately absent.",
+
+    claimCaveats: [
+      "Synthetic personas only; no real-customer experimentation.",
+      "No claim of production deployment, credit approval, underwriting, fairness, revenue, conversion, or model-lift outcomes.",
+    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "UTMIST / Flybits Machine Learning Engineer",
+      description:
+        "Privacy-preserving student-team ML work using 100,000+ synthetic personas, clustering, and autoencoders to explore interpretable customer archetypes.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 05
+  {
+    slug: "royal-military-college-machine-learning-researcher",
+    legacySlugs: ["royal-military-college-ml-researcher"],
+    organization: "Royal Military College of Canada",
+    shortOrganization: "Royal Military College",
+    role: "Machine Learning Researcher",
+    dateStart: "2025-05",
+    dateEnd: "2025-09",
+    current: false,
+    displayDates: "May 2025 – Sep 2025",
+    location: "Kingston, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Software & ML", "Research & Engineering", "Industry"],
+    featured: true,
+    archive: false,
+    sortOrder: 5,
+
+    oneLine:
+      "Developed and compared PyTorch CNNs for five-class RF-signal classification on approximately 150,000 samples, including noisy-condition and embedded tests.",
+    summary:
+      "Developed and evaluated more than five PyTorch CNN architectures for classifying five RF-signal categories from a corpus of approximately 150,000 samples.",
+    context:
+      "The work emphasized noisy-condition robustness and its connection to an embedded inference pipeline, rather than optimizing a single clean-data score.",
+
+    responsibilities: [
+      "Built and compared more than five convolutional neural-network architectures.",
+      "Worked with a roughly 150,000-sample, five-class RF dataset.",
+      "Used RTL-SDR-oriented signal-processing and ML workflows.",
+      "Evaluated held-out and unseen performance and noisy-condition behavior.",
+      "Improved noisy-condition accuracy by approximately 10%.",
+      "Contributed to an embedded inference workflow operating at roughly 2 Hz.",
+    ],
+
+    metrics: [
+      {
+        value: "≈90%",
+        label: "Average accuracy on unseen real-world signals",
+        methodology:
+          "Research-role result reported in the current Master and MLE/SWE resumes and the LinkedIn record.",
+        qualifier: "Approximate; no public dataset supports reproduction.",
+      },
+      {
+        value: "≈10%",
+        label: "Improvement in noisy-band generalization",
+        methodology:
+          "Achieved through data augmentation, learning-rate decay, frequency-offset sampling, and spectrogram normalization.",
+        qualifier:
+          "The source does not state relative versus percentage-point lift; it is reported as written.",
+      },
+      {
+        value: "150K / 5",
+        label: "Sample RF dataset and signal classes",
+        methodology: "Dataset scale as reported in the current resume.",
+      },
+      {
+        value: "≈2 Hz",
+        label: "Embedded inference cadence",
+        methodology:
+          "Refresh rate supported by the embedded inference pipeline.",
+        qualifier: "An inference cadence, not a latency percentile.",
+      },
+    ],
+
+    proofChips: [
+      "5+ CNN architectures",
+      "150,000 samples / 5 classes",
+      "≈90% unseen-data accuracy",
+    ],
+
     tools: [
       "Python",
       "PyTorch",
       "CNNs",
+      "NumPy",
+      "Signal processing",
       "RTL-SDR",
-      "Spectrograms",
-      "Embedded Inference",
+      "Embedded inference",
     ],
-    bullets: [
-      "Built and trained 5+ PyTorch CNNs to classify RF spectrograms from RTL-SDR captures using custom Python data collection and scanning pipelines.",
-      "Curated a 150K-sample, 5-class RF dataset and achieved 90% average accuracy on unseen real-world signals.",
-      "Improved noisy-band generalization by 10% through augmentation, learning-rate decay, frequency-offset sampling, and spectrogram normalization.",
-      "Designed latency-accuracy CNN variants for embedded drone-mounted inference, supporting RF scanning at a 2Hz refresh rate.",
-    ],
-    results: [
-      { value: "5+", label: "PyTorch CNNs built and trained" },
-      { value: "150K", label: "Sample RF dataset, 5 classes" },
-      { value: "90%", label: "Average accuracy on unseen signals" },
-      { value: "+10%", label: "Noisy-band generalization" },
-      { value: "2Hz", label: "Embedded RF scanning refresh rate" },
-    ],
+
     workflow: [
+      { label: "Capture", title: "RTL-SDR captures" },
+      { label: "Dataset", title: "150K samples, 5 classes" },
+      { label: "Prepare", title: "Augmentation + normalization" },
+      { label: "Model", title: "5+ PyTorch CNNs" },
+      { label: "Evaluate", title: "Unseen + noisy-condition tests" },
+      { label: "Deploy", title: "≈2 Hz embedded inference" },
+    ],
+
+    confidentialityNote:
+      "This page includes only the high-level project scale and approximate outcomes already present in the current public resumes and LinkedIn profile. Code, raw data, signal details, and operational context are not public, and the specific signal classes are not named.",
+
+    claimCaveats: [
+      "Every figure keeps its approximation mark, as the source states it.",
+      "Not production-deployed; no operational or state-of-the-art claim is made.",
+    ],
+
+    relatedProjectSlugs: ["rf-signal-classification-research"],
+    seo: {
+      title: "Machine Learning Researcher at RMC",
+      description:
+        "Public-scope PyTorch CNN research on five-class RF signal classification, noisy-condition robustness, and embedded inference.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 06
+  {
+    slug: "sat-university-admissions-advisor",
+    organization: "Self-employed",
+    shortOrganization: "Independent",
+    role: "SAT & University Admissions Advisor",
+    dateStart: "2023-09",
+    dateEnd: "2025-07",
+    current: false,
+    displayDates: "Sep 2023 – Jul 2025",
+    location: "Kingston, Ontario, Canada",
+    workMode: "Remote",
+    categories: ["Teaching & Leadership"],
+    featured: false,
+    archive: true,
+    sortOrder: 6,
+
+    oneLine:
+      "Delivered individualized SAT tutoring and created tailored study, interview-preparation, and university-application resources.",
+    summary:
+      "Delivered individualized tutoring and built practice, study, interview, and application resources around each student's needs.",
+
+    responsibilities: [
+      "Delivered individualized SAT tutoring.",
+      "Created custom practice and study materials.",
+      "Developed interview-preparation resources.",
+      "Developed university-application resources.",
+      "Adapted explanations, pacing, and preparation plans to individual needs.",
+    ],
+
+    metrics: [],
+    proofChips: [],
+
+    tools: [
+      "Tutoring",
+      "Curriculum design",
+      "Structured practice",
+      "Interview preparation",
+      "Application guidance",
+    ],
+
+    claimCaveats: [
+      "No score increase, admissions result, acceptance rate, student count, or testimonial is published, because none was verified.",
+      "No student identity or application material appears anywhere on this site.",
+    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "SAT & University Admissions Advisor",
+      description:
+        "Individual SAT tutoring and tailored study, interview-preparation, and university-application resources delivered from 2023 to 2025.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 07
+  {
+    slug: "bgc-canada-robotics-intern",
+    organization: "BGC Canada",
+    shortOrganization: "BGC Canada",
+    role: "Robotics Intern",
+    dateStart: "2023-09",
+    dateEnd: "2024-07",
+    current: false,
+    displayDates: "Sep 2023 – Jul 2024",
+    location: "Kingston, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Software & ML", "Teaching & Leadership"],
+    featured: false,
+    archive: true,
+    sortOrder: 7,
+
+    oneLine:
+      "Supported youth robotics and STEM programming, created more than five coding and simulation guides, and helped deliver technical demonstrations.",
+    summary:
+      "Supported STEM-lab and robotics curriculum development, mentored youth through coding and simulation activities, and helped prepare technical demonstrations.",
+
+    responsibilities: [
+      "Supported STEM-lab and robotics curriculum development.",
+      "Mentored youth during coding, robotics, and simulation activities.",
+      "Created more than five coding and simulation guides.",
+      "Helped prepare and deliver technical demonstrations.",
+    ],
+
+    metrics: [
       {
-        label: "Capture",
-        title: "RTL-SDR",
-        items: ["Real-world RF captures"],
-      },
-      {
-        label: "Pipeline",
-        title: "Custom Python",
-        items: ["Data collection", "Scanning"],
-      },
-      {
-        label: "Dataset",
-        title: "RF spectrograms",
-        items: ["150K samples", "5 classes", "Normalization"],
-      },
-      {
-        label: "Modeling",
-        title: "PyTorch CNNs",
-        items: ["Augmentation", "LR decay", "Frequency offset"],
-      },
-      {
-        label: "Deployment",
-        title: "Embedded inference",
-        items: ["Drone-mounted", "2Hz scanning"],
+        value: "5+",
+        label: "Coding and simulation guides written",
+        methodology: "Count as reported in the current LinkedIn record.",
       },
     ],
-    feedbackLabel: "Latency / accuracy variant comparison",
+    proofChips: ["5+ coding and simulation guides"],
+
+    tools: [
+      "Robotics",
+      "Programming fundamentals",
+      "Simulation",
+      "Technical documentation",
+      "Curriculum support",
+    ],
+
+    claimCaveats: [
+      "No participant count, competition result, completion rate, or learning-improvement percentage is published.",
+      "No minors, participant names, or classroom records appear anywhere on this site.",
+    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "Robotics Intern at BGC Canada",
+      description:
+        "Youth robotics and STEM curriculum support, technical demonstrations, mentoring, and more than five coding and simulation guides.",
+    },
+    lastVerified: VERIFIED,
   },
+
+  // ------------------------------------------------------------------- 08
   {
-    slug: "uoft-mist-flybits-ml-engineer",
+    slug: "city-of-kingston-lifeguard-swim-instructor",
+    organization: "City of Kingston",
+    shortOrganization: "City of Kingston",
+    role: "Lifeguard & Swim Instructor",
+    dateStart: "2023-07",
+    dateEnd: "2024-07",
+    current: false,
+    displayDates: "Jul 2023 – Jul 2024",
+    location: "Kingston, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Teaching & Leadership"],
+    featured: false,
+    archive: true,
+    sortOrder: 8,
+
+    oneLine:
+      "Delivered weekly swim instruction while supporting swimmer safety, pool operations, and emergency-response readiness.",
+    summary:
+      "Planned and delivered weekly lessons, monitored swimmer and facility safety, and supported day-to-day pool operations.",
+
+    responsibilities: [
+      "Planned and delivered weekly swim lessons.",
+      "Adapted instruction to learners' needs.",
+      "Monitored swimmer and facility safety.",
+      "Supported pool operations.",
+      "Maintained emergency-response readiness.",
+    ],
+
+    metrics: [],
+    proofChips: [],
+
+    tools: [
+      "Instruction",
+      "Safety monitoring",
+      "Lesson planning",
+      "Situational awareness",
+      "Emergency-response readiness",
+    ],
+
+    claimCaveats: [
+      "No rescue count, class size, pass rate, certification, or incident outcome is published.",
+    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "Lifeguard & Swim Instructor, City of Kingston",
+      description:
+        "Weekly swim instruction, swimmer and facility safety, pool operations, and emergency-response readiness with the City of Kingston.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 09
+  {
+    slug: "queens-satellite-program",
+    organization: "Queen's Satellite Program",
+    shortOrganization: "Queen's Satellite Program",
+    /* LinkedIn shows "Queen's Satellite Program" as both title and
+       organization. The descriptive subtitle below is added for clarity; no
+       officer, engineer, lead, or internship title is invented. */
+    role: "Student high-altitude-balloon payload contributor",
+    dateStart: "2023-12",
+    dateEnd: "2024-04",
+    current: false,
+    displayDates: "Dec 2023 – Apr 2024",
+    location: "Kingston, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Research & Engineering"],
+    featured: false,
+    archive: true,
+    sortOrder: 9,
+
+    oneLine:
+      "Contributed to a student high-altitude-balloon payload integrating five instruments, data logging, structural work, testing, and assembly.",
+    summary:
+      "Contributed to a student high-altitude-balloon payload incorporating five instruments for UV, sound, temperature, pressure, and acceleration measurements.",
+
+    responsibilities: [
+      "Contributed to a student high-altitude-balloon payload.",
+      "Integrated and supported five measurement instruments.",
+      "Supported UV, sound, temperature, pressure, and acceleration measurements.",
+      "Worked on SSD data logging.",
+      "Supported payload structure, testing, and assembly.",
+    ],
+
+    metrics: [
+      {
+        value: "5",
+        label: "Integrated measurement instruments",
+        methodology: "Instrument count as reported in the LinkedIn record.",
+      },
+    ],
+    proofChips: ["5 integrated instruments"],
+
+    tools: [
+      "Sensor integration",
+      "Data logging",
+      "Payload structure",
+      "Assembly",
+      "Testing",
+    ],
+
+    claimCaveats: [
+      "No launch outcome, maximum altitude, mission duration, telemetry result, award, or leadership title is published.",
+      "A high-altitude balloon payload, not an orbital spacecraft.",
+    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "Queen's Satellite Program",
+      description:
+        "Student high-altitude-balloon payload work spanning five instruments, SSD data logging, structural assembly, and testing.",
+    },
+    lastVerified: VERIFIED,
+  },
+
+  // ------------------------------------------------------------------- 10
+  {
+    slug: "mcdonald-institute-summer-science-student",
     organization:
-      "University of Toronto Machine Intelligence Student Team - Flybits Industry Project",
-    shortName: "UofT MIST — Flybits Industry Project",
-    role: "Machine Learning Engineer",
-    dates: "Sept 2025 - Present",
-    categories: ["Industry"],
+      "Arthur B. McDonald Canadian Astroparticle Physics Research Institute",
+    shortOrganization: "McDonald Institute",
+    role: "McDonald Institute Summer Science Student",
+    dateStart: "2023-06",
+    dateEnd: "2023-09",
+    current: false,
+    displayDates: "Jun 2023 – Sep 2023",
+    location: "Kingston, Ontario, Canada",
+    workMode: "On-site",
+    categories: ["Research & Engineering"],
+    featured: false,
+    archive: true,
+    sortOrder: 10,
+
+    oneLine:
+      "Used Python for galaxy modeling while exploring particle physics, dark matter, optics, chemistry, the brachistochrone problem, and binary circuits.",
+    summary:
+      "Used Python for galaxy modeling while studying particle physics and dark matter and completing hands-on activities across optics, spectra, chemistry, and digital circuits.",
+
+    responsibilities: [
+      "Used Python for galaxy modeling.",
+      "Studied particle physics and dark matter.",
+      "Completed activities involving Snell's law.",
+      "Explored emission spectra and chemistry experiments.",
+      "Studied the brachistochrone problem.",
+      "Built and explored binary circuits.",
+    ],
+
+    metrics: [],
+    proofChips: [],
+
     tools: [
       "Python",
-      "PyTorch",
-      "Clustering",
-      "Autoencoders",
-      "Synthetic Data",
+      "Scientific computing",
+      "Galaxy modeling",
+      "Optics",
+      "Binary circuits",
     ],
-    bullets: [
-      "Designing an ML-driven system to personalize digital credit offers using demographic, transactional, and product-level features.",
-      "Built a scalable synthetic data pipeline for 100K+ customer personas with realistic population, spending, and credit-product distributions.",
-      "Implemented clustering and autoencoder prototypes in Python/PyTorch to create 5+ customer archetypes and evaluate offer quality.",
+
+    claimCaveats: [
+      "No publication, research finding, dataset size, mentor, competition result, or university credit is claimed.",
     ],
-    results: [
-      { value: "100K+", label: "Synthetic customer personas generated" },
-      { value: "5+", label: "Customer archetypes produced" },
-      { value: "3", label: "Feature families: demographic, transactional, product" },
-    ],
-    workflow: [
-      {
-        label: "Features",
-        title: "Customer signals",
-        items: ["Demographic", "Transactional", "Product-level"],
-      },
-      {
-        label: "Data",
-        title: "Synthetic pipeline",
-        items: ["100K+ personas", "Spending distributions"],
-      },
-      {
-        label: "Modeling",
-        title: "Clustering + autoencoders",
-        items: ["Python / PyTorch"],
-      },
-      {
-        label: "Segments",
-        title: "Customer archetypes",
-        items: ["5+ archetypes"],
-      },
-      {
-        label: "Evaluation",
-        title: "Offer quality",
-        items: ["Personalized credit offers"],
-      },
-    ],
-  },
-  {
-    slug: "uoft-efa-portfolio-manager",
-    organization: "University of Toronto Engineering Finance Association",
-    shortName: "UofT Engineering Finance Association",
-    role: "Portfolio Manager - promoted from Sales & Trading Analyst",
-    dates: "Sept 2025 - Present",
-    categories: ["Quant", "Leadership"],
-    tools: [
-      "XGBoost",
-      "VaR",
-      "Efficient Frontier",
-      "Factor Models",
-    ],
-    bullets: [
-      "Built a 22-factor XGBoost return-prediction model for a 50-participant quant trading contest using macro, technical, momentum, volatility, and rates features.",
-      "Use ML, VaR, and efficient frontier optimization for asset allocation, risk management, and trade proposals.",
-      "Develop thesis-driven trade proposals combining model outputs, risk constraints, transaction-cost assumptions, and macroeconomic research.",
-    ],
-    results: [
-      { value: "22", label: "Factors in the return-prediction model" },
-      { value: "50", label: "Participants in the quant trading contest" },
-      { value: "5", label: "Feature groups: macro, technical, momentum, volatility, rates" },
-    ],
-    workflow: [
-      {
-        label: "Features",
-        title: "Factor set",
-        items: ["Macro", "Technical", "Momentum", "Volatility", "Rates"],
-      },
-      {
-        label: "Modeling",
-        title: "XGBoost returns",
-        items: ["22 factors"],
-      },
-      {
-        label: "Risk",
-        title: "VaR + optimization",
-        items: ["Efficient frontier", "Asset allocation"],
-      },
-      {
-        label: "Output",
-        title: "Trade proposals",
-        items: ["Thesis-driven", "Transaction costs"],
-      },
-    ],
+
+    relatedProjectSlugs: [],
+    seo: {
+      title: "McDonald Institute Summer Science Student",
+      description:
+        "Summer science work using Python for galaxy modeling and exploring particle physics, optics, chemistry, mathematical modeling, and binary circuits.",
+    },
+    lastVerified: VERIFIED,
   },
 ];
 
-const experienceBySlug = new Map(experience.map((item) => [item.slug, item]));
+/** Index order is the single source of truth for card, rail and next/prev. */
+export const experience = [...roles].sort((a, b) => a.sortOrder - b.sortOrder);
 
-export const featuredExperience =
-  experience.find((item) => item.featured) ?? experience[0];
+// ------------------------------------------------------------------ derived
 
-/** Everything except the featured entry, in the order given above. */
-export const supportingExperience = experience.filter(
-  (item) => item.slug !== featuredExperience.slug
-);
+/** Timeline roles: the technical and finance work, in source order. */
+export const primaryExperience = experience.filter((item) => !item.archive);
+
+/** Earlier experience. Shown under its own heading — never dropped. */
+export const earlierExperience = experience.filter((item) => item.archive);
+
+/** The four roles previewed on the homepage. */
+export const featuredExperience = experience.filter((item) => item.featured);
 
 export const experienceSlugs = experience.map((item) => item.slug);
 
 export function getExperienceBySlug(slug: string) {
-  return experienceBySlug.get(slug);
+  return experience.find((item) => item.slug === slug);
 }
 
 export function getAdjacentExperience(slug: string) {
   const index = experience.findIndex((item) => item.slug === slug);
-  if (index === -1) return undefined;
-  return experience[(index + 1) % experience.length];
+  if (index === -1) return { previous: undefined, next: undefined };
+
+  return {
+    previous: experience[(index - 1 + experience.length) % experience.length],
+    next: experience[(index + 1) % experience.length],
+  };
+}
+
+/** Filter buttons for the index, with counts computed from the records. */
+export const experienceFilters = [
+  { key: "All", count: experience.length },
+  ...experienceCategories.map((category) => ({
+    key: category,
+    count: experience.filter((item) => item.categories.includes(category))
+      .length,
+  })),
+] as const;
+
+/**
+ * Roles grouped by organisation, so a promotion reads as one employer with a
+ * history rather than as two unrelated entries side by side.
+ */
+export function roleHistory(item: ExperienceItem) {
+  if (!item.parentRoleGroup) return [];
+  return experience.filter(
+    (other) =>
+      other.parentRoleGroup === item.parentRoleGroup && other.slug !== item.slug
+  );
 }

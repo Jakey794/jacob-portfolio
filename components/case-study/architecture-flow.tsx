@@ -42,7 +42,7 @@ export function ArchitectureFlow({
                   : "flex w-[7.25rem] flex-col justify-between border border-white/10 bg-white/[0.02] px-2.5 py-3"
               }
             >
-              <p className="font-mono text-[0.58rem] uppercase leading-tight tracking-[0.12em] text-accent-indigo-soft/75">
+              <p className="font-mono text-[0.58rem] uppercase leading-tight tracking-[0.12em] text-accent-indigo-soft/85">
                 {stage.label}
               </p>
               <p
@@ -80,7 +80,7 @@ export function ArchitectureFlow({
               >
                 <svg
                   viewBox="0 0 24 8"
-                  className="w-5 text-white/30"
+                  className="w-5 text-white/55"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1}
@@ -96,11 +96,11 @@ export function ArchitectureFlow({
       {feedbackLabel ? (
         <div aria-hidden="true" className="mt-3 px-1">
           <div className="border-t border-dashed border-white/15 pt-2 text-center">
-            <p className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-white/35">
+            <p className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-white/55">
               {feedbackLabel}
             </p>
             {feedbackNote ? (
-              <p className="mt-1 text-[0.62rem] text-white/25">{feedbackNote}</p>
+              <p className="mt-1 text-[0.62rem] text-white/55">{feedbackNote}</p>
             ) : null}
           </div>
         </div>

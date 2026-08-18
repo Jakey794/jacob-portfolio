@@ -18,10 +18,10 @@ export function PageEyebrow({
       )}
     >
       <span className="text-accent-indigo-soft">{index}</span>
-      <span aria-hidden="true" className="text-white/25">
+      <span aria-hidden="true" className="text-white/55">
         /
       </span>
-      <span className="text-white/45">{label}</span>
+      <span className="text-white/55">{label}</span>
     </p>
   );
 }
