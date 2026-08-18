@@ -28,6 +28,7 @@ import sharp from "sharp";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(root, "assets/captures");
+const BRANDING = path.join(root, "assets/branding");
 const CARDS = path.join(root, "public/images/projects");
 const SOCIAL = path.join(root, "public/images/og");
 
@@ -299,34 +300,37 @@ async function build() {
   }
 
   /*
-    App icon for the web manifest. Drawn rather than photographed: the
-    wordmark's accent bar over the page background, at the one size the
-    manifest asks for.
+    One Imagegen master drives every icon surface. The crop removes excess
+    canvas while preserving a generous small-size safe area. App Router owns
+    the browser and Apple icons; the separately named public derivative is for
+    the web manifest, avoiding a pathname collision with `app/icon.png`.
   */
-  const icon = path.join(root, "public/icon.png");
-  await sharp({
-    create: { width: 512, height: 512, channels: 3, background: BRAND.background },
-  })
-    .composite([
-      {
-        input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-  <defs>
-    <radialGradient id="haze" cx="0.5" cy="0.36" r="0.72">
-      <stop offset="0%" stop-color="#3e4888" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="${BRAND.background}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="512" height="512" fill="url(#haze)"/>
-  <rect x="112" y="150" width="8" height="212" fill="${BRAND.accent}" fill-opacity="0.85"/>
-  <text x="164" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="230" font-weight="500" letter-spacing="-8" fill="${BRAND.ink}">JA</text>
-</svg>`),
-        top: 0,
-        left: 0,
-      },
-    ])
-    .png({ compressionLevel: 9 })
-    .toFile(icon);
-  written.push(icon);
+  const faviconMaster = path.join(BRANDING, "favicon-master.png");
+  const faviconCrop = { left: 177, top: 177, width: 900, height: 900 };
+  const browserIcon = path.join(root, "app/icon.png");
+  const appleIcon = path.join(root, "app/apple-icon.png");
+  const manifestIcon = path.join(root, "public/app-icon-512.png");
+
+  const favicon = () =>
+    sharp(faviconMaster)
+      .extract(faviconCrop)
+      .flatten({ background: BRAND.background });
+
+  await Promise.all([
+    favicon()
+      .resize(32, 32)
+      .png({ compressionLevel: 9 })
+      .toFile(browserIcon),
+    favicon()
+      .resize(180, 180)
+      .png({ compressionLevel: 9 })
+      .toFile(appleIcon),
+    favicon()
+      .resize(512, 512)
+      .png({ compressionLevel: 9 })
+      .toFile(manifestIcon),
+  ]);
+  written.push(manifestIcon);
 
   /* A manifest the content checks read, so a record cannot point at a
      derivative that was never generated. */
@@ -339,6 +343,8 @@ async function build() {
   );
 
   for (const file of manifest) console.log(`  wrote ${file}`);
+  console.log("  wrote /app/icon.png");
+  console.log("  wrote /app/apple-icon.png");
   console.log(`\n${manifest.length} derivatives written.`);
 }
 

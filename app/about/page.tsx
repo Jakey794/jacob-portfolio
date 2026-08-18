@@ -23,6 +23,7 @@ import {
   awards,
   certifications,
   education,
+  independentInvestingNote,
   journey,
   technicalFocus,
   volunteering,
@@ -135,6 +136,24 @@ export default function AboutPage() {
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
+
+        <aside
+          aria-labelledby="independent-investing-title"
+          className="mt-8 max-w-[36rem] border-l border-accent-indigo-soft/55 pl-5"
+        >
+          <h2
+            id="independent-investing-title"
+            className="font-mono text-[0.7rem] uppercase tracking-[0.15em] text-accent-indigo-soft/90"
+          >
+            {independentInvestingNote.title}
+          </h2>
+          <p className="mt-3 text-[0.95rem] leading-[1.7] text-[#b2b7c3]">
+            {independentInvestingNote.body} {independentInvestingNote.performance}
+          </p>
+          <p className="mt-2 text-[0.76rem] leading-[1.6] text-[#777e8d]">
+            {independentInvestingNote.qualifier}
+          </p>
+        </aside>
 
         <TechLine
           items={aboutTags}

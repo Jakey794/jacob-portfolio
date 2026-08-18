@@ -20,6 +20,22 @@ export const aboutLede =
 
 export const aboutBody = profile.longBio;
 
+/**
+ * Independent activity, deliberately kept separate from the UTEFA records.
+ * The return is a point-in-time figure Jacob supplied directly; the qualifier
+ * renders with it so it cannot be mistaken for group, client, or audited
+ * performance.
+ */
+export const independentInvestingNote = {
+  title: "Independent investing group",
+  body:
+    "Outside my university roles, I founded and run an informal investing group chat with 20+ members. I share my own trades, price targets, and market analysis, and help peers work through research, risk, and market questions.",
+  performance:
+    "My personal portfolio was up approximately 25% year to date as of August 18, 2026.",
+  qualifier:
+    "Self-reported and unaudited personal result; not group performance. Informal peer discussion only—not personalized investment advice or managed client capital.",
+} as const;
+
 export const aboutTags = [
   "Software Engineering",
   "Machine Learning",
@@ -108,7 +124,7 @@ export const homeHighlights = [
   },
   {
     value: "UTEFA",
-    label: "Portfolio Manager — 20+ member investing group",
+    label: "Portfolio Manager — portfolio research and risk modeling",
     href: "/experience/utefa-portfolio-manager",
   },
   {

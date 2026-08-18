@@ -172,8 +172,7 @@ const roles: ExperienceItem[] = [
       "UTEFA is a student finance organization. This is student-led investment research and education, not regulated investment management or professional advisory activity.",
 
     responsibilities: [
-      "Lead portfolio research and review for a 20+ member investing group.",
-      "Publish research notes, trade rationale, and position disclosures to a 20+ member student group.",
+      "Lead portfolio research and review across quantitative and fundamental workstreams.",
       "Promoted into this role from Sales & Trading Analyst.",
       "Apply probability, factor analysis, Value at Risk, stress testing, and efficient-frontier concepts to portfolio construction.",
       "Consider portfolio constraints, concentration, correlations, and transaction costs rather than presenting frictionless allocations.",
@@ -181,17 +180,9 @@ const roles: ExperienceItem[] = [
       "Support analyst development and communicate assumptions, risks, and research limitations.",
     ],
 
-    metrics: [
-      {
-        value: "20+",
-        label: "Members in the investing group",
-        methodology:
-          "Group size for the 2026 UTEFA portfolio team, reported directly by Jacob in August 2026.",
-        qualifier: "Self-reported team size; no performance figure attached.",
-      },
-    ],
+    metrics: [],
     proofChips: [
-      "20+ member investing group",
+      "Portfolio research leadership",
       "Promoted from Sales & Trading Analyst",
       "VaR, stress testing, efficient frontier",
     ],

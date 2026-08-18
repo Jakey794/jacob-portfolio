@@ -13,7 +13,7 @@
  * media-file existence check takes the manifest the media build writes.
  */
 
-import { homeHighlights } from "./about";
+import { homeHighlights, independentInvestingNote } from "./about";
 import { awards } from "./awards";
 import { certifications } from "./certifications";
 import type { Metric, Project } from "./content-types";
@@ -371,18 +371,18 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
     }
   }
 
-  /* Keep the UTEFA description useful while preserving the explicit student
-     research boundary. Compliance-sensitive wording should not drift back
-     toward an affirmative professional-advice claim during later edits. */
+  /* Keep the university role useful while preserving its explicit student
+     research boundary. Copy from independent activities must never drift into
+     this organisation's record. */
   const utefaManager = experience.find(
     (item) => item.slug === "utefa-portfolio-manager"
   );
-  const disclosureSentence =
-    "Publish research notes, trade rationale, and position disclosures to a 20+ member student group.";
-  if (!utefaManager?.responsibilities.includes(disclosureSentence)) {
+  const leadershipSentence =
+    "Lead portfolio research and review across quantitative and fundamental workstreams.";
+  if (!utefaManager?.responsibilities.includes(leadershipSentence)) {
     add(
-      "utefa-research-disclosures",
-      "UTEFA Portfolio Manager is missing the verified research-notes, trade-rationale, and position-disclosures responsibility."
+      "utefa-research-leadership",
+      "UTEFA Portfolio Manager is missing the verified quantitative and fundamental research-leadership responsibility."
     );
   }
   const utefaBoundary = [
@@ -400,6 +400,35 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
   }
   const utefaResponsibilities =
     utefaManager?.responsibilities.join(" ") ?? "";
+  const utefaRenderedText = [
+    utefaManager?.oneLine ?? "",
+    utefaManager?.summary ?? "",
+    utefaManager?.context ?? "",
+    utefaResponsibilities,
+    ...(utefaManager?.proofChips ?? []),
+    ...(utefaManager?.claimCaveats ?? []),
+    ...(utefaManager?.metrics.flatMap((metric) => [
+      metric.value,
+      metric.label,
+      metric.methodology,
+      metric.qualifier ?? "",
+    ]) ?? []),
+    utefaManager?.seo.title ?? "",
+    utefaManager?.seo.description ?? "",
+    ...homeHighlights
+      .filter((item) => item.href === "/experience/utefa-portfolio-manager")
+      .flatMap((item) => [item.value, item.label]),
+  ].join(" ");
+  if (
+    /20\+|20[- ]plus|investing group|member student group|group chat/i.test(
+      utefaRenderedText
+    )
+  ) {
+    add(
+      "utefa-independent-group-misattribution",
+      "The university portfolio role contains copy reserved for an independent activity."
+    );
+  }
   if (
     /\btrade alerts?\b/i.test(utefaResponsibilities) ||
     /\b(?:give|gives|giving|provide|provides|providing)\s+investment advice\b/i.test(
@@ -409,6 +438,32 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
     add(
       "utefa-advisory-claim",
       "UTEFA responsibilities must not claim professional investment advice or trade alerts."
+    );
+  }
+
+  const independentInvestingText = [
+    independentInvestingNote.title,
+    independentInvestingNote.body,
+    independentInvestingNote.performance,
+    independentInvestingNote.qualifier,
+  ].join(" ");
+  if (
+    /UTEFA/i.test(independentInvestingText) ||
+    !/outside my university roles/i.test(independentInvestingText) ||
+    !/20\+ members/i.test(independentInvestingText) ||
+    !/personal portfolio was up approximately 25% year to date as of August 18, 2026/i.test(
+      independentInvestingText
+    ) ||
+    !/self-reported and unaudited personal result/i.test(
+      independentInvestingText
+    ) ||
+    !/not group performance/i.test(independentInvestingText) ||
+    !/not personalized investment advice/i.test(independentInvestingText) ||
+    !/not .*managed client capital/i.test(independentInvestingText)
+  ) {
+    add(
+      "independent-investing-boundaries",
+      "The independent investing note must remain separate from UTEFA and retain its personal-performance, non-advisory, and no-client-capital qualifiers."
     );
   }
 
@@ -531,6 +586,7 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
     profile.headline,
     profile.shortBio,
     ...profile.longBio,
+    independentInvestingText,
     ...allProjects.map(projectText),
     ...experience.map(experienceText),
     ...awards.map((a) => `${a.title} ${a.summary}`),
