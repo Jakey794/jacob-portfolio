@@ -575,6 +575,14 @@ const projects: Project[] = [
       },
     ],
 
+    thumbnailMedia: {
+      wide:
+        "/images/projects/low-latency-trading-engine-thumbnail.webp",
+      alt: "Conceptual illustration of ordered event streams passing through a deterministic matching-engine core.",
+      tone: "dark",
+      kind: "conceptual",
+    },
+
     relatedExperienceSlugs: ["utefa-portfolio-manager"],
     seo: {
       title: "Rust Event-Driven Trading Engine",
@@ -1124,6 +1132,13 @@ const projects: Project[] = [
       "Only the high-level project scale and approximate outcomes already present in the public resumes and LinkedIn record are published here. Code, raw data, signal details, and operational context are not public.",
 
     links: [],
+    thumbnailMedia: {
+      wide:
+        "/images/projects/rf-signal-classification-research-thumbnail.webp",
+      alt: "Conceptual illustration of radio signals moving from an SDR receiver through spectral processing into a neural classifier.",
+      tone: "dark",
+      kind: "conceptual",
+    },
     relatedExperienceSlugs: [
       "royal-military-college-machine-learning-researcher",
     ],

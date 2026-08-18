@@ -10,7 +10,7 @@ import { StageChain } from "@/components/experience/role-visuals";
 import { Reveal } from "@/components/reveal";
 import { SectionRail } from "@/components/section-rail";
 import { Tag } from "@/components/section-shell";
-import type { FlowNode, Media } from "@/lib/content-types";
+import type { FlowNode, Media, VisualMedia } from "@/lib/content-types";
 import { cn } from "@/lib/utils";
 
 /** Serialisable slice of an experience record, prepared on the server. */
@@ -30,6 +30,7 @@ export type ExperienceIndexItem = {
   archive: boolean;
   proofChips: string[];
   workflow?: FlowNode[];
+  thumbnailMedia?: VisualMedia;
   media?: Media;
   /** Other roles held at the same organisation, e.g. a promotion history. */
   roleHistory: { slug: string; role: string; displayDates: string }[];
@@ -182,6 +183,8 @@ function FilterRow({
 }
 
 function FeaturedExperience({ item }: { item: ExperienceIndexItem }) {
+  const cardMedia = item.thumbnailMedia ?? item.media;
+
   return (
     <article
       id={`experience-${item.slug}`}
@@ -221,15 +224,11 @@ function FeaturedExperience({ item }: { item: ExperienceIndexItem }) {
         <TagRow tags={item.tools.slice(0, 5)} className="mt-4" />
       </div>
 
-      {/*
-        No photography exists for any role and none is invented. Where the
-        record describes a pipeline the pane draws that pipeline; otherwise
-        the grid closes to one column rather than reserving space for a
-        placeholder.
-      */}
+      {/* Card-only conceptual artwork can identify a role without displacing
+          the public-scope workflow on its detail route. */}
       <div className="relative border-t border-white/10 lg:border-l lg:border-t-0">
         <RecordVisual
-          media={item.media}
+          media={cardMedia}
           nodes={item.workflow}
           caption="Public-scope workflow"
           sizes="(min-width: 1024px) 46vw, 100vw"

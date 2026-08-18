@@ -66,6 +66,8 @@ const PLATES = {
   projects: "/images/atmosphere/projects.jpg",
   /** High-key snowfield under cloud; cold, clinical, high micro-contrast. */
   experience: "/images/atmosphere/experience.jpg",
+  /** Conceptual Northstar rig scene; route-specific and not employer media. */
+  northstarExperience: "/images/atmosphere/northstar-experience.jpg",
   /** Still alpine water at dusk; the only horizontal, restful plate. */
   contact: "/images/atmosphere/contact.jpg",
 } as const;
@@ -227,6 +229,26 @@ export const pageAtmospheres = {
     reach: 66,
     dissolve: 88,
     wash: "linear-gradient(180deg, rgba(18,24,44,0.32) 0%, rgba(10,13,22,0.16) 62%, transparent 100%)",
+    horizon: true,
+    decor: true,
+  },
+  /**
+   * Northstar alone gets an industrial variation. The generated plate keeps
+   * deep copy-safe sky at left and the conceptual rig in the right third;
+   * every other role continues to use the neutral snowfield above.
+   */
+  northstarExperienceDetail: {
+    src: PLATES.northstarExperience,
+    height: "h-[24rem] lg:h-[31rem]",
+    position: "72% 48%",
+    brightness: 0.92,
+    contrast: 1.06,
+    saturate: 0.72,
+    opacity: 0.78,
+    scrim: 0.86,
+    reach: 64,
+    dissolve: 88,
+    wash: "linear-gradient(180deg, rgba(18,24,44,0.22) 0%, rgba(10,13,22,0.12) 62%, transparent 100%)",
     horizon: true,
     decor: true,
   },

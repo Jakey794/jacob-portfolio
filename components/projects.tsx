@@ -21,6 +21,8 @@ import { featuredProject, previewProjects } from "@/lib/projects";
  * page. A single hairline separates the copy from the capture instead.
  */
 export function FeaturedProjectShowcase() {
+  const showcaseMedia = featuredProject.thumbnailMedia ?? featuredProject.media;
+
   return (
     <HomeSection id="projects" labelledBy="featured-project-title" glow="right">
       <SectionHeading
@@ -46,11 +48,12 @@ export function FeaturedProjectShowcase() {
       >
         <div className="xl:pr-16 2xl:pr-20">
           <RecordVisual
-            media={featuredProject.media}
+            media={showcaseMedia}
             nodes={featuredProject.architecture}
             caption="System architecture"
-            framed={Boolean(featuredProject.media)}
+            framed={Boolean(showcaseMedia)}
             frameLabel={featuredProject.title}
+            frameChrome={showcaseMedia?.kind !== "conceptual"}
             frameBodyClassName="aspect-[1.62/1]"
             sizes="(min-width: 1024px) 55vw, 100vw"
             priority

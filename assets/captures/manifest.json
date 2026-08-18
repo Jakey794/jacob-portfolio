@@ -1,5 +1,7 @@
 [
   "/app-icon-512.png",
+  "/images/atmosphere/northstar-experience.jpg",
+  "/images/experience/northstar-downhole-software-engineering-intern-thumbnail.webp",
   "/images/og/about.jpg",
   "/images/og/contact.jpg",
   "/images/og/default.jpg",
@@ -18,6 +20,8 @@
   "/images/projects/incident-triage-wide.webp",
   "/images/projects/llm-evalops-detail.webp",
   "/images/projects/llm-evalops-wide.webp",
+  "/images/projects/low-latency-trading-engine-thumbnail.webp",
   "/images/projects/market-regime-risk-detail.webp",
-  "/images/projects/market-regime-risk-wide.webp"
+  "/images/projects/market-regime-risk-wide.webp",
+  "/images/projects/rf-signal-classification-research-thumbnail.webp"
 ]

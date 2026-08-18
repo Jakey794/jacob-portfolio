@@ -138,6 +138,14 @@ const roles: ExperienceItem[] = [
       "No uptime, customer count, compliance, or production-scale claim is made.",
     ],
 
+    thumbnailMedia: {
+      wide:
+        "/images/experience/northstar-downhole-software-engineering-intern-thumbnail.webp",
+      alt: "Conceptual editorial scene of a Northstar-branded service rig in a blue-hour mountain valley.",
+      tone: "dark",
+      kind: "conceptual",
+    },
+    detailAtmosphere: "/images/atmosphere/northstar-experience.jpg",
     relatedProjectSlugs: ["llm-evalops-platform", "incident-triage-copilot"],
     seo: {
       title: "Software Engineering Intern at Northstar",

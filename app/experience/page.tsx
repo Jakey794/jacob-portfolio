@@ -60,6 +60,7 @@ const items: ExperienceIndexItem[] = experience.map((item) => ({
   archive: item.archive,
   proofChips: item.proofChips,
   workflow: item.workflow,
+  thumbnailMedia: item.thumbnailMedia,
   media: item.media,
   roleHistory: roleHistory(item).map((other) => ({
     slug: other.slug,

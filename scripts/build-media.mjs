@@ -1,13 +1,13 @@
 /**
- * Derives every shipped project image from the sources in `assets/captures/`.
+ * Derives the captures, conceptual artwork, social cards, and icons owned by
+ * this media pipeline from private-to-the-web source assets.
  *
  *   node scripts/build-media.mjs
  *
- * Why the sources live outside `public/`: a raw capture is a whole browser
- * window and carries toolbars, bookmark bars and account avatars. Anything
- * under `public/` is web-addressable, so a raw file placed there is published
- * whether or not a page references it. The sources stay out of the served tree
- * and only the crops below are written into it.
+ * Why the sources live outside `public/`: raw captures can carry browser chrome
+ * and personal UI, while artwork masters and supplied brand references are
+ * larger than the site needs. Anything under `public/` is web-addressable, so
+ * sources stay outside the served tree and only reviewed derivatives ship.
  *
  * Every derivative is re-encoded from pixels, so EXIF, ICC profiles and any
  * other embedded metadata are dropped rather than passed through. Colour is
@@ -28,8 +28,11 @@ import sharp from "sharp";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(root, "assets/captures");
+const ARTWORK = path.join(root, "assets/artwork");
 const BRANDING = path.join(root, "assets/branding");
 const CARDS = path.join(root, "public/images/projects");
+const EXPERIENCE_CARDS = path.join(root, "public/images/experience");
+const ATMOSPHERE = path.join(root, "public/images/atmosphere");
 const SOCIAL = path.join(root, "public/images/og");
 
 /** Card slot: 16:10, sized for the widest slot any card renders at. */
@@ -81,6 +84,30 @@ const CAPTURES = [
     // `detailCrop` and `socialCrop` are in post-`crop` coordinates.
     detailCrop: { left: 1830, top: 200, width: 780, height: 488 },
     socialCrop: { left: 700, top: 0, width: 1910, height: 1003 },
+  },
+];
+
+/**
+ * Conceptual card art is deliberately separate from evidence captures. These
+ * derivatives are consumed only by index/home cards; the corresponding detail
+ * routes continue to draw their architecture/workflow from structured data.
+ */
+const ARTWORKS = [
+  {
+    slug: "low-latency-trading-engine",
+    source: "low-latency-trading-engine.png",
+    outputDirectory: CARDS,
+  },
+  {
+    slug: "rf-signal-classification-research",
+    source: "rf-signal-classification-research.png",
+    outputDirectory: CARDS,
+  },
+  {
+    slug: "northstar-downhole-software-engineering-intern",
+    source: "northstar-experience-thumbnail.png",
+    outputDirectory: EXPERIENCE_CARDS,
+    compositeNorthstarMark: true,
   },
 ];
 
@@ -204,8 +231,63 @@ function plainSocial({ title, kicker }) {
     .jpeg({ quality: 88, chromaSubsampling: "4:4:4" });
 }
 
+/**
+ * Turns the exact supplied Northstar mark into a transparent overlay. The
+ * source PNG is red-on-white with no alpha; alpha is recovered from the pale
+ * matte and the original RGB values are unmatted rather than redrawn or
+ * recoloured. No generated approximation of the mark is published.
+ */
+async function northstarMarkOverlay() {
+  const source = path.join(BRANDING, "northstar-mark.png");
+  const { data, info } = await sharp(source)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const rgba = Buffer.alloc(info.width * info.height * 4);
+
+  for (let input = 0, output = 0; input < data.length; input += 3, output += 4) {
+    const green = data[input + 1];
+    const blue = data[input + 2];
+    const alpha = Math.max(
+      0,
+      Math.min(255, Math.round(((255 - Math.min(green, blue)) / 215) * 255))
+    );
+    const fraction = alpha / 255;
+    const unmatte = (channel) =>
+      fraction === 0
+        ? 0
+        : Math.max(
+            0,
+            Math.min(
+              255,
+              Math.round((channel - 255 * (1 - fraction)) / fraction)
+            )
+          );
+
+    rgba[output] = unmatte(data[input]);
+    rgba[output + 1] = unmatte(green);
+    rgba[output + 2] = unmatte(blue);
+    rgba[output + 3] = alpha;
+  }
+
+  return sharp(rgba, {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  })
+    .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize({
+      width: 58,
+      height: 58,
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+}
+
 async function build() {
   await mkdir(CARDS, { recursive: true });
+  await mkdir(EXPERIENCE_CARDS, { recursive: true });
+  await mkdir(ATMOSPHERE, { recursive: true });
   await mkdir(SOCIAL, { recursive: true });
 
   const written = [];
@@ -248,6 +330,61 @@ async function build() {
       .toFile(social);
     written.push(social);
   }
+
+  for (const artwork of ARTWORKS) {
+    const source = path.join(ARTWORK, artwork.source);
+
+    if (!existsSync(source)) {
+      throw new Error(`Missing conceptual artwork source: ${source}`);
+    }
+
+    let pixels = await sharp(source).toColorspace("srgb").png().toBuffer();
+    if (artwork.compositeNorthstarMark) {
+      pixels = await sharp(pixels)
+        .composite([
+          {
+            input: await northstarMarkOverlay(),
+            // The generated master deliberately carries a clean, front-facing
+            // equipment panel. These coordinates place the exact mark inside
+            // that panel before the final derivative is resized.
+            left: 919,
+            top: 661,
+          },
+        ])
+        .png()
+        .toBuffer();
+    }
+
+    const thumbnail = path.join(
+      artwork.outputDirectory,
+      `${artwork.slug}-thumbnail.webp`
+    );
+    await sharp(pixels)
+      .resize({ ...WIDE, fit: "cover", position: "center" })
+      .webp({ quality: 82, effort: 6 })
+      .toFile(thumbnail);
+    written.push(thumbnail);
+  }
+
+  const northstarAtmosphereSource = path.join(
+    ARTWORK,
+    "northstar-experience-atmosphere.png"
+  );
+  if (!existsSync(northstarAtmosphereSource)) {
+    throw new Error(
+      `Missing Northstar atmosphere source: ${northstarAtmosphereSource}`
+    );
+  }
+  const northstarAtmosphere = path.join(
+    ATMOSPHERE,
+    "northstar-experience.jpg"
+  );
+  await sharp(northstarAtmosphereSource)
+    .toColorspace("srgb")
+    .resize({ width: 1672, height: 941, fit: "cover", position: "center" })
+    .jpeg({ quality: 84, chromaSubsampling: "4:4:4", mozjpeg: true })
+    .toFile(northstarAtmosphere);
+  written.push(northstarAtmosphere);
 
   /* Pages with no capture of their own still need a social card. */
   const generated = [

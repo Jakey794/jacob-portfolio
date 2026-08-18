@@ -29,6 +29,8 @@ export function ProjectRow({
   /** Two-digit label, matching the featured slot above. */
   index?: string;
 }) {
+  const cardMedia = project.thumbnailMedia ?? project.media;
+
   return (
     <Reveal
       as="li"
@@ -99,14 +101,15 @@ export function ProjectRow({
       </div>
 
       <div className="order-4 lg:col-start-3 lg:row-start-2 lg:self-start">
-        {project.media ? (
+        {cardMedia ? (
           <CaptureFrame
             label={project.title}
+            chrome={cardMedia.kind !== "conceptual"}
             className="w-full max-w-[22rem] shadow-[0_28px_70px_-45px_rgba(0,0,0,0.95)] lg:max-w-none"
             bodyClassName="aspect-[1.5/1]"
           >
             <RecordVisual
-              media={project.media}
+              media={cardMedia}
               caption=""
               variant="detail"
               decorative

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import { CaptureFrame } from "@/components/projects/capture-frame";
 import { WireframePeaks } from "@/components/technical-decor";
-import type { FlowNode, Media } from "@/lib/content-types";
+import type { FlowNode, VisualMedia } from "@/lib/content-types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,7 +11,8 @@ import { cn } from "@/lib/utils";
  * There are exactly three things this can draw, in descending order of
  * evidential weight, and it never invents a fourth:
  *
- * 1. A sanitised capture of the real product.
+ * 1. A sanitised capture of the real product or clearly labelled conceptual
+ *    artwork supplied by a card-only field.
  * 2. The record's own architecture, drawn by this site as a schematic. This
  *    is not decoration — every stage in it comes from the record's
  *    `architecture` or `workflow` field, so it is a diagram of the thing that
@@ -33,7 +34,7 @@ import { cn } from "@/lib/utils";
  * happened when the two new dashboards were first dropped into the slot built
  * for the two light-mode ones.
  */
-const TONE_FILTER: Record<Media["tone"], string | undefined> = {
+const TONE_FILTER: Record<VisualMedia["tone"], string | undefined> = {
   light: "brightness(0.62) saturate(0.72) contrast(1.05)",
   dark: "brightness(0.94) saturate(0.96)",
 };
@@ -51,7 +52,7 @@ export function CaptureImage({
    */
   decorative = false,
 }: {
-  media: Media;
+  media: VisualMedia;
   className?: string;
   sizes: string;
   priority?: boolean;
@@ -88,6 +89,11 @@ export function CaptureImage({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[rgba(34,42,78,0.26)] mix-blend-multiply"
         />
+      ) : null}
+      {media.kind === "conceptual" ? (
+        <span className="pointer-events-none absolute bottom-2.5 left-2.5 rounded-sm border border-white/12 bg-[#080b12]/82 px-2 py-1 font-mono text-[0.52rem] uppercase tracking-[0.14em] text-white/70 backdrop-blur-sm sm:bottom-3 sm:left-3">
+          Concept visual
+        </span>
       ) : null}
     </div>
   );
@@ -181,8 +187,9 @@ export function RecordVisual({
   framed = false,
   frameLabel,
   frameBodyClassName,
+  frameChrome = true,
 }: {
-  media?: Media;
+  media?: VisualMedia;
   nodes?: FlowNode[];
   caption: string;
   className?: string;
@@ -195,6 +202,8 @@ export function RecordVisual({
   frameLabel?: string;
   /** Aspect ratio for the framed body, which sizes the capture. */
   frameBodyClassName?: string;
+  /** Concept artwork uses a simple frame rather than browser-window chrome. */
+  frameChrome?: boolean;
 }) {
   if (media) {
     const image = (
@@ -213,6 +222,7 @@ export function RecordVisual({
     return (
       <CaptureFrame
         label={frameLabel}
+        chrome={frameChrome}
         className={className}
         bodyClassName={frameBodyClassName}
       >

@@ -66,6 +66,7 @@ const items: ProjectIndexItem[] = allProjects.map((project) => ({
     ? { value: project.metrics[0].value, label: project.metrics[0].label }
     : undefined,
   links: project.links,
+  thumbnailMedia: project.thumbnailMedia,
   media: project.media,
   architecture: project.architecture,
 }));

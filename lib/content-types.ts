@@ -52,7 +52,7 @@ export type FlowNode = {
 };
 
 /**
- * Published media for a record.
+ * A published visual used by a record.
  *
  * `tone` drives grading. The site is near-black, so a light-mode capture has
  * to be pulled down to sit in the page and a dark-mode capture has to be left
@@ -63,17 +63,26 @@ export type FlowNode = {
  * is an explanation drawn by this site; conceptual art is neither and must be
  * labelled on the page so it is never read as a result.
  */
-export type Media = {
-  /** 16:10 card derivative under `public/images/projects/`. */
+export type VisualMedia = {
+  /** 16:10 card derivative under a record-specific `public/images/` folder. */
   wide: string;
   /** Zoomed crop for small slots. Falls back to `wide`. */
   detail?: string;
-  /** Exactly 1200x630, under `public/images/og/`. */
-  social: string;
   alt: string;
-  caption: string;
   tone: "light" | "dark";
   kind: "screenshot" | "diagram" | "conceptual";
+};
+
+/**
+ * Full record media may appear in a detail-page masthead and therefore carries
+ * a caption and social derivative. Card-only artwork intentionally uses the
+ * smaller `VisualMedia` shape so it cannot silently replace a case study's
+ * architecture or workflow.
+ */
+export type Media = VisualMedia & {
+  /** Exactly 1200x630, under `public/images/og/`. */
+  social: string;
+  caption: string;
 };
 
 export type Seo = {
@@ -142,6 +151,8 @@ export type Project = {
   securityAndPrivacy?: string;
 
   links: ResourceLink[];
+  /** Card/index artwork only; detail routes keep the architecture masthead. */
+  thumbnailMedia?: VisualMedia;
   media?: Media;
   relatedExperienceSlugs: string[];
   seo: Seo;
@@ -198,7 +209,11 @@ export type ExperienceItem = {
   /** Framing a reader needs so a figure is not over-read. */
   claimCaveats: string[];
   relatedProjectSlugs: string[];
+  /** Card/index artwork only; detail routes keep the workflow masthead. */
+  thumbnailMedia?: VisualMedia;
   media?: Media;
+  /** Optional record-specific backdrop for the detail route. */
+  detailAtmosphere?: string;
   seo: Seo;
   lastVerified: string;
 };

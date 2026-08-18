@@ -95,6 +95,12 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
   const hasMetrics = item.metrics.length > 0;
   const hasWorkflow = Boolean(item.workflow?.length);
   const hasCaveats = item.claimCaveats.length > 0;
+  const atmosphere = item.detailAtmosphere
+    ? {
+        ...pageAtmospheres.northstarExperienceDetail,
+        src: item.detailAtmosphere,
+      }
+    : pageAtmospheres.experienceDetail;
 
   /*
     The workflow diagram renders once. When the masthead carries it — which is
@@ -124,9 +130,9 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <PageAtmosphere config={pageAtmospheres.experienceDetail} />
+      <PageAtmosphere config={atmosphere} />
       <SiteNav active="experience" />
-      {pageAtmospheres.experienceDetail.decor ? (
+      {atmosphere.decor ? (
         <PageDecorTop variant="instrument" />
       ) : null}
 

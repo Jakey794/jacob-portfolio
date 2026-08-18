@@ -14,7 +14,12 @@ import { CaptureFrame } from "@/components/projects/capture-frame";
 import { Reveal } from "@/components/reveal";
 import { SectionRail } from "@/components/section-rail";
 import { Tag } from "@/components/section-shell";
-import type { FlowNode, Media, ResourceLink } from "@/lib/content-types";
+import type {
+  FlowNode,
+  Media,
+  ResourceLink,
+  VisualMedia,
+} from "@/lib/content-types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -40,6 +45,7 @@ export type ProjectIndexItem = {
   /** First metric, shown in the thumbnail slot when there is no capture. */
   headlineMetric?: { value: string; label: string };
   links: ResourceLink[];
+  thumbnailMedia?: VisualMedia;
   media?: Media;
   architecture: FlowNode[];
 };
@@ -226,6 +232,8 @@ function FeaturedCard({
   project: ProjectIndexItem;
   index: number;
 }) {
+  const cardMedia = project.thumbnailMedia ?? project.media;
+
   return (
     <article
       id={`project-${project.slug}`}
@@ -281,16 +289,17 @@ function FeaturedCard({
 
       <div className="relative border-t border-white/10 p-5 sm:p-6 lg:border-l lg:border-t-0 lg:p-7">
         <RecordVisual
-          media={project.media}
+          media={cardMedia}
           nodes={project.architecture}
           caption="System architecture"
           frameLabel={project.title}
-          framed={Boolean(project.media)}
+          framed={Boolean(cardMedia)}
+          frameChrome={cardMedia?.kind !== "conceptual"}
           sizes="(min-width: 1024px) 52vw, 100vw"
           priority
           frameBodyClassName="aspect-[2/1] lg:aspect-[2.4/1]"
           className={
-            project.media
+            cardMedia
               ? "shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)]"
               : "h-full min-h-[15rem] border border-white/10"
           }
@@ -307,6 +316,8 @@ function CompactRow({
   project: ProjectIndexItem;
   index: number;
 }) {
+  const cardMedia = project.thumbnailMedia ?? project.media;
+
   return (
     <li
       id={`project-${project.slug}`}
@@ -321,9 +332,9 @@ function CompactRow({
           chrome={false}
           className="aspect-[16/10] w-[7rem] shrink-0 sm:w-[9.5rem] lg:w-[11rem]"
         >
-          {project.media ? (
+          {cardMedia ? (
             <RecordVisual
-              media={project.media}
+              media={cardMedia}
               caption=""
               variant="detail"
               decorative

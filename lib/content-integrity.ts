@@ -104,6 +104,7 @@ function projectText(project: Project): string {
       m.qualifier ?? "",
     ]),
     ...project.links.flatMap((l) => [l.label, l.href, l.note ?? ""]),
+    project.thumbnailMedia?.alt ?? "",
     project.media?.alt ?? "",
     project.media?.caption ?? "",
     project.seo.title,
@@ -131,6 +132,9 @@ function experienceText(item: (typeof experience)[number]): string {
       m.methodology,
       m.qualifier ?? "",
     ]),
+    item.thumbnailMedia?.alt ?? "",
+    item.media?.alt ?? "",
+    item.media?.caption ?? "",
     item.seo.title,
     item.seo.description,
   ].join("\n");
@@ -279,6 +283,21 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
         }
       }
     }
+    if (project.thumbnailMedia) {
+      if (!project.thumbnailMedia.alt.trim()) {
+        add("empty-alt", `${scope}: thumbnail media has empty alt text.`);
+      }
+      if (mediaManifest) {
+        for (const file of [
+          project.thumbnailMedia.wide,
+          project.thumbnailMedia.detail,
+        ]) {
+          if (file && !mediaManifest.includes(file)) {
+            add("missing-media", `${scope}: "${file}" was never generated.`);
+          }
+        }
+      }
+    }
 
     for (const related of project.relatedExperienceSlugs) {
       if (!experience.some((item) => item.slug === related)) {
@@ -368,6 +387,50 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
     }
     if (!item.seo.title || !item.seo.description) {
       add("missing-seo", `${scope}: incomplete SEO record.`);
+    }
+    if (item.media) {
+      if (!item.media.alt.trim()) {
+        add("empty-alt", `${scope}: informative media has empty alt text.`);
+      }
+      if (!item.media.caption.trim()) {
+        add("no-caption", `${scope}: media has no caption.`);
+      }
+      if (mediaManifest) {
+        for (const file of [
+          item.media.wide,
+          item.media.detail,
+          item.media.social,
+        ]) {
+          if (file && !mediaManifest.includes(file)) {
+            add("missing-media", `${scope}: "${file}" was never generated.`);
+          }
+        }
+      }
+    }
+    if (item.thumbnailMedia) {
+      if (!item.thumbnailMedia.alt.trim()) {
+        add("empty-alt", `${scope}: thumbnail media has empty alt text.`);
+      }
+      if (mediaManifest) {
+        for (const file of [
+          item.thumbnailMedia.wide,
+          item.thumbnailMedia.detail,
+        ]) {
+          if (file && !mediaManifest.includes(file)) {
+            add("missing-media", `${scope}: "${file}" was never generated.`);
+          }
+        }
+      }
+    }
+    if (
+      item.detailAtmosphere &&
+      mediaManifest &&
+      !mediaManifest.includes(item.detailAtmosphere)
+    ) {
+      add(
+        "missing-media",
+        `${scope}: atmosphere "${item.detailAtmosphere}" was never generated.`
+      );
     }
   }
 
