@@ -29,7 +29,7 @@ export const aboutBody = profile.longBio;
 export const independentInvestingNote = {
   title: "Independent investing group",
   body:
-    "Outside my university roles, I founded and run an informal investing group chat with 20+ members. I share my own trades, price targets, and market analysis, and help peers work through research, risk, and market questions.",
+    "Outside my university roles, I founded and run an investing group with 20+ members. I share my own trades, price targets, and market analysis, and help peers work through research, risk, and market questions.",
   performance:
     "My personal portfolio was up approximately 25% year to date as of August 18, 2026.",
   qualifier:
