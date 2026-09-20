@@ -1,5 +1,5 @@
 /**
- * The experience collection: all ten current roles, complete.
+ * The experience collection: all ten roles, complete.
  *
  * The index, the filters, the counts, every detail route, the previous/next
  * links and the structured data are derived from this array. There is no
@@ -164,8 +164,9 @@ const roles: ExperienceItem[] = [
     role: "Portfolio Manager",
     parentRoleGroup: "UTEFA",
     dateStart: "2026-02",
-    current: true,
-    displayDates: "Feb 2026 – Present",
+    dateEnd: "2026-09-15",
+    current: false,
+    displayDates: "Feb 2026 – Sep 2026",
     workMode: "Remote",
     categories: ["Finance"],
     featured: true,
@@ -173,19 +174,19 @@ const roles: ExperienceItem[] = [
     sortOrder: 2,
 
     oneLine:
-      "Leading portfolio research and risk-aware modeling across factor analysis, portfolio construction, stress testing, and transaction-cost-aware evaluation.",
+      "Led portfolio research and risk-aware modeling across factor analysis, portfolio construction, stress testing, and transaction-cost-aware evaluation.",
     summary:
-      "Leads and reviews quantitative and fundamental research with an emphasis on disciplined portfolio construction, risk, and transparent assumptions.",
+      "Led and reviewed quantitative and fundamental research with an emphasis on disciplined portfolio construction, risk, and transparent assumptions.",
     context:
       "UTEFA is a student finance organization. This is student-led investment research and education, not regulated investment management or professional advisory activity.",
 
     responsibilities: [
-      "Lead portfolio research and review across quantitative and fundamental workstreams.",
+      "Led portfolio research and review across quantitative and fundamental workstreams.",
       "Promoted into this role from Sales & Trading Analyst.",
-      "Apply probability, factor analysis, Value at Risk, stress testing, and efficient-frontier concepts to portfolio construction.",
-      "Consider portfolio constraints, concentration, correlations, and transaction costs rather than presenting frictionless allocations.",
-      "Translate macroeconomic and security-level research into structured portfolio discussions.",
-      "Support analyst development and communicate assumptions, risks, and research limitations.",
+      "Applied probability, factor analysis, Value at Risk, stress testing, and efficient-frontier concepts to portfolio construction.",
+      "Considered portfolio constraints, concentration, correlations, and transaction costs rather than presenting frictionless allocations.",
+      "Translated macroeconomic and security-level research into structured portfolio discussions.",
+      "Supported analyst development and communicated assumptions, risks, and research limitations.",
     ],
 
     metrics: [],
@@ -218,7 +219,7 @@ const roles: ExperienceItem[] = [
       description:
         "Jacob Allan's student-led portfolio research and leadership across factor analysis, portfolio risk, stress testing, optimization, and transaction costs.",
     },
-    lastVerified: "2026-08-18",
+    lastVerified: "2026-09-20",
   },
 
   // ------------------------------------------------------------------- 03
