@@ -124,7 +124,7 @@ export const homeHighlights = [
   },
   {
     value: "UTEFA",
-    label: "Portfolio Manager — portfolio research and risk modeling",
+    label: "Former Portfolio Manager — Feb 2026 to Sep 2026",
     href: "/experience/utefa-portfolio-manager",
   },
   {
