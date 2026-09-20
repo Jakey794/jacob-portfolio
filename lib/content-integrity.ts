@@ -441,7 +441,7 @@ export function checkContent(mediaManifest?: string[]): Issue[] {
     (item) => item.slug === "utefa-portfolio-manager"
   );
   const leadershipSentence =
-    "Lead portfolio research and review across quantitative and fundamental workstreams.";
+    "Led portfolio research and review across quantitative and fundamental workstreams.";
   if (!utefaManager?.responsibilities.includes(leadershipSentence)) {
     add(
       "utefa-research-leadership",
