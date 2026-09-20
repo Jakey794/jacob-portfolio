@@ -25,7 +25,7 @@ export function Highlights() {
       className="py-[3.25rem] sm:py-[3.75rem] lg:py-[4.25rem]"
     >
       <h2 id="highlights-title" className="sr-only">
-        Credentials and current work
+        Credentials and experience
       </h2>
 
       <ul className="grid gap-x-10 gap-y-9 border-y border-white/10 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:py-9">
